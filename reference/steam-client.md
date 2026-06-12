@@ -129,6 +129,30 @@ echo "vm.max_map_count=2147483642" | sudo tee /etc/sysctl.d/80-gamecompat.conf &
 | Remote Play crashes (Arch host → Arch guest) | Install `lib32-libcanberra` |
 | Hardware decoding unavailable | Install `libva` + `lib32-libva`; Intel also needs `libva-intel-driver` + `lib32-libva-intel-driver`; may need to delete `~/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/lib/i386-linux-gnu/libva*` to force system libs |
 
+## Flatpak Steam (whole different beast)
+
+Flatpak Steam (`com.valvesoftware.Steam`) is community-packaged, **not by Valve**. Different paths, different permission model — "works native, breaks in Flatpak" is its own failure class.
+
+**Path translation:**
+```
+native:  ~/.local/share/Steam/            (~/.steam/root)
+flatpak: ~/.var/app/com.valvesoftware.Steam/.local/share/Steam/
+```
+Every prefix/compatdata path in this skill needs that prefix substitution for Flatpak installs.
+
+| Issue | Fix |
+|-------|-----|
+| Second library on external drive invisible | `flatpak override --user --filesystem=/mnt/external_drive/games com.valvesoftware.Steam` (grant the parent dir, not `steamapps` itself) |
+| protontricks can't find games | Use the Flatpak: `flatpak install com.github.Matoking.protontricks`; run `flatpak run com.github.Matoking.protontricks` |
+| MangoHud doesn't load | Install runtime extension: `flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud` + `flatpak override --user --env=MANGOHUD=1 com.valvesoftware.Steam` |
+| GE-Proton install | `flatpak install com.valvesoftware.Steam.CompatibilityTool.Proton-GE` (Flathub community build, no pressure-vessel) |
+| Controller not working | Device permission: `flatpak override --user --device=input com.valvesoftware.Steam` (or `--device=all` on older runtimes) |
+| Wrong timezone in games | `flatpak override --user --env=TZ=$(readlink -f /etc/localtime \| sed 's|.*/zoneinfo/||') com.valvesoftware.Steam` |
+| Game crashes from bundled-lib conflict | `SHARED_LIBRARY_GUARD_DEBUG="(/\|/.)/" flatpak run com.valvesoftware.Steam > output.log 2>&1` → file issue on flathub/com.valvesoftware.Steam for a blocklist entry |
+| Debug shell inside sandbox | `flatpak run --command=bash com.valvesoftware.Steam` |
+
+**Rule of thumb for triage:** ask early whether Steam is native or Flatpak (`flatpak list \| grep -i steam`). If Flatpak and the problem is permission-shaped, the fastest fix is often switching to native Steam — Flatpak Steam is a constrained environment by design.
+
 ## Debugging tools
 
 ```bash

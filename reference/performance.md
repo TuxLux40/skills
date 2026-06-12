@@ -115,6 +115,47 @@ sudo turbostat --quiet --interval 1 --show CPU,Busy%,Avg_MHz,Bzy_MHz,PkgWatt
 
 **amd_pstate driver** (AMD Zen3+ / Ryzen 6000+): replaces `acpi_cpufreq`; supports hardware-guided frequency scaling. Enable with `amd_pstate=active` kernel parameter for best efficiency.
 
+## Shader Pre-Compilation (Fossilize)
+
+"Processing Vulkan shaders" before launch = **Fossilize** replaying a community-shared pipeline cache so the game doesn't stutter-compile live.
+
+| Symptom | Fix |
+|---------|-----|
+| Stuck at "Processing Vulkan shaders" for very long | Normal on first run / after GPU driver or Proton update (cache invalidates). Let it finish once. CPU-bound — uses many cores |
+| Fossilize eats CPU in background constantly | Steam → Settings → Downloads → "Allow background processing of Vulkan shaders" off; or per-download-finish only |
+| Want to skip it entirely | Steam → Settings → Downloads → disable "Enable shader pre-caching" — trades pre-compile wait for in-game first-encounter stutter (DXVK compiles live to its own state cache) |
+| Stutter despite pre-caching | DXVK state cache builds anyway per game: `~/.steam/root/steamapps/shadercache/<appid>/`. First session per area stutters, improves after |
+| Cache suspected corrupt | Delete `steamapps/shadercache/<appid>/` — rebuilds |
+
+Env knobs: `DXVK_STATE_CACHE=0` disables DXVK's own cache (debug only); `DXVK_ASYNC` exists only in patched DXVK forks (gplasync) — not stock.
+
+## Memory Pressure / OOM
+
+Games killed silently mid-session — check first:
+```bash
+journalctl -b 0 -k | grep -i oom        # oom-killer chose your game?
+free -h; swapon --show                  # zram/swap present at all?
+```
+
+| Fix | Notes |
+|-----|-------|
+| zram (compressed RAM swap) | `zram-generator`; size = ~RAM size, `zstd`. CachyOS ships it default. Buys headroom without disk swap latency |
+| `vm.max_map_count` | Covered in `steam-client.md` — Elden Ring/DCS class crashes |
+| systemd-oomd too aggressive | Kills game under memory pressure before kernel OOM would — check `journalctl -u systemd-oomd`; raise thresholds or mask for gaming sessions (⚠️) |
+
+**split_lock_detect stutter** (obscure but real): kernel's split-lock detector intentionally *slows* offending processes — several Windows games (God of War, others) trigger it constantly via Wine. Symptom: `x86/split lock detection: #AC: crash` style kernel log lines + inexplicable stutter on Intel 12th gen+. Fix: `split_lock_detect=off` kernel parameter (🔴 — disables a mitigation meant to stop bus-locking DoS; fine on a private gaming box).
+
+## Recording / Streaming Capture
+
+| Tool | Use |
+|------|-----|
+| **gpu-screen-recorder** | Lowest-overhead recorder (NVENC/VAAPI direct); ShadowPlay-style replay buffer; GUI available |
+| **obs-vkcapture** | OBS plugin for capturing Vulkan/OpenGL games directly (`game capture` quality on Linux); wrap game: `obs-gamecapture %command%` |
+| OBS + PipeWire screen capture | Default Wayland path; captures output, not game-direct — fine for most streaming |
+| Gamescope built-in pipeline | `pipewiresrc target-object=gamescope` GStreamer pipeline (see `display.md` recording row) |
+
+Game-only audio for streams: virtual sink trick in `audio.md`.
+
 ## CPU / Memory Tuning (advanced, 🔴 Deep)
 
 **Threading sync generations** (Wine/Proton):

@@ -71,6 +71,24 @@ Order of preference: local package > direct API > extraction service (Tavily/Fir
 - https://www.protondb.com/help/improving-performance — ProtonDB performance guide
 - https://www.protondb.com/help/troubleshooting-faq — ProtonDB troubleshooting FAQ
 
+## NVIDIA / input / Flatpak (Tier 1+2 expansion)
+- https://wiki.archlinux.org/title/NVIDIA — driver install, KMS, suspend
+- https://wiki.archlinux.org/title/NVIDIA/Troubleshooting — boot failures, Xid, refresh-rate caps
+- https://wiki.archlinux.org/title/NVIDIA/Tips_and_tricks
+- https://wiki.archlinux.org/title/Gamepad — controllers, udev, per-pad drivers
+- https://github.com/ValveSoftware/steam-devices — canonical controller udev rules
+- https://github.com/atar-axis/xpadneo — Xbox Bluetooth DKMS driver
+- https://github.com/medusalix/xone — Xbox dongle DKMS driver
+- https://github.com/C0rn3j/sc-controller — Steam-Input-alternative remapper
+- https://github.com/mdqinc/SDL_GameControllerDB — community SDL mappings
+- https://github.com/flathub/com.valvesoftware.Steam/wiki — Flatpak Steam quirks/permissions
+- https://github.com/ValveSoftware/Fossilize — shader pre-compilation system
+- https://github.com/doitsujin/dxvk/wiki — DXVK state cache, env vars
+- https://github.com/nowrep/obs-vkcapture — OBS Vulkan/GL game capture
+- https://github.com/dec05eba/gpu-screen-recorder — low-overhead recorder
+- https://github.com/sonic2kk/steamtinkerlaunch — launcher workaround encyclopedia
+- https://wiki.archlinux.org/title/Zram — compressed swap
+
 ## AMD GPU
 - https://amdgpu-install.readthedocs.io/en/latest/ — amdgpu-install tool docs
 - https://www.amd.com/de/resources/support-articles/knowledge-base-search.html — AMD KB articles

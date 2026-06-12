@@ -1,48 +1,87 @@
 # steam-debugger
 
-Agent skill for troubleshooting **Steam on Linux gaming distros** — SteamOS, Bazzite, ChimeraOS, CachyOS, Nobara, and plain Arch.
+Agent skill for debugging **Steam on Linux gaming distros** — SteamOS, Bazzite, ChimeraOS, CachyOS, Nobara, plain Arch.
 
-Built for [Claude Code](https://claude.com/claude-code) and other agents that support the [Agent Skills](https://agentskills.io) format, but the reference files are plain markdown and useful to humans directly.
+Built for [Claude Code](https://claude.com/claude-code) and any agent speaking the [Agent Skills](https://agentskills.io) format. Reference files are plain markdown — useful to humans without any agent.
+
+## Why this exists
+
+Linux gaming knowledge is scattered: Arch Wiki, Valve repos, ProtonDB, distro docs, Discord servers. Several of those sources block automated fetchers. This skill distills all of it into one self-contained package an agent can load offline, route by symptom, and apply with appropriate caution.
+
+`★ Insight ─────────────────────────────────────`
+Most "gaming mode broken" bugs reduce to one mental model:
+device → single-owner privilege → arbiter → unexpected second claimant.
+Gamescope needs exclusive DRM master on the GPU. A lingering ghost
+session, a leaked WAYLAND_DISPLAY, a compositor that didn't let go —
+all the same bug wearing different clothes. The skill teaches the
+pattern once, then maps every variant to it.
+`─────────────────────────────────────────────────`
 
 ## What it covers
 
-- **Gamescope session architecture** — embedded vs nested mode, DRM/KMS ownership, the seven recurring failure patterns (DRM master conflicts, linger ghost sessions, `WAYLAND_DISPLAY` pollution, services silently skipping gaming mode, …)
-- **Steam client** — installation, runtime/library error tables, NTFS issues, Remote Play
-- **Steam Linux Runtime** — scout/soldier/sniper/steamrt4 and why scout breaks rolling-release distros
-- **Proton & Wine** — launch options, prefix management, winetricks, DLL overrides, builds and managers
-- **Anti-cheat** — what works (EAC/BattlEye opt-in), what never will (Vanguard/Hyperion), cloud-gaming escape hatch
-- **AMD GPU** — kernel module parameters, power management sysfs, known hardware issues, RADV
-- **Audio** — PipeWire/WirePlumber architecture, failure table, ALSA fallback debugging
-- **Performance** — GameMode, MangoHud, CPU governors, scheduler tuning
-- **Display** — HDR setup per Proton variant, VRR, hardware raytracing, Wayland color management
+- **Session architecture** — gamescope embedded/nested modes, distro session stacks, systemd target wiring, Steam Linux Runtime (scout→steamrt4), the seven recurring failure patterns
+- **Steam client** — install, runtime/library error tables, Flatpak Steam differences, NTFS, Remote Play
+- **Proton & Wine** — launch options, prefixes, winetricks, DLL overrides, in-game launcher (EA/Ubisoft/Rockstar) patterns
+- **Anti-cheat** — what works (EAC/BattlEye opt-in), what never will (kernel-level), cloud-gaming escape hatch
+- **GPU** — AMD (module params, power sysfs, known hardware bugs) and NVIDIA (driver choice, version-match rule, Secure Boot, suspend VRAM, Xid errors), hybrid laptops
+- **Input** — controller drivers per pad, udev rules, the double-input bug, Steam Input, SDL mappings
+- **Audio** — PipeWire/WirePlumber architecture, failure table, ALSA fallback
+- **Performance** — GameMode, MangoHud, CPU governors, shader pre-compilation, OOM/zram, split-lock stutter, recording
+- **Display** — HDR per Proton variant, VRR, raytracing, Wayland color management
 - **Steam Deck** — hardware IDs, firmware shortcuts, OLED audio on plain Arch
 
-## Layout
+## How it works
 
 ```
-SKILL.md                 entry point: triage protocol, symptom routing, fix tiers
-reference/               per-domain knowledge files (loaded on demand)
-scripts/                 read-only diagnostic evidence collectors (POSIX sh)
+SKILL.md          triage protocol + symptom routing + fix tiers
+reference/        11 domain files, loaded on demand per symptom
+scripts/          read-only diagnostic collectors (POSIX sh)
 ```
 
-The skill is **triage-first**: it instructs the agent to ask intake questions before suggesting fixes, label every fix with a risk tier (✅ official / ⚠️ community / 🔴 deep), and explain commands to non-expert users.
+Triage-first design: the agent asks intake questions before touching anything (distro? GPU? gaming or desktop mode? what changed?), routes via symptom table, and labels every fix with a risk tier before running it.
 
-The diagnostic scripts mutate nothing. They collect logind/DRM/GPU/audio state in one pass and degrade gracefully when tools are missing.
+**Fix tiers:** ✅ official → ⚠️ community-documented → 🟣 tribal (anecdotal, provenance required) → 🔴 deep/risky. Escalation in that order; 🔴 always needs explicit user confirmation.
 
-## Install (Claude Code)
+`★ Insight ─────────────────────────────────────`
+The 🟣 tribal tier is deliberate: community fixes that work but lack
+official documentation are knowledge, not noise — IF they carry
+provenance (source, date, confirmation count, reversal steps).
+An unsourced fix is a rumor. Dated entries also self-prune:
+on a rolling release, two-year-old tribal knowledge is suspect
+by default.
+`─────────────────────────────────────────────────`
 
+## Diagnostic scripts
+
+Three evidence collectors. Read-only, POSIX sh, degrade gracefully when tools are missing, locale-pinned output:
+
+| Script | Collects |
+|--------|----------|
+| `diagnose-session.sh` | logind sessions, linger state, DRM holders, gamescope target state, journal failure signatures |
+| `gpu-info.sh` | PCI/driver binding, Vulkan devices, AMD sysfs clocks/VRAM/thermals, kernel GPU errors |
+| `audio-snapshot.sh` | audio server identity, PipeWire service state, sinks/sources, ALSA cards, bridge packages |
+
+One script run replaces 15 manual commands and gives the agent a structured snapshot to reason over.
+
+`★ Insight ─────────────────────────────────────`
+Knowledge goes in markdown, procedure goes in scripts. Triage
+questions need judgment — they stay prose. Evidence collection is
+identical every time — it became a script. The script body never
+enters the agent's context; only its output does.
+`─────────────────────────────────────────────────`
+
+## Install
+
+**Claude Code (git clone):**
 ```bash
-git clone https://github.com/YOURUSER/steam-debugger ~/.claude/skills/steam-debugger
+git clone https://github.com/TuxLux40/steam-debugger ~/.claude/skills/steam-debugger
 ```
-
-Claude Code discovers skills in `~/.claude/skills/` automatically. Per-project install: clone into `.claude/skills/` inside the project instead.
+Skills in `~/.claude/skills/` are discovered automatically. Project-local: clone into `.claude/skills/` instead.
 
 ## Sources
 
-Distilled from the Arch Wiki (Steam, Gamescope, AMDGPU, PipeWire, Wine, HDR, and ~15 more pages), Valve's gamescope/steam-runtime/Proton repositories, ProtonDB guides, distro documentation, and kernel.org GPU docs. Full link list with scraper-accessibility notes: [`reference/sources.md`](reference/sources.md).
-
-Note: several primary sources (wiki.archlinux.org, docs.bazzite.gg, wiki.cachyos.org, wiki.nobaraproject.org) block automated fetchers — one motivation for this skill being fully self-contained.
+Distilled from ~25 Arch Wiki pages (Steam, Gamescope, AMDGPU, NVIDIA, Gamepad, PipeWire, Wine, HDR …), Valve's gamescope/steam-runtime/Proton repos, the Flathub Steam wiki, ProtonDB guides, distro docs, kernel.org GPU docs. Full list with per-source agent-access methods (some sites block plain fetchers): [`reference/sources.md`](reference/sources.md).
 
 ## License
 
-CC-BY-SA 4.0 — substantial portions derive from the [Arch Wiki](https://wiki.archlinux.org), which is licensed CC-BY-SA.
+CC-BY-SA 4.0 — substantial portions derive from the [Arch Wiki](https://wiki.archlinux.org) (CC-BY-SA).

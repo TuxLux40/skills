@@ -25,6 +25,8 @@ Pattern: `[diagnosis]. [reason]. [fix or next step].`
 | `reference/session-architecture.md` | Gamescope modes, distro session stacks, systemd targets, Steam Linux Runtime, environment variables, the 7 common failure patterns |
 | `reference/steam-client.md` | Steam installation, directory layout, launch options format, client/runtime error tables, NTFS, Remote Play, debugging tools |
 | `reference/gpu.md` | AMD driver stack, kernel module params, power management sysfs, known hardware issues, RADV, hybrid graphics (PRIME), DKMS |
+| `reference/gpu-nvidia.md` | NVIDIA driver choice (nvidia/nvidia-open/NVK), version-match rule, KMS, Secure Boot, suspend VRAM, Wayland/gamescope quirks, Xid errors |
+| `reference/input.md` | Controller setup, udev rules, per-pad drivers (xpadneo/xone/hid_playstation), double-input bug, Steam Input, SDL mappings |
 | `reference/audio.md` | PipeWire architecture, config locations, failure table, ALSA troubleshooting |
 | `reference/wine-proton.md` | Proton troubleshooting, Wine prefixes, winetricks, DLL overrides, Wine builds/managers, anti-cheat compatibility, cloud gaming |
 | `reference/performance.md` | GameMode, MangoHud, CPU power management, scheduler tuning, advanced CPU/memory tuning |
@@ -76,6 +78,14 @@ Users reporting gaming issues are usually **not Linux experts**. Before suggesti
 | Wine game crashes / won't start (non-Steam) | `wine-proton.md` → Wine section |
 | Game on GOG/Epic/itch.io (not in Steam) | `wine-proton.md` → Wine managers |
 | Steam Deck hardware question (firmware, OLED audio, controller) | `steam-deck.md` |
+| Controller not detected / wrong buttons / double input | `input.md` |
+| NVIDIA: driver won't load, black screen, post-suspend crashes, version mismatch | `gpu-nvidia.md` |
+| Flatpak Steam: drives invisible, MangoHud/protontricks broken, controller blocked | `steam-client.md` → Flatpak Steam |
+| In-game launcher broken (EA App, Ubisoft Connect, Rockstar) | `wine-proton.md` → In-Game Launchers |
+| Stuck "Processing Vulkan shaders" / shader stutter | `performance.md` → Shader Pre-Compilation |
+| Game killed silently mid-session / OOM | `performance.md` → Memory Pressure |
+| Recording or streaming game capture | `performance.md` → Recording |
+| Documented fixes exhausted, symptom persists | `tribal.md` (🟣 disclose provenance) |
 
 ### Step 3: Match fix to user comfort level
 

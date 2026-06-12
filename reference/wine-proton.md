@@ -148,6 +148,21 @@ winetricks gmdls dsound directmusic  # install MIDI DLS collection + DirectSound
 ```
 System MIDI must be configured first: check `aplaymidi -l` for available ports.
 
+## In-Game Launchers (EA App, Ubisoft Connect, Rockstar)
+
+Games that bootstrap a second launcher inside Proton are a distinct failure class: the *game* runs fine, the *launcher* breaks. Patterns:
+
+| Pattern | What to do |
+|---------|-----------|
+| Launcher updates itself, then prefix breaks | Common after launcher-side updates — check ProtonDB for the flagship title (e.g. GTA V for Rockstar, Star Wars Jedi for EA) within days of breakage; usually a GE-Proton release fixes it first |
+| Login loop / blank login window | Launcher webview needs gecko/codecs — GE-Proton bundles more media components than Valve Proton; switch to GE-Proton first |
+| Launcher stuck downloading its own update forever | Delete the launcher's directory inside the prefix (NOT the whole prefix) so the game reinstalls a fresh launcher copy |
+| EA App "unable to connect" | Often prefix-level: nuclear-reset prefix, let EA App reinstall; verify date/time correct (TLS failures) |
+| Ubisoft Connect black window | Try `PROTON_USE_WINED3D=1` for the launcher phase, or disable launcher overlay in its settings once you get in |
+| Want to skip launcher entirely | Some titles accept `-EpicPortal`-style bypass flags or registry edits — game-specific, check ProtonDB; Lutris install scripts (lutris.net) encode known-good launcher setups |
+
+**General rule:** launcher problems are time-sensitive tribal territory — what works changes with every launcher update. ProtonDB recent reports (sort by newest) beat any static documentation, including this file.
+
 ## Anti-Cheat Compatibility
 
 Check any game first at **[areweanticheatyet.com](https://areweanticheatyet.com)**.
