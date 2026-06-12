@@ -30,6 +30,7 @@ Pattern: `[diagnosis]. [reason]. [fix or next step].`
 | `reference/performance.md` | GameMode, MangoHud, CPU power management, scheduler tuning, advanced CPU/memory tuning |
 | `reference/display.md` | Gamescope-specific troubleshooting, HDR, hardware raytracing, VRR, Wayland color management |
 | `reference/steam-deck.md` | Deck hardware IDs, firmware shortcuts, OLED audio, controller modes |
+| `reference/tribal.md` | 🟣 Anecdotal community fixes with provenance — last resort after documented fixes fail |
 | `reference/sources.md` | All source URLs (Arch Wiki, Valve, distro docs) with scraper-blocked-site warnings |
 | `scripts/` | Read-only diagnostic evidence collectors (see Diagnostic Scripts below) |
 
@@ -80,6 +81,8 @@ Users reporting gaming issues are usually **not Linux experts**. Before suggesti
 
 Before running any fix, state which tier it is and what it does. For **Deep/Risky** fixes, explain the risk and ask for confirmation. Never assume a layperson knows what `loginctl`, `modprobe`, or `sysfs` are — explain briefly before using them.
 
+**Escalation order:** ✅ Official → ⚠️ Community-documented → 🟣 Tribal (`reference/tribal.md`) → 🔴 Deep. Don't skip ahead; exhaust the safer tier for the symptom first.
+
 ## Fix Tiers
 
 ### ✅ Official / Fully supported
@@ -103,6 +106,9 @@ Widely used, generally safe, but not explicitly documented by Valve:
 - Editing `config.vdf` or `shortcuts.vdf` with Steam closed (well-understood format)
 - `MESA_VK_DEVICE_SELECT` for GPU selection
 - `SteamInput=2` in `localconfig.vdf` to disable Steam Input per-game
+
+### 🟣 Tribal / anecdotal (last resort)
+Fixes from community discussion (Discord, forum threads, Reddit comments) that worked for *someone* but have no official documentation. Stored in `reference/tribal.md` with provenance. **Only reach for these after ✅ and ⚠️ fixes for the symptom have been tried and failed.** Always tell the user the fix is anecdotal, cite its provenance, and prefer reversible variants.
 
 ### 🔴 Deep / Risky
 Bypasses normal update paths, may break on package updates, or has system-wide side effects:
