@@ -48,6 +48,8 @@ cat ~/.steam/root/steamapps/compatdata/<APPID>/version
 
 **Nuclear prefix reset** (when all else fails): delete `~/.steam/root/steamapps/compatdata/<APPID>/pfx/` — Steam rebuilds it on next launch. Loses save games stored in prefix (check for cloud saves first).
 
+⚠️ **Reset "didn't work"?** Some games store config in their *install directory* (`steamapps/common/<Game>/`), which survives prefix wipes. If a bad config value is the cause, the reset changes nothing — check the game dir for config/savedata files (see `tribal.md` → "Game config persists across prefix wipes").
+
 ## Wine / Native Prefix Tools
 
 Wine is a Win32 API implementation — not emulation, not virtualization. Performance penalty vs Windows varies per game.

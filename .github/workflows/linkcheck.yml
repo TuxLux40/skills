@@ -1,0 +1,36 @@
+name: Link check
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"   # monthly, 1st at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run lychee
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Wikis behind bot challenges 403 plain checkers — only flag hard 404s
+          args: >-
+            --no-progress
+            --accept 200,403,429
+            './**/*.md'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Open issue on failure
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "Dead links found — review affected skill sections"
+          content-filepath: ./lychee/out.md
+          labels: maintenance

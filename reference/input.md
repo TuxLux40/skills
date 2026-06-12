@@ -60,6 +60,10 @@ The layer where detection stops tells you where the problem is: kernel = driver/
 3. Or the opposite: force Steam Input on, so only the virtual pad exists
 4. `SteamInput=2` in `localconfig.vdf` for stubborn titles (⚠️ tier)
 
+## Works in menus, not in gameplay
+
+Distinct from the double-input bug: some ports use different input paths for menus (DirectInput/window messages) vs gameplay (raw XInput polling). Steam Input's interception feeds the first and starves the second. Fix: disable Steam Input per-game. Details + provenance: `tribal.md` → "Gamepad works in menus but not in gameplay".
+
 ## Steam Input vs native
 
 | Mode | When |
