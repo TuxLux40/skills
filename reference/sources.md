@@ -1,9 +1,21 @@
 # Source References
 
-Links used to build this skill. **Sites blocked to headless fetchers** (must open in browser or use saved HTML):
-- `wiki.archlinux.org` — Anubis JS challenge blocks all scrapers
+Links used to build this skill. **Sites blocked to plain headless fetchers** (curl, basic WebFetch):
+- `wiki.archlinux.org` — Anubis JS proof-of-work challenge blocks simple scrapers
 - `docs.bazzite.gg`, `wiki.cachyos.org`, `wiki.nobaraproject.org` — return 403
 - `wiki.hyprland.org` — may block depending on request headers
+
+## How an agent CAN access these sources
+
+| Source | Method | Notes |
+|--------|--------|-------|
+| **ProtonDB** | Direct JSON API — no tool needed | `curl https://www.protondb.com/api/v1/reports/summaries/<APPID>.json` → tier/score/confidence. Unofficial but stable. Find AppID in `steamapps/appmanifest_*.acf` or the store URL |
+| **Arch Wiki (offline)** | `pacman -S arch-wiki-docs` | Full wiki HTML at `/usr/share/doc/arch-wiki/html/en/` — agent greps/reads local files, zero network. Add `wikiman` for terminal search |
+| **Arch Wiki (online)** | Tavily MCP `tavily_extract`, or Firecrawl | Both fetch via their own infrastructure and pass the Anubis challenge (verified working) |
+| **Bazzite/CachyOS/Nobara docs** | Tavily MCP `tavily_extract`, or Firecrawl | Verified working on docs.bazzite.gg |
+| **Any JS-challenged site (fallback)** | Playwright MCP (`npx @playwright/mcp@latest`) | Real headless browser, executes the challenge JS; heaviest option |
+
+Order of preference: local package > direct API > extraction service (Tavily/Firecrawl) > headless browser.
 
 ## Valve / Steam official
 - https://github.com/ValveSoftware/gamescope — gamescope source + README (architecture, flags, known bugs)
