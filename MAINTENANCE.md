@@ -29,13 +29,13 @@ This turns every debugging session into a potential skill improvement — no sch
 ### Link rot (automated, free)
 `.github/workflows/linkcheck.yml` runs [lychee](https://github.com/lycheeverse/lychee) monthly over all markdown and opens an issue on dead links. Dead link = upstream moved = content may have changed too. Treat linkcheck issues as review prompts, not just URL fixes.
 
-### Source-drift checking (automated, costs API tokens)
-A scheduled GitHub Action can run Claude with repo access to re-fetch key sources and diff them against the skill's claims, opening a PR with proposed updates:
-- Official action: `anthropics/claude-code-action` (needs `ANTHROPIC_API_KEY` secret)
-- Sensible cadence: monthly, scoped to one reference file per run to bound cost
-- Keep human review on the PR — auto-merge of LLM-rewritten reference content is how errors compound silently
+### Source-drift checking (automated, costs API tokens) — ENABLED
+`.github/workflows/drift-check.yml` runs monthly (15th): picks one reference file by month rotation, has Claude re-check that domain's sources, and opens a minimal-diff PR if claims drifted. Manual run with a specific target: workflow_dispatch with `target=<file>`.
 
-Not enabled by default: it costs money and the usage feedback loop above catches the important drift for free. Enable when the skill has users beyond its maintainer.
+Requirements and guardrails:
+- Repo secret `ANTHROPIC_API_KEY` must be set (`gh secret set ANTHROPIC_API_KEY`)
+- One file per run bounds token cost; `--max-turns 30` caps runaway sessions
+- PR-only, never merges — human review stays mandatory; the prompt forbids wholesale rewrites
 
 ### What NOT to automate
 - Tribal entries — provenance requires a human (or an agent in a real debugging session), not a crawler

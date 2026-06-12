@@ -72,11 +72,16 @@ enters the agent's context; only its output does.
 
 ## Install
 
-**Claude Code (git clone):**
-```bash
-git clone https://github.com/TuxLux40/steam-debugger ~/.claude/skills/steam-debugger
-```
-Skills in `~/.claude/skills/` are discovered automatically. Project-local: clone into `.claude/skills/` instead.
+Same artifact works in any agent supporting the [Agent Skills](https://agentskills.io) format — only the install path differs:
+
+| Agent | Install |
+|-------|---------|
+| **Claude Code** | `git clone https://github.com/TuxLux40/steam-debugger ~/.claude/skills/steam-debugger` |
+| **GitHub Copilot CLI** | `git clone https://github.com/TuxLux40/steam-debugger ~/.copilot/skills/steam-debugger` |
+| **Codex** | `git clone https://github.com/TuxLux40/steam-debugger ~/.agents/skills/steam-debugger` |
+| Project-local (any) | clone into `.claude/skills/` (or agent equivalent) inside the project |
+
+Skills in these directories are discovered automatically; the agent loads `SKILL.md` when a gaming symptom matches the description. Diagnostic scripts are plain POSIX sh — they run identically under every agent (and standalone).
 
 ## Sources
 

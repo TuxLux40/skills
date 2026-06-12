@@ -1,0 +1,55 @@
+name: Source drift check
+
+on:
+  schedule:
+    - cron: "0 7 15 * *"   # monthly, 15th at 07:00 UTC (offset from linkcheck)
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Reference file to check (default: month-based rotation)"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pick rotation target
+        id: pick
+        run: |
+          # One reference file per run to bound token cost; rotates monthly.
+          FILES=(session-architecture steam-client gpu gpu-nvidia audio wine-proton performance display input steam-deck)
+          IDX=$(( ($(date +%-m) - 1) % ${#FILES[@]} ))
+          TARGET="${{ github.event.inputs.target }}"
+          [ -z "$TARGET" ] && TARGET="${FILES[$IDX]}"
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+
+      - name: Claude drift review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are maintaining the steam-debugger agent skill. This month's target:
+            reference/${{ steps.pick.outputs.target }}.md
+
+            1. Read the target file and note its factual claims (versions, package
+               names, flags, minimum requirements, "known issue" statuses).
+            2. Re-check the relevant upstream sources listed in reference/sources.md
+               for that domain (WebFetch/WebSearch). Focus on: version-gated claims,
+               deprecated flags, issues marked pending/unfixed that may have landed.
+            3. If claims drifted: edit ONLY the target file (plus a tribal.md
+               graduation if an anecdotal fix became official), then open a PR via
+               `gh pr create` on a branch named drift/<target>-<date>. PR body must
+               list each change as: claim → new state → source URL.
+            4. If nothing drifted: do not open a PR; print "no drift found".
+
+            Rules: never rewrite sections wholesale — minimal diffs only. Never
+            auto-merge. Preserve the file's structure, tier labels, and tone.
+          claude_args: "--max-turns 30"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
