@@ -10,11 +10,11 @@ on:
         required: false
 
 permissions:
-  contents: write
-  pull-requests: write
+  issues: write
+  contents: read
 
 jobs:
-  drift:
+  create-drift-task:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,34 +22,64 @@ jobs:
       - name: Pick rotation target
         id: pick
         run: |
-          # One reference file per run to bound token cost; rotates monthly.
+          # One reference file per run to bound cost; rotates monthly.
           FILES=(session-architecture steam-client gpu gpu-nvidia audio wine-proton performance display input steam-deck)
           IDX=$(( ($(date +%-m) - 1) % ${#FILES[@]} ))
           TARGET="${{ github.event.inputs.target }}"
           [ -z "$TARGET" ] && TARGET="${FILES[$IDX]}"
           echo "target=$TARGET" >> "$GITHUB_OUTPUT"
 
-      - name: Claude drift review
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            You are maintaining the steam-debugger agent skill. This month's target:
-            reference/${{ steps.pick.outputs.target }}.md
-
-            1. Read the target file and note its factual claims (versions, package
-               names, flags, minimum requirements, "known issue" statuses).
-            2. Re-check the relevant upstream sources listed in reference/sources.md
-               for that domain (WebFetch/WebSearch). Focus on: version-gated claims,
-               deprecated flags, issues marked pending/unfixed that may have landed.
-            3. If claims drifted: edit ONLY the target file (plus a tribal.md
-               graduation if an anecdotal fix became official), then open a PR via
-               `gh pr create` on a branch named drift/<target>-<date>. PR body must
-               list each change as: claim → new state → source URL.
-            4. If nothing drifted: do not open a PR; print "no drift found".
-
-            Rules: never rewrite sections wholesale — minimal diffs only. Never
-            auto-merge. Preserve the file's structure, tier labels, and tone.
-          claude_args: "--max-turns 30"
+      - name: Create drift-check issue for Copilot
+        id: issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET: ${{ steps.pick.outputs.target }}
+        run: |
+          URL=$(gh issue create \
+            --title "Drift check: reference/${TARGET}.md ($(date +%Y-%m))" \
+            --label maintenance \
+            --body "$(cat <<EOF
+          Monthly source-drift check. Scope: **reference/${TARGET}.md only**.
+
+          1. Read \`reference/${TARGET}.md\` and list its factual claims (versions,
+             package names, flags, minimum requirements, 'known issue' statuses).
+          2. Re-check the relevant upstream sources listed in \`reference/sources.md\`
+             for that domain. Focus on: version-gated claims, deprecated flags,
+             issues marked pending/unfixed that may have landed since.
+          3. If claims drifted: edit ONLY the target file (plus a \`reference/tribal.md\`
+             graduation if an anecdotal fix became official) and open a PR.
+             PR body must list each change as: claim → new state → source URL.
+          4. If nothing drifted: close this issue with a comment 'no drift found'.
+
+          Rules: minimal diffs only — never rewrite sections wholesale. Preserve
+          structure, tier labels (✅/⚠️/🟣/🔴), and tone. Do not touch other files.
+          EOF
+          )")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "number=${URL##*/}" >> "$GITHUB_OUTPUT"
+
+      - name: Assign issue to Copilot coding agent
+        # Assignment API for the Copilot agent has changed before; if this step
+        # fails, the issue stays open and unassigned — assign it manually in the UI.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BOT_ID=$(gh api graphql -f query='
+            query($owner: String!, $name: String!) {
+              repository(owner: $owner, name: $name) {
+                suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 100) {
+                  nodes { login __typename ... on Bot { id } }
+                }
+              }
+            }' -f owner='${{ github.repository_owner }}' \
+               -f name='${{ github.event.repository.name }}' \
+            --jq '.data.repository.suggestedActors.nodes[] | select(.login=="copilot-swe-agent") | .id')
+          [ -z "$BOT_ID" ] && { echo "Copilot agent not assignable here"; exit 1; }
+          ISSUE_ID=$(gh api repos/${{ github.repository }}/issues/${{ steps.issue.outputs.number }} --jq .node_id)
+          gh api graphql -f query='
+            mutation($assignableId: ID!, $actorIds: [ID!]!) {
+              replaceActorsForAssignable(input: {assignableId: $assignableId, actorIds: $actorIds}) {
+                assignable { ... on Issue { number } }
+              }
+            }' -f assignableId="$ISSUE_ID" -f actorIds="[\"$BOT_ID\"]"

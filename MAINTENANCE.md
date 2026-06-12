@@ -29,13 +29,13 @@ This turns every debugging session into a potential skill improvement — no sch
 ### Link rot (automated, free)
 `.github/workflows/linkcheck.yml` runs [lychee](https://github.com/lycheeverse/lychee) monthly over all markdown and opens an issue on dead links. Dead link = upstream moved = content may have changed too. Treat linkcheck issues as review prompts, not just URL fixes.
 
-### Source-drift checking (automated, costs API tokens) — ENABLED
-`.github/workflows/drift-check.yml` runs monthly (15th): picks one reference file by month rotation, has Claude re-check that domain's sources, and opens a minimal-diff PR if claims drifted. Manual run with a specific target: workflow_dispatch with `target=<file>`.
+### Source-drift checking (automated via Copilot coding agent) — ENABLED
+`.github/workflows/drift-check.yml` runs monthly (15th): picks one reference file by month rotation, opens a scoped task issue, and assigns it to the GitHub Copilot coding agent, which re-checks sources and opens a minimal-diff PR. Manual run: workflow_dispatch with `target=<file>`.
 
-Requirements and guardrails:
-- Repo secret `ANTHROPIC_API_KEY` must be set (`gh secret set ANTHROPIC_API_KEY`)
-- One file per run bounds token cost; `--max-turns 30` caps runaway sessions
-- PR-only, never merges — human review stays mandatory; the prompt forbids wholesale rewrites
+Guardrails:
+- One file per issue bounds scope; issue body forbids wholesale rewrites and touching other files
+- PR-only, never merges — human review stays mandatory
+- Requires Copilot coding agent enabled for the repo; if the auto-assign step fails (the assignment API has churned before), the issue stays open — assign to Copilot manually in the UI
 
 ### What NOT to automate
 - Tribal entries — provenance requires a human (or an agent in a real debugging session), not a crawler
