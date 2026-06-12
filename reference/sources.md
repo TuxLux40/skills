@@ -12,8 +12,12 @@ Links used to build this skill. **Sites blocked to plain headless fetchers** (cu
 | **ProtonDB** | Direct JSON API — no tool needed | `curl https://www.protondb.com/api/v1/reports/summaries/<APPID>.json` → tier/score/confidence. Unofficial but stable. Find AppID in `steamapps/appmanifest_*.acf` or the store URL |
 | **Arch Wiki (offline)** | `pacman -S arch-wiki-docs` | Full wiki HTML at `/usr/share/doc/arch-wiki/html/en/` — agent greps/reads local files, zero network. Add `wikiman` for terminal search |
 | **Arch Wiki (online)** | Tavily MCP `tavily_extract`, or Firecrawl | Both fetch via their own infrastructure and pass the Anubis challenge (verified working) |
-| **Bazzite/CachyOS/Nobara docs** | Tavily MCP `tavily_extract`, or Firecrawl | Verified working on docs.bazzite.gg |
+| **Bazzite/CachyOS/Nobara docs** | Tavily MCP `tavily_extract`, or Firecrawl | All three verified working via Tavily |
+| **Steam Community forums, Reddit wikis, GamingOnLinux** | Tavily MCP `tavily_extract` | Verified working |
+| **ProtonDB full user reports** | Community data dumps | `github.com/bdefore/protondb-data` — the site itself only exposes summary tiers via API |
 | **Any JS-challenged site (fallback)** | Playwright MCP (`npx @playwright/mcp@latest`) | Real headless browser, executes the challenge JS; heaviest option |
+
+**Truly inaccessible to agents:** Discord servers (CachyOS/Bazzite/Nobara/GE communities — export channels with DiscordChatExporter if needed) and video content (grab transcripts manually).
 
 Order of preference: local package > direct API > extraction service (Tavily/Firecrawl) > headless browser.
 
