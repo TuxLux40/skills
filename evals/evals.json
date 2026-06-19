@@ -1,0 +1,131 @@
+{
+  "skill_name": "yubikey-linux-setup",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just got a YubiKey 5 NFC. I want to use it for sudo on Ubuntu 22.04. How do I set this up from scratch?",
+      "expected_output": "Response must cover: (1) udev rules — both 69-yubikey.rules and 70-u2f.rules with file content or paths, (2) plugdev group membership, (3) pamu2fcfg registration command to generate key mapping, (4) /etc/pam.d/sudo edit showing pam_u2f.so line with authfile=/etc/u2f_mappings, (5) safety warning about keeping a root terminal open during PAM changes, (6) package install (libpam-u2f pamu2fcfg). Should use caveman style in prose.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "mentions_udev_rules",
+          "text": "Response includes reference to both udev rule files (69-yubikey.rules and 70-u2f.rules) or /etc/udev/rules.d/",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "includes_pamu2fcfg",
+          "text": "Response includes pamu2fcfg command for registering the key",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shows_pam_sudo_config",
+          "text": "Response shows /etc/pam.d/sudo with pam_u2f.so on the same line or in a code block",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "mentions_authfile",
+          "text": "Response mentions authfile option or /etc/u2f_mappings or ~/.config/Yubico/u2f_keys",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "includes_safety_warning",
+          "text": "Response warns about keeping a root terminal/session open before editing PAM, or mentions risk of lockout",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "mentions_plugdev",
+          "text": "Response mentions plugdev group or usermod -aG plugdev",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "How do I use my YubiKey for SSH authentication using PIV certificates on Fedora? I want to generate a key on the device and use it for SSH without a software key file.",
+      "expected_output": "Response must cover: (1) pcscd install and enable on Fedora (dnf install pcsc-lite, systemctl enable --now pcscd), (2) yubico-piv-tool key generation in slot 9a (yubico-piv-tool -agenerate -s9a -AECCP256 -k), (3) warning to change default PIN 123456, (4) CSR or self-signed cert step, (5) SSH connection via PKCS#11 (ssh -I libykcs11.so or PKCS11Provider in ~/.ssh/config), (6) how to export public key for authorized_keys. Should read piv-management.md reference.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "mentions_pcscd",
+          "text": "Response includes pcscd installation or systemctl enable/start pcscd",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shows_key_generation",
+          "text": "Response includes yubico-piv-tool with -agenerate and -s9a flags",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shows_ssh_pkcs11",
+          "text": "Response includes PKCS11Provider or ssh -I with libykcs11.so",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "mentions_default_pin",
+          "text": "Response mentions default PIN 123456 and urges changing it",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "covers_cert_or_csr",
+          "text": "Response covers certificate creation: either -aselfsign or -arequest (CSR) step",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shows_public_key_export",
+          "text": "Response shows how to get the public key for authorized_keys (ssh-keygen -D or similar)",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to store my TOTP codes (like Google Authenticator / 2FA codes for GitHub, AWS, etc.) on my YubiKey 5 and generate them from the Linux command line. How do I set this up?",
+      "expected_output": "Response must cover: (1) ykman oath applet (not OTP slot — they are different), (2) ykman oath accounts add -t for TOTP, (3) ykman oath accounts code to generate codes, (4) importing via otpauth:// URI with ykman oath accounts uri, (5) pcscd requirement (CCID/smart card interface), (6) optional: touch requirement -T flag, password protection. Should clearly distinguish OATH/TOTP (stored on smart card, better) from OTP slot (keyboard output, different thing).",
+      "files": [],
+      "assertions": [
+        {
+          "name": "uses_ykman_oath",
+          "text": "Response uses 'ykman oath' subcommand — not OTP slot or ykman otp",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shows_add_totp",
+          "text": "Response shows ykman oath accounts add with -t flag for TOTP",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shows_code_generation",
+          "text": "Response shows ykman oath accounts code command for generating TOTP codes",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "mentions_uri_import",
+          "text": "Response mentions URI import (accounts uri command or otpauth:// format)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "mentions_pcscd_requirement",
+          "text": "Response mentions pcscd, CCID, or smart card interface requirement for OATH",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    }
+  ]
+}
