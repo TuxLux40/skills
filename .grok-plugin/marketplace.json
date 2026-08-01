@@ -1,0 +1,26 @@
+{
+  "name": "tuxlux-skills",
+  "description": "Marketplace mit Agent-Skills von TuxLux40",
+  "owner": {
+    "name": "TuxLux40",
+    "url": "https://github.com/TuxLux40"
+  },
+  "plugins": [
+    {
+      "name": "tuxlux-skills",
+      "description": "Alle eigenen Agent-Skills von TuxLux40 in einem Plugin",
+      "category": "productivity",
+      "source": "./",
+      "homepage": "https://github.com/TuxLux40/skills",
+      "keywords": [
+        "linux",
+        "kde",
+        "steam",
+        "gaming",
+        "yubikey",
+        "documents",
+        "skills"
+      ]
+    }
+  ]
+}

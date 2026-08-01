@@ -1,0 +1,24 @@
+{
+  "name": "tuxlux-skills",
+  "version": "1.0.0",
+  "description": "Agent-Skills von TuxLux40: Linux-Tuning, Steam/Gaming, KDE-Theming, YubiKey, Dokumenten-Organisation, Stow, USB-Peripherie, Smart-OKF",
+  "author": {
+    "name": "TuxLux40",
+    "url": "https://github.com/TuxLux40"
+  },
+  "homepage": "https://github.com/TuxLux40/skills",
+  "repository": "https://github.com/TuxLux40/skills",
+  "license": "MIT",
+  "keywords": [
+    "linux",
+    "kde",
+    "steam",
+    "gaming",
+    "yubikey",
+    "documents",
+    "stow",
+    "usb",
+    "skills"
+  ],
+  "skills": "./skills/"
+}
