@@ -1,0 +1,19 @@
+{
+  "name": "steam-debugger",
+  "owner": {
+    "name": "TuxLux40"
+  },
+  "plugins": [
+    {
+      "name": "steam-debugger",
+      "source": "./",
+      "description": "Triage-first troubleshooting skill for Steam on Linux gaming distros: gamescope sessions, Proton, AMD/GPU, audio, anti-cheat, HDR. Includes read-only diagnostic scripts.",
+      "version": "1.0.0",
+      "author": {
+        "name": "TuxLux40"
+      },
+      "license": "CC-BY-SA-4.0",
+      "keywords": ["steam", "linux", "gaming", "gamescope", "proton", "troubleshooting", "steamos", "bazzite", "cachyos"]
+    }
+  ]
+}
