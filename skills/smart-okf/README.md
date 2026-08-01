@@ -1,15 +1,10 @@
-## Install (this skill only)
+## Install
 
 ```bash
 mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/smart-okf
 ```
 
-### Full marketplace (all skills)
-
-```bash
-# Claude:  claude plugin marketplace add TuxLux40/skills && claude plugin install tuxlux-skills
-# Grok:    grok plugin marketplace add TuxLux40/skills && grok plugin install TuxLux40/skills --trust
-```
+Full marketplace: [TuxLux40/skills](https://github.com/TuxLux40/skills)
 
 ---
 

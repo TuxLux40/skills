@@ -21,26 +21,13 @@ Works in CLI mode (runs diagnostics itself) and web UI mode (asks only for missi
 - KDE boosters: plasma-foreground-booster, dmemcg-booster (AUR/Arch only)
 - Distros: Arch, CachyOS, Fedora, Ubuntu/Debian, openSUSE, NixOS, Gentoo
 
-## Install (nur dieser Skill)
+## Install
 
 ```bash
 mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/linux-tuner
 ```
 
-Oder lokal aus diesem Ordner:
-
-```bash
-mkdir -p ~/.claude/skills && cp -r . ~/.claude/skills/linux-tuner
-```
-
-## Alle Skills (Marketplace)
-
-```bash
-# Claude:  claude plugin marketplace add TuxLux40/skills && claude plugin install tuxlux-skills
-# Grok:    grok plugin marketplace add TuxLux40/skills && grok plugin install TuxLux40/skills --trust
-```
-
-Quelle: [TuxLux40/skills](https://github.com/TuxLux40/skills)
+Full marketplace: [TuxLux40/skills](https://github.com/TuxLux40/skills)
 
 ## References
 
