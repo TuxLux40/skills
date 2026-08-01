@@ -1,6 +1,6 @@
 # Aurorae Window Decoration Reference
 
-Source: `/home/oliver/Projects/develop-kde-org/content/docs/plasma/aurorae/index.md`
+Source: `/path/to/develop-kde-org/content/docs/plasma/aurorae/index.md`
 
 ---
 

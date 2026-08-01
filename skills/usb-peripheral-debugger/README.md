@@ -1,11 +1,11 @@
-# dokumenten-organisation
+# usb-peripheral-debugger
 
-Agent-Skill: Dateien und Dokumente **ordnen, benennen und erschließen** (Aktenplan, Namenskonventionen, Auffindbarkeit, Kassation).
+Agent-Skill für **USB-HID-Peripherie unter Linux**: Ownership, Daemon-Konflikte, RGB-Tools, Reverse Engineering.
 
 ## Install (nur dieser Skill)
 
 ```bash
-mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/dokumenten-organisation
+mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/usb-peripheral-debugger
 ```
 
 ## Alle Skills (Marketplace)

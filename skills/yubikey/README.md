@@ -1,11 +1,11 @@
-# dokumenten-organisation
+# yubikey
 
-Agent-Skill: Dateien und Dokumente **ordnen, benennen und erschließen** (Aktenplan, Namenskonventionen, Auffindbarkeit, Kassation).
+Agent-Skill: **YubiKey unter Linux** (udev, PAM, FIDO2/U2F, PIV, OpenPGP, OATH/TOTP, SSH).
 
 ## Install (nur dieser Skill)
 
 ```bash
-mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/dokumenten-organisation
+mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/yubikey
 ```
 
 ## Alle Skills (Marketplace)

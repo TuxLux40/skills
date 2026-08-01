@@ -117,7 +117,7 @@ Default options can be set in `.stowrc` (current dir) or `~/.stowrc` (home). Use
 
 ```ini
 # ~/Projects/dotfiles/.stowrc
---target=/home/oliver
+--target=$HOME
 --verbose
 ```
 

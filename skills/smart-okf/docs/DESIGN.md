@@ -8,7 +8,7 @@
 | **Version** | 0.4 (re-review round 2) |
 | **Status** | Draft |
 | **Scope** | Full local-first OKF knowledge base — Phase 0 scaffolding through Phase 3 MCP/agent integration |
-| **Repository** | `/home/oliver/Projects/smart-okf` |
+| **Repository** | `/path/to/smart-okf` |
 
 ### Revision History
 

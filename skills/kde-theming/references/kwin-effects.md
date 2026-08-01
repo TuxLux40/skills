@@ -1,6 +1,6 @@
 # KWin Declarative Effects Reference
 
-Source: `/home/oliver/Projects/develop-kde-org/content/docs/plasma/kwineffect/_index.md`
+Source: `/path/to/develop-kde-org/content/docs/plasma/kwineffect/_index.md`
 
 ---
 

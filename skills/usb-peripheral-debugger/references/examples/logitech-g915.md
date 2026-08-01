@@ -22,13 +22,52 @@ Demonstrates the onboard-profile problem, daemon conflict detection, and workaro
 
 **Root cause:** Onboard memory slot 0 was never written. The G915 has 3 onboard profile slots stored in its firmware. Slot 0 is the factory default (rainbow animation). OpenRGB writes to the device's "live mode" (active colour state) but does not write the onboard firmware slot. On reconnect, the device loads slot 0 from firmware → rainbow.
 
-**Why OpenRGB can't write the firmware slot:** OpenRGB does not implement G915 onboard profile firmware writing. It controls live colour state only. The onboard profile write requires the full G Hub HID++ protocol, which is not implemented in OpenRGB for the G915.
+**Why OpenRGB can't write the firmware slot:** OpenRGB does not implement G915 onboard profile firmware writing. It controls live colour state only.
 
-**Why Solaar can't fix it:** Solaar manages Bolt receiver settings (pairing, DPI, battery status), not G915 per-key RGB profiles.
+**Solaar CAN write the onboard flash (CONFIRMED 2026-06-26).** Earlier notes here said it couldn't — wrong, and it cost a multi-hour session. Solaar's `logitech_receiver.hidpp20.OnboardProfiles` reads AND writes the onboard profiles with correct CRCs. See "Persisting onboard profiles from Linux" below. Hand-rolling the HID++ writes is the trap — it almost works and silently fails.
 
 ---
 
-## Working Solutions
+## Persisting onboard profiles from Linux (the real fix)
+
+⚠️ **Community** — uses Solaar's internal API. This writes the keyboard's firmware flash, so colours survive power-cycle/reboot with **no daemon running**.
+
+```python
+import sys; sys.path.insert(0, "/usr/lib/python3.14/site-packages")
+from logitech_receiver import base, receiver
+from logitech_receiver.hidpp20 import OnboardProfiles, LEDEffectSetting
+from logitech_receiver.hidpp20_constants import SupportedFeature
+
+# G915 is device [1] on the Lightspeed receiver (/dev/hidraw9), NOT direct hidraw14.
+# Solaar MUST be stopped first — exclusive hidraw access.
+dev = None
+for di in base.receivers_and_devices():
+    if getattr(di, "isDevice", False):
+        continue
+    r = receiver.create_receiver(base, di)
+    for n in range(1, 7):
+        cd = r[n] if r else None
+        if cd and "G915" in (cd.name or "").upper():
+            dev = cd; break
+    if dev: break
+
+dev.ping()
+prof = OnboardProfiles.from_device(dev)          # reads real profiles + sizes
+static = lambda R,G,B: LEDEffectSetting.from_bytes(bytes([0x01,R,G,B,0,0,0,0,0,0,0]))
+for idx, rgb in {1:(0xFF,0xFF,0xFF), 2:(0x00,0xBC,0xFF)}.items():
+    p = prof.profiles[idx]
+    p.lighting[0] = static(*rgb); p.lighting[1] = static(*rgb)  # zone 0=primary, 1=logo
+prof.write(dev)                                  # writes control sector 0 + each profile, with CRC16
+dev.feature_request(SupportedFeature.ONBOARD_PROFILES, 0x30, 0, 1)   # activate profile 1
+```
+
+**Why hand-rolled HID++ writes fail** (all three matter): sector size is **255**, not 254; every sector ends with a **crc16** (`common.crc16`, CCITT poly 0x1021) — writing `0x0000` makes firmware reject the profile and revert to rainbow; the **control/directory sector 0** must be written too (`prof.write` does it first). Also `ReadSector` (fn 0x50) returns the write *buffer*, not committed flash — so bad writes read back as "correct" while the keyboard stays invalid.
+
+**Mode trap:** Solaar `rgb_control: 1` (software mode) paints ONE global colour over every profile — looks like a persistent solid colour but it's Solaar repainting on each connect, not the flash, and it kills per-profile switching. Set `rgb_control: 0` (onboard mode) to let the flash drive per-profile colours. `brightness_control` must be > 0 or LEDs stay dark.
+
+---
+
+## Working Solutions (live-mode fallback, if flash write isn't an option)
 
 ### Option A: Re-apply on login via systemd autostart
 

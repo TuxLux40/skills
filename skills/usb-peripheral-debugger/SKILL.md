@@ -59,16 +59,7 @@ Hardware → xhci_hcd → usb-core → HID driver → udev
                               User tools: Polychromatic / Piper / OpenRGB GUI
 ```
 
-Explain any layer in detail when the user asks. Don't pre-explain.
-
-## YAGNI
-
-Apply to all suggestions and code written during this skill:
-- Suggest the simplest fix that solves the stated problem. Not the "correct" architecture.
-- One tool per device unless the user explicitly needs two.
-- No autostart services, udev rules, or config unless the problem requires them.
-- No abstractions from a single use case (e.g., don't suggest a "unified daemon wrapper" for one device).
-- If the user asks "how do I fix X", fix X — don't also fix Y, Z, and suggest a refactor.
+Explain any layer in detail with visualizations and what abbreviations mean.
 
 ---
 

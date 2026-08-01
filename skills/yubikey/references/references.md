@@ -104,7 +104,7 @@ https://raw.githubusercontent.com/Yubico/libu2f-host/master/70-u2f.rules
 
 ### Agent Workflow
 
-1. **For blocked/unreachable sites:** Use whatever search MCP is active in the session (Tavily, Brave, Perplexity, etc.). Don't assume a specific one — check what's available. Local HTML files in /home/oliver/Projects/yubikey-skill/ include ArchWiki copies.
+1. **For blocked/unreachable sites:** Use whatever search MCP is active in the session (Tavily, Brave, Perplexity, etc.). Don't assume a specific one — check what's available. Local HTML files in /path/to/yubikey-skill/ include ArchWiki copies.
 
 2. **For accessible sites:** Fetch directly — use a fetch-capable MCP or `firecrawl-scrape` / `agent-browser` skill.
 

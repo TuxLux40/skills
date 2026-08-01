@@ -1,11 +1,11 @@
-# dokumenten-organisation
+# kde-theming
 
-Agent-Skill: Dateien und Dokumente **ordnen, benennen und erschließen** (Aktenplan, Namenskonventionen, Auffindbarkeit, Kassation).
+Agent-Skill für **KDE Plasma Theming**: Plasma Styles, Aurorae, Plasmoids/Widgets, KWin-Effekte.
 
 ## Install (nur dieser Skill)
 
 ```bash
-mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/dokumenten-organisation
+mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/kde-theming
 ```
 
 ## Alle Skills (Marketplace)
