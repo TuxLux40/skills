@@ -25,3 +25,8 @@ _local-fonts/
 smart-okf.yaml
 .env
 .env.*
+# Fonts / proprietary local assets (not for publish)
+Segoe*/
+Segoe */
+**/Segoe*/
+**/Segoe */
