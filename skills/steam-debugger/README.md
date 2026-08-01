@@ -70,30 +70,13 @@ identical every time — it became a script. The script body never
 enters the agent's context; only its output does.
 `─────────────────────────────────────────────────`
 
-## Install (this skill only)
+## Install
 
 ```bash
 mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/steam-debugger
 ```
 
-Same one-liner works for other agents — swap the target dir (`~/.copilot/skills`, `~/.agents/skills`, project `.claude/skills/`, …).
-
-| Agent | Path |
-|-------|------|
-| **Claude Code** | `~/.claude/skills/steam-debugger` |
-| **GitHub Copilot CLI** | `~/.copilot/skills/steam-debugger` |
-| **Codex** | `~/.agents/skills/steam-debugger` |
-
-### Full marketplace (all skills)
-
-```bash
-# Claude:  claude plugin marketplace add TuxLux40/skills && claude plugin install tuxlux-skills
-# Grok:    grok plugin marketplace add TuxLux40/skills && grok plugin install TuxLux40/skills --trust
-```
-
-Canonical home: [TuxLux40/skills](https://github.com/TuxLux40/skills) (`skills/steam-debugger`).
-
-Skills are discovered automatically; the agent loads `SKILL.md` when a gaming symptom matches. Diagnostic scripts are plain POSIX sh.
+Full marketplace: [TuxLux40/skills](https://github.com/TuxLux40/skills)
 
 ## Sources
 
