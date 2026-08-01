@@ -1,0 +1,14 @@
+{
+  "name": "linux-kernel-tuner",
+  "description": "Linux desktop performance tuning advisor — kernel/scheduler selection (BORE, EEVDF, sched_ext, scx_lavd/rusty/layered), VA-API, browser HW accel, preload, KDE cgroup boosters, power stack. Generates runnable apply-all.sh bundle in CLI mode.",
+  "version": "1.0.0",
+  "author": {
+    "name": "TuxLux40"
+  },
+  "category": "linux-sysadmin",
+  "keywords": [
+    "linux", "kernel", "scheduler", "performance", "gaming", "desktop",
+    "sched_ext", "scx_lavd", "bore", "eevdf", "cachyos", "xanmod",
+    "vaapi", "browser-accel", "preload", "kde", "power", "tuning"
+  ]
+}

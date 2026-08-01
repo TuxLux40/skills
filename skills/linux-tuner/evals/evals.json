@@ -1,0 +1,26 @@
+{
+  "skill_name": "linux-kernel-tuner",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I'm on Arch Linux with a Ryzen 9 7950X (16c/32t, multi-CCD), RX 7900 XTX (amdgpu), 32GB DDR5. Running linux-zen 6.9 right now with stock EEVDF. Main use is gaming + occasional Docker builds. Getting some stutter in games and compile times feel slower than I'd expect. What kernel and scheduler should I switch to?",
+      "expected_output": "Should detect web UI mode, give diagnostic command block + 6 questions, then after gathering info recommend scx_lavd or linux-cachyos with BORE/scx for this multi-CCD AMD setup. Should give exact pacman/yay commands.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "prompt": "Ubuntu 22.04 LTS, ThinkPad X1 Carbon Gen 11, Intel Core i7-1365U (10c hybrid P+E, Intel 13th gen), Intel Iris Xe graphics (i915). I'm a software developer, battery life is critical. Getting 4-5 hours max and some lag in VS Code. Risk appetite: low — I need this machine stable for work.",
+      "expected_output": "Should detect web UI mode, give diagnostic block + 6 questions. Should recommend stock/HWE kernel with intel_pstate HWP, tuned or auto-cpufreq for battery. Should NOT recommend sched_ext or bleeding-edge kernels given low risk appetite + NVIDIA/battery constraints. Should mention sched_ext likely absent on LTS HWE.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "prompt": "Fedora 40, AMD Ryzen 5 5600 (6c/12t, single CCX Zen3), no dedicated GPU (Vega integrated). I run an audio production setup with Ardour and JACK. I get xruns constantly even at 128 frames buffer. What's the best kernel for low-latency audio on Fedora?",
+      "expected_output": "Should detect web UI mode, give diagnostic block + 6 questions. Should recommend -rt or -rt-bore kernel via COPR, threadirqs, CPU isolation. Should mention JACK configuration. Should flag that -rt kernels may lack some virtualization features.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}
