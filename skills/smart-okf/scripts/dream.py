@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+"""Cross-folder "dream" synthesis pass — run after (or independently of) ingest.
+
+Reads every folder aggregate under the root and writes one `<root>/synthesis.md`
+(`type: Synthesis`): matters spanning folders, conflicts, patterns, open actions.
+Incremental: zero LLM calls when no aggregate changed since the last dream.
+
+Usage:
+    uv run python scripts/dream.py /path/to/documents
+    uv run python scripts/dream.py /path/to/documents --force       # re-dream even if nothing changed
+"""
+
+import argparse
+import os
+import sys
+from pathlib import Path
+
+from app.config import load_config, resolve_document_root
+from app.constants import LLM_LOG_FILENAME
+from app.exceptions import LLMClientError
+from app.services.dream import dream
+from app.services.gating import GatingRules
+from app.services.llm_client import LLMClient
+
+
+def main() -> None:
+    """CLI entry point for the dream pass."""
+    parser = argparse.ArgumentParser(description="Synthesize matters/conflicts/patterns/actions across aggregates.")
+    parser.add_argument("folder", help="Document root to dream over.")
+    parser.add_argument(
+        "--host",
+        default=None,
+        help="OpenAI-compatible server URL for the dreamer (default: dream_host from config/env, "
+        "falling back to the extractor's llm_host)",
+    )
+    parser.add_argument(
+        "--model",
+        default=None,
+        help="Dreamer model name (default: dream_model from config/env, falling back to llm_model). "
+        "Dreaming is reasoning, not extraction — use the smartest model you have access to.",
+    )
+    parser.add_argument("--force", action="store_true", help="Re-dream even when no aggregate changed")
+    parser.add_argument("--quiet", action="store_true", help="Suppress progress output")
+    parser.add_argument(
+        "--allow-model-mismatch",
+        action="store_true",
+        help="Proceed even if the server at --host isn't currently serving the configured "
+        "--model (default: abort). See ingest_folder.py --help for why this matters.",
+    )
+    args = parser.parse_args()
+
+    root = Path(args.folder).expanduser().resolve()
+    config = load_config(root)
+    folders = [str(root)]
+
+    # Dreamer resolution: CLI flag > dream_* (config/env) > extractor settings (config, then
+    # LLMClient's own SMART_OKF_LLM_* env fallback via model/host=None).
+    host: str | None = (
+        args.host
+        or os.getenv("SMART_OKF_DREAM_HOST")
+        or ((config.dream_host or config.llm_host) if config is not None else None)
+    )
+    model: str | None = (
+        args.model
+        or os.getenv("SMART_OKF_DREAM_MODEL")
+        or ((config.dream_model or config.llm_model) if config is not None else None)
+    )
+
+    rules = GatingRules(
+        low_priority_patterns=list(config.low_priority_patterns) if config is not None else [],
+        priority_patterns=list(config.priority_patterns) if config is not None else [],
+    )
+    ordering_principle = config.ordering_principle if config is not None else "provenance"
+    content_language = config.content_language if config is not None else None
+
+    exit_code = 0
+    for folder in folders:
+        log_path = resolve_document_root(Path(folder)) / LLM_LOG_FILENAME
+        client = LLMClient(model=model, host=host, log_path=log_path, content_language=content_language)
+        try:
+            client.confirm_model_available()
+        except LLMClientError as mismatch_error:
+            if args.allow_model_mismatch:
+                print(f"warning: {mismatch_error}", file=sys.stderr)
+            else:
+                print(f"error: {mismatch_error}", file=sys.stderr)
+                sys.exit(1)
+        result = dream(
+            folder,
+            client=client,
+            force=args.force,
+            verbose=not args.quiet,
+            rules=rules,
+            ordering_principle=ordering_principle,
+        )
+        for error in result.errors:
+            print(f"Error: {error}", file=sys.stderr)
+        exit_code = max(exit_code, result.exit_code)
+    sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    main()

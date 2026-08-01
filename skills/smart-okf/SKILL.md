@@ -1,0 +1,514 @@
+---
+name: smart-okf
+description: Ingest and query a local-first OKF knowledge base of personal documents (health, insurance, government, providers/ISP, finances, contracts). Turns folders of PDFs, docx, eml, csv, xlsx, and txt files into one aggregate OKF markdown file per folder using a local OpenAI-compatible LLM, then answers questions from those aggregates. Use this skill whenever the user asks to ingest/OCR/index their documents, update or rebuild their document knowledge base, or asks a question answerable from their personal documents — "what does my ISP contract say", "when was my last doctor visit", "find my insurance policy number" — even if they don't mention OKF or smart-okf by name.
+---
+# smart-okf — personal document knowledge base
+
+OKF (Open Knowledge Format) knowledge base for personal document folders. Each folder gets **one
+aggregate markdown file** (`<folder>/<folder-name>.md`) for every supported file directly inside
+it — non-recursive; subfolders get their own aggregate.
+
+**Core purpose:**
+
+- **Aggregates = library of atomic facts** (IDs, date ranges, amounts, provenance)
+- **Synthesis (roadmap) = librarian** — same story across folders, conflicts, patterns, next steps
+- **Retrieval ladder (below) = how agents must use that library** — not one topical folder and hope
+
+Honcho-as-architecture is out; Honcho-as-inspiration for smarter passes over MDs is in. Extract
+runs via the ingest script (local or hosted model); query prefers MDs + transcripts + git.
+
+Three operations: **onboarding** (first run only), **ingest** (build/refresh the library), and
+**query** (retrieve from the library — and later, synthesized matter files).
+
+## Onboarding (first run)
+
+Config lives *inside* each document root (`<root>/.smart-okf/config.yaml`), not in the skill
+repo — one config per root, so it travels with that tree (e.g. over a private git remote)
+instead of staying behind on this machine. **Before concluding "no config yet," walk up from
+the current directory** (`find . -maxdepth 0 ...` won't do it — check CWD, then each parent, up
+to `/` or a filesystem boundary) looking for `.smart-okf/config.yaml`. Invoked from inside a
+subfolder of an already-onboarded root (e.g. Claude started directly in
+`documents/apartments/`), the config lives higher up, not in CWD — treat that ancestor as the
+root and skip onboarding entirely, including the git check in step 6 (a `git init` there would
+nest a repo inside the real root's repo). Only if no ancestor has `.smart-okf/config.yaml`
+(and no `.git` either, as a second signal) is this actually an unconfigured root. If the user's
+document root has no `.smart-okf/config.yaml` yet, run this interview before doing anything
+else. Each root is onboarded independently — running this again for a second, unrelated
+document root (a different share, a different archive) is expected and does not touch the
+first root's config. This is a conversation you conduct, not a script to invoke — walk the
+user through it, don't dump all the questions at once.
+
+**State the walk-up result out loud before asking anything** — one line: which directory you
+resolved as the root, and whether a `.git` repo was found there (existing repo → will be
+reused as-is, nothing gets initialized or overwritten; no repo → will offer `git init` in step
+6). This is the single most common source of user anxiety here — "will my existing repo get
+clobbered?" — so say it up front instead of leaving them to infer it from which bash commands
+run.
+
+**Two roles (say this once early — it answers "why a local model if Claude is driving?"):**
+
+- **Orchestrator** = you (Claude Code / OpenWebUI / Hermes / cron): decide when to ingest and
+  answer from finished `.md` files. You never send raw PDF/image bytes to a cloud model for
+  extraction.
+- **Extractor** = the local OpenAI-compatible model the *script* always calls
+  (`llm_host` / `llm_model`). Cron and interactive agent runs behave the same because
+  extraction is always that second call inside `scripts/ingest_folder.py`.
+
+There is no "skip the script; orchestrator extracts every PDF by hand every time" mode — the
+script has no callback into the live agent, and cron needs the same engine. Orchestrator and
+extractor can be different models. **Privacy is a degree:** default is local/LAN extractor so
+raw OCR need not enter a cloud chat; with `allow_remote_llm` you may use a hosted extractor.
+At **query** time, prefer aggregates + transcripts + git even if the orchestrator is hosted —
+do not re-read every original PDF for facts that were already distilled.
+
+1. **Where tools install** — system CLIs (`rg`, `tesseract`, `gs`, `marker_single`) and the
+   Python skill venv (`uv sync`) live on the **machine that runs ingest and hosts the
+   extractor model**, not necessarily on a NAS that only holds the document tree. Documents
+   may be remote-mounted (SSHFS/NFS); deps and GPU/CPU inference stay on the workstation.
+
+2. **Check system prerequisites** — run each and note what's missing, don't just assume:
+
+   ```bash
+   command -v rg && command -v tesseract && command -v gs && command -v marker_single
+   ```
+
+   `rg` (ripgrep) is needed for querying; `tesseract` for image OCR; `gs` (Ghostscript) is an
+   OCRmyPDF dependency for scanned-PDF OCR when `--no-marker` is used; `marker_single` is the
+   default layout-aware PDF backend (tables, forms). **marker is not bundled in this repo** —
+   install it *externally* the same way as tesseract: `pipx install marker-pdf` (own venv, own
+   PyTorch). Its code is GPL-3.0 and model weights use a modified OpenRAIL-M license (free for
+   personal/research use; commercial redistribution needs a license from datalab.to).
+   `--no-marker` / `use_marker: false` skips it and uses pdfplumber+OCRmyPDF only. For
+   `rg`/`tesseract`/`gs`, detect the package manager (`command -v pacman`/`apt`/`dnf`/`brew`)
+   and give the exact install command. **Ask before running any install yourself.**
+
+3. **Detect a local LLM backend** (the extractor) — probe common defaults before asking:
+
+   ```bash
+   for url in http://localhost:11434 http://127.0.0.1:1234 http://localhost:8080; do
+     curl -s -m 2 "$url/v1/models" && echo " <- $url"
+   done
+   ```
+
+   Ollama defaults to `:11434`, LM Studio to `:1234`, llama.cpp's `llama-server` commonly to
+   `:8080`. If one responds, list its models and ask which to use for **extraction** —
+   prefer a 7B+ instruction-tuned model over a 2–3B one if hardware fits; extraction quality
+   (OKF structure, not missing fields) scales with model size. If none respond, ask what they
+   use and where it runs. Remind them this model is the *extractor*, not the chat agent
+   driving the skill.
+
+   If the user has standalone images (photos, meter readings, scans without a PDF wrapper),
+   also ask whether a listed model is vision-capable (`vl`/`vision` in the name) for
+   handwriting + brief scene description (never identifies people). Optional. Written to
+   `vision_model` in `.smart-okf/config.yaml` if yes. Vision + structured extraction = two LLM calls
+   per image.
+
+4. **Ask which model should dream** (`dream_model` / `dream_host`). The dream pass
+   (see **Dreaming** below) is cross-folder *reasoning* — conflicts, patterns, matter
+   linking — and benefits from the smartest model available more than any other stage;
+   the extractor's small fast model is often not the right choice here. Offer three
+   options and explain the tradeoff:
+
+   - **Same as extractor** (default — leave `dream_model` unset): fine to start, weakest
+     reasoning.
+   - **Bigger local model**: same or another local host (a second machine's llama.cpp,
+     a GPU box on the LAN). Best quality without data leaving the network. If their
+     backend lists larger models (30B+, `thinking`/`reasoner` variants), suggest one.
+   - **Hosted model** (`dream_host` pointing at a cloud API + `allow_remote_llm: true`):
+     strongest reasoning. Be explicit about what leaves the machine: not the raw
+     documents, but the aggregate *digests* — distilled personal facts, names, reference
+     numbers. Only with informed consent, never as a silent default.
+
+   Dreaming runs rarely (after ingest batches), so a slow-but-smart model costs little.
+
+5. **Ask where this document root lives** and confirm the folder exists and looks like
+   personal documents, not a code repo or media library. One config = one root = one
+   independent knowledge base. A second, unrelated tree (a different share, a different
+   archive) is a separate onboarding run with its own `.smart-okf/config.yaml` — there is
+   no cross-root linking in smart-okf itself; that happens at query time if the orchestrator
+   references multiple KBs (e.g. several OpenWebUI knowledge collections in one chat).
+
+6. **Set up git version tracking** — check the document root:
+
+   ```bash
+   git -C /path/to/documents rev-parse --is-inside-work-tree
+   ```
+
+   If that **succeeds**, say so explicitly ("found existing git repo at `<root>` — reusing it,
+   nothing will be re-initialized or overwritten") and move on to step 7; never run `git init`
+   in this branch. If it **fails**, say that too ("no git repo found at `<root>`") before
+   offering to `git init` it (and a first commit of whatever's already there) — this is not
+   optional polish: git is the version timeline the retrieval ladder (step 3) and Change
+   tracking rely on — without a repo here, "what changed since the last ingest" and "find this
+   ID months later" have no history to search. Skip only if the user explicitly already tracks
+   the tree elsewhere and tells you so.
+
+7. **Ask which archival ordering principle governs** (`ordering_principle`, see
+   [docs/ARCHIVAL_PRINCIPLES.md](docs/ARCHIVAL_PRINCIPLES.md)). Both the per-folder aggregate
+   layer (provenance) and the cross-folder matter layer (pertinence) always run; this only
+   tunes how eagerly matters form across folders:
+
+   - **`provenance`** (default): respect the folder structure; only strong, longer shared
+     IDs link documents into a cross-folder matter. Best when their folders already map to
+     how they think.
+   - **`pertinence`**: lean into subject-based synthesis; shorter shared IDs also form
+     matters. Best when the same affair is scattered across many folders.
+
+8. **Ask what to keep out** (gating, deterministic — no LLM). Two independent lists:
+   `exclude_patterns` (glob) for documents never worth ingesting (manuals, terms of
+   service, marketing — e.g. `["*handbuch*", "*/AGB/*"]`), and `low_priority_patterns` for
+   things worth storing but not deep-analyzing. Built-in trivial keywords (AGB,
+   Bedienungsanleitung, …) are already deprioritized eagerly, so most users need only add
+   their own exceptions; `priority_patterns` forces something back into deep analysis.
+   Password-protected files are always skipped and logged automatically.
+
+9. **Write `<document_root>/.smart-okf/config.yaml`** from what you learned (see
+   [smart-okf.example.yaml](smart-okf.example.yaml): `llm_host`, `llm_model`, optional
+   `vision_model` / `dream_model` / `dream_host` / `verify_model` / `verify_host` /
+   `use_marker` / `ordering_principle` / `exclude_patterns` / `low_priority_patterns` /
+   `priority_patterns` / `derive_per_file` / `generate_readme`). Plain YAML — create the
+   `.smart-okf/` folder and write the file directly; there is no `scripts/onboard.py`. The
+   config lives in the document root itself, not the skill repo — it's part of that KB, not
+   part of this install.
+
+10. Offer a first ingest on one subfolder as a smoke test before the whole tree — see
+   **Ingest cautions** below.
+
+## Query (default operation)
+
+Answer from existing knowledge — no extractor LLM needed for Q&A. Retrieval is **not** a
+vector DB: it is **whole-tree ripgrep + read + git**, with an explicit fallback ladder.
+**You must follow this ladder**; do not only open the topically named folder.
+
+### Retrieval ladder (do this every time)
+
+| Step | Where | Use for |
+|------|--------|---------|
+| 0 | **Synthesis** (`<root>/synthesis.md`, `type: Synthesis`) | Cross-folder matters, conflicts, patterns, open actions — check first for any question that could span folders; it names the aggregates to read next |
+| 0.5 | **Matter files** (`<root>/matters/*.md`, `type: Matter`) | A specific cross-folder case already resolved to a dedicated file — check here when the synthesis or a shared ID points at one before reading every cited aggregate |
+| 0.8 | **Navigation / roll-up** (root `README.md`; parent `## Subfolders` sections; `type: FolderIndex` files) | Orient in an unfamiliar tree — the root README lists every folder with stats, and each folder with subfolders links down to its children. Use to find *which* aggregate to read, not as a fact source (it links, never duplicates) |
+| 1 | **Aggregates** (`**/*.md` with `type: FolderSummary`) | Distilled facts, tags, orientation summary, provenance — **always start here** for folder-level facts. A `_Verification: FLAGGED — <reason>_` line anywhere in the file — under a section (a per-document fact-check failure) or as a banner at the top (a folder-level heuristic failure: fabricated placeholder, missing citations, thin body) — means untrusted; confirm against the transcript. **No such line anywhere = trust the file directly, no extra check needed** (see callout below) |
+| 2 | **Transcripts (mandatory fallback)** (`.okf-transcripts/`) | When MD is thin, partial, or missing a full ID/amount/quote — search here **before** re-ingest or guessing. Hidden folder; greppable; lossless raw extract |
+| 3 | **Git history** | “What’s new,” same-batch uploads, ID-tagged commits months later |
+| 4 | **JSONL** (`.okf-llm-log.jsonl`) | Ingest debugging only — **not** knowledge retrieval |
+
+Steps 0 and 0.5 exist only after a dream pass has run (see **Dreaming** below); if
+`synthesis.md` is missing or older than recent ingests, offer to run it.
+
+**Transcripts are not optional polish.** Ingest always writes them so agents never need to re-OCR for exact strings. If step 1 does not fully answer the question, you **must** run step 2.
+
+**The whole point of this skill is that you should not have to reopen the original for every
+question** — including precision-critical ones (a government form, a legal deadline, exact
+employment/education date ranges for a Bürgergeld application's tabular Lebenslauf). Ingest
+enforces that automatically now: every extraction runs mandatory per-document fact-verification
+(`render_section`), and every aggregate/matter write additionally runs the same heuristic checks
+`validate_okf.py` uses (`validate_aggregate`) *before* the file is written — a failure on either
+gets baked into the file itself as an in-body `_Verification: FLAGGED — <reason>_` line, not left
+as something you'd only see by separately running a script. So: **a file with no `_Verification:
+FLAGGED` line anywhere is safe to cite directly, original unopened.** Only open the original
+for a file that *is* flagged (or when step 2's transcript still can't answer the question) — that
+minority, not everything, is where "the aggregate said so" isn't good enough yet.
+
+Run `uv run python scripts/validate_okf.py <root>` periodically (already in the cron chain
+below) as a tree-wide health check and to sweep up aggregates written before this guarantee
+existed (old-format files with no banner even though they'd fail validation today) — not as a
+per-query step. A clean `validate_okf.py` run plus zero `_Verification: FLAGGED` hits from `rg`
+is what "the KB can be trusted" concretely means; it should read as confirmation, not busywork.
+
+**Always search the entire documents root**, never just the topically-named folder. Real
+processes cut across the taxonomy (benefits ↔ finances ↔ insurance ↔ providers; utility
+dispute ↔ bank ↔ lawyers). Missing cross-folder IDs is the main failure mode this KB exists
+to prevent.
+
+1. **Find candidates** with ripgrep from the root:
+
+   ```bash
+   rg -l --glob '*.md' 'type: FolderSummary' /path/to/documents
+   rg -i -C3 'vodafone|kündigungsfrist|aktenzeichen|vertragsnummer' /path/to/documents --glob '*.md'
+   ```
+
+2. **Read matching aggregates.** Frontmatter has `sources:`; body has orientation summary
+   (folders with 2+ docs), then `## <Title>` sections with `_Source: <filename>_`. A section
+   may carry a `_Verification: FLAGGED — <reason>_` line right after its `_Source:` — every
+   extraction is checked against its own source before ingest writes it, and a flagged one is
+   kept (not silently dropped) but should not be treated as trustworthy without checking the
+   transcript/original yourself first.
+
+3. **Fallback to transcripts** if the aggregate is thin (partial ID, missing amount, exact
+   quote, “not sure”): search `.okf-transcripts/`, not the binary original and not a re-ingest
+   unless the transcript is also missing:
+
+   ```bash
+   rg -i 'aktenzeichen|kundennummer|vertragsnummer' /path/to/documents/.okf-transcripts/
+   ```
+
+   Skipping this step when the MD is incomplete is a retrieval failure.
+
+4. **Link matters over time** with IDs + git (see Change tracking). Prefer stable identifiers
+   from the docs (Aktenzeichen, contract/customer/account numbers, invoice numbers, IBAN last
+   4, case refs) as the join key across folders and commits:
+
+   ```bash
+   git -C /path/to/documents log --all --grep='123456789' -i
+   git -C /path/to/documents log -S '123456789' -- '*.md'
+   ```
+
+5. **Answer** citing source **filenames** (provenance lines), not only the aggregate path.
+   If the folder has more source files than `sources:` lists, offer re-ingest.
+
+6. **Do not** use `.okf-llm-log.jsonl` to answer user questions about their documents.
+
+If no aggregate exists for a relevant folder yet, offer to ingest first.
+
+## Change tracking
+
+Documents root is a git repo (set up in Onboarding step 6 if it wasn't already one). **After
+every pass that touches files — ingest (extract+derive+aggregate) and dream — commit before
+moving on.** This is not a suggestion: git is the only place "what's new since the last run"
+and "find this ID months later" (retrieval ladder step 3) actually live. A pass that ran but
+was never committed is invisible to both.
+
+**git = ingest/version timeline; aggregates = current distilled truth.** No changelogs inside
+every `.md`. Case-event dates from the documents still live in the body as facts.
+
+### Commit message format — derived from the OKF frontmatter shape
+
+A commit message follows the same shape as an OKF document, so the same reflex ("where are
+the identifiers, where are the sources") applies whether you're reading a `.md` or a
+`git log` entry:
+
+```
+<type>: <title>
+
+<description — one or two sentences, the why>
+
+Folders: <relative-path-1>, <relative-path-2>, ...
+IDs: <label>=<value>, <label>=<value>, ...
+```
+
+| Commit field | OKF frontmatter analog | Content |
+|---|---|---|
+| `<type>:` prefix | `type:` | `ingest`, `dream`, `fix`, `cleanup`, `feat`, `chore` |
+| `<title>` | `title:` | one line, imperative, what changed |
+| description paragraph | `description:` | why — what triggered this pass/fix, not a restatement of the diff |
+| `Folders:` trailer | `sources:` | every top-level folder touched, relative to the document root |
+| `IDs:` trailer | (new) `identifiers:` frontmatter field | every stable identifier involved, as `label=value` — same labels the extraction prompt and the identifier-loss validation check use (Kundennummer, Vertragsnummer, Aktenzeichen, Personalnummer, IBAN, …), not free-form prose |
+
+```bash
+# Good — structured, greppable, matches the aggregate's own vocabulary
+git commit -m "$(cat <<'EOF'
+ingest: capture missing identifiers in social_insurance and pension_insurance
+
+Re-ingest after the extraction prompt was fixed to stop dropping footer-block
+identifiers; both folders previously collapsed a second employer into the first.
+
+Folders: insurances/social_insurance, insurances/pension_insurance
+IDs: rentenversicherungsnummer=13040393S105, personalnummer=02093612, betriebsnummer=32268191, betriebsnummer=35306434
+EOF
+)"
+
+# Weak — no structure, nothing greppable, indistinguishable from any other commit
+git commit -m "Ingest: 2026-07-18"
+```
+
+Harvest IDs from the **new/changed aggregate sections'** `identifiers:` frontmatter (and
+transcripts if that frontmatter is missing/pre-migration): contract numbers, customer
+numbers, Aktenzeichen, invoice/case refs, meter IDs, etc. Same IDs should already appear
+in the Markdown bodies (extraction) so `rg`, `git log --grep`, and `git log -S` all work.
+
+Batch uploads → one commit still correlates co-arrival; **IDs in the trailer** correlate the
+same matter across batches months apart (the other half of "two birds"). A commit touching
+many unrelated matters (a bulk cleanup pass, say) is better split into one commit per matter
+than crammed into a single `IDs:` trailer with dozens of unrelated values — the trailer stops
+being a useful join key once it's everything.
+
+```bash
+git -C /path/to/documents log --stat
+git -C /path/to/documents diff HEAD~1 -- '*.md'
+git -C /path/to/documents log --grep='123456789' -i
+```
+
+Root-level per-matter files (**R2**, `<root>/matters/<slug>.md`) are written automatically by
+the dream pass for any candidate group sharing a reference number — see **Dreaming** below.
+Batch commits + shared IDs still matter for cases the free grouping pre-filter misses.
+
+**Remote / web agents:** push to a **private** remote (Gitea, GitLab, …); they read `.md` +
+git history, not raw PDFs. MCP is optional glue on a clone. See
+[README — Remote access via git](README.md#remote-access-via-git).
+Do not put personal case details in this skill file when documenting examples.
+
+**Consumer-only agents:** point them at the generated `scripts/dashboard.py` HTML file
+instead of a raw filesystem path when an agent should only ever *read* the KB. A static
+rendered page structurally can't be written back to through a "read this URL" tool the
+way a mounted folder can — read-only is enforced by what the interface *is*, not by a
+permission the agent has to respect. Also easier to hand an agent one link than a path
+plus "and browse it non-recursively" instructions.
+
+## Ingest
+
+Requires an OpenAI-compatible LLM server (LM Studio, llama.cpp `llama-server`, Ollama, vLLM).
+Check reachability before starting: `curl -s $SMART_OKF_LLM_HOST/v1/models`.
+
+**Ingest verifies the configured model is actually loaded before doing any work** (`GET
+/v1/models` against `--host`, compared to `--model`) and aborts with a clear error if not —
+LM Studio/Ollama serve whatever happens to be loaded regardless of what's requested by name,
+so a stale or manually-swapped model would otherwise degrade every extraction in the run
+silently instead of erroring. Pass `--allow-model-mismatch` to proceed anyway (not
+recommended outside a deliberate one-off); this exists as an escape hatch, not a default.
+
+```bash
+cd /path/to/smart-okf   # skill root — scripts import the app/ package
+SMART_OKF_LLM_HOST=http://127.0.0.1:1234 \
+SMART_OKF_LLM_MODEL=gemma-4-e4b-it-qat \
+uv run python scripts/ingest_folder.py /path/to/documents
+```
+
+- Supported: `.pdf`, `.txt`, `.docx`, `.eml`, `.csv`, `.xlsx`, and images (`.png`/`.jpg`/`.jpeg`,
+  read-only). Images use tesseract OCR by default (text only); pass `--vision-model <name>`
+  (a vision-capable model served by the same host) for handwriting transcription plus a brief
+  scene description instead — useful for things like a photographed utility meter reading where
+  plain OCR misses handwritten digits. No extra dependency either way (two LLM calls per image
+  when vision is on: describe, then structure).
+- **PDF path (default = external marker):** layout-aware markdown via `marker_single` (not a
+  pip dep of this skill — install with `pipx install marker-pdf`). Marker does its own layout
+  OCR; it does **not** rewrite the PDF in place. **`--no-marker`:** pdfplumber + OCRmyPDF
+  (deu+eng) embeds a searchable text layer into scanned PDFs once — later ingests and PDF
+  editors reuse it. Standalone images are never modified — text lives in the transcript store
+  and aggregate only.
+- **Every extraction writes a raw transcript** to `<root>/.okf-transcripts/<relpath>.txt` —
+  the lossless full text, so OCR/extraction never needs to repeat and agents can read exact
+  wording without touching originals.
+- **Ingest is incremental**: each aggregate stores SHA-256 hashes of its sources in
+  frontmatter (`source_hashes`). Re-runs skip unchanged files entirely — no LLM calls, no
+  rewrites — so scheduled re-ingests of a mostly-static tree are cheap. Only changed, new, or
+  removed files trigger work in their folder.
+- Roughly one LLM call per changed source file, so a large first run takes time. Ingest one
+  subfolder at a time on first runs and check output quality before continuing. Documents too
+  large for a single call (over ~8000 characters of extracted text) are chunked automatically
+  and merged back into one aggregate section — this is transparent, no flag needed.
+- Every LLM call (chunked or not) is logged to `<root>/.okf-llm-log.jsonl`, where `<root>` is
+  resolved to the true document root (the ancestor holding `.smart-okf/config.yaml`) even if
+  ingest was pointed at a subfolder — one log per document root, not one per invocation, so a
+  subfolder smoke test and a full-tree run share the same file instead of fragmenting it.
+  Logs model, duration, retry count, success/failure. Useful for spotting a flaky backend or
+  unusually slow document: `rg '"success": false' /path/to/documents/.okf-llm-log.jsonl`.
+- [marker](https://github.com/datalab-to/marker)'s `marker_single` is used by default for
+  layout-aware PDF extraction (tables, forms) — see Prerequisites in [README.md](README.md).
+  Pass `--no-marker` to skip it and use plain pdfplumber/OCRmyPDF instead. If marker was never
+  installed and `--no-marker` isn't passed, ingest explicit-fails (not a silent quality
+  downgrade) — install it or add the flag.
+- The run reports written aggregates, unchanged folders, skipped files, and flagged
+  files/folders at the end; relay all of it to the user, not just written + skipped —
+  a flagged file is exactly the "don't trust this one without checking" signal this
+  KB relies on to make every unflagged file safe to cite directly.
+- Cron/systemd-timer use the same command — no daemon, no watcher. Example crontab line:
+
+  ```
+  0 3 * * 0  cd /path/to/smart-okf && SMART_OKF_LLM_HOST=http://127.0.0.1:1234 SMART_OKF_LLM_MODEL=gemma-4-e4b-it-qat uv run python scripts/ingest_folder.py /path/to/documents
+  ```
+
+### Ingest cautions
+
+- Never ingest folders containing unrelated project files (web assets, git repos, media). Check
+  what's in a folder before pointing ingest at a whole tree; suggest excluding junk folders.
+- Aggregates are overwritten when their folder's files change — by design (rebuild from
+  filesystem truth), but warn the user if they hand-edited an aggregate: manual edits survive
+  only as long as no source file in that folder changes.
+- In-place PDF OCR rewrites original documents. Content is preserved (OCRmyPDF only adds the
+  text layer), but if the user is cautious about file mutation, mention it before the first
+  ingest of a folder with scanned PDFs.
+- `index.md` and `log.md` are reserved OKF filenames; a folder literally named `index` or `log`
+  is skipped rather than overwriting them.
+
+## Dreaming (cross-folder synthesis)
+
+The librarian pass. After ingest has built/refreshed aggregates, run:
+
+```bash
+cd /path/to/smart-okf
+uv run python scripts/dream.py /path/to/documents
+```
+
+- Writes one `<root>/synthesis.md` (`type: Synthesis`) with exactly four sections:
+  **Matters** (same real-world affair across folders, joined by IDs), **Conflicts**
+  (contradicting dates/amounts/statuses between aggregates), **Patterns**, **Open actions**.
+- **Two passes.** A cheap scan reads a compact digest of **every** aggregate (identity,
+  tags, orientation summary, section headings — not full bodies) and produces a baseline
+  report. A free, non-LLM pre-filter then groups aggregates that share a reference number
+  (contract/customer/meter/case ID — 5+ digit runs, matched in filenames/tags/summaries) into
+  candidate matters; only those candidate groups get a follow-up call that reads their
+  **full** aggregate text and replaces the baseline's Matters/Conflicts for that part of the
+  report with fact-dense, ID-exact write-ups (Patterns always stays cheap-scan). Cost scales
+  with the number of candidate groups, not tree size. No shared reference numbers anywhere →
+  identical to the cheap-scan-only baseline, zero extra cost.
+- **Each candidate group also gets its own file** — `<root>/matters/<slug>.md`
+  (`type: Matter`), linking the involved aggregates plus the same deep-dive write-up. A
+  stable, linkable concept per matter instead of only a paragraph in whichever `synthesis.md`
+  happens to be current (this is **R2**; see step 0.5 below).
+- **Incremental like ingest, per matter too**: aggregate hashes live in the synthesis
+  frontmatter (whole-tree gate) *and* in each matter file's own frontmatter (per-matter gate)
+  — a matter whose own aggregates are unchanged reuses its existing file and skips the
+  deep-dive call even when an unrelated aggregate elsewhere triggered the run. `--force`
+  re-dreams the whole tree anyway.
+- **Dreamer model is its own choice** (`dream_model`/`dream_host` in config,
+  `SMART_OKF_DREAM_MODEL`/`SMART_OKF_DREAM_HOST`, or `--model`/`--host`): falls back to the
+  extractor model when unset, but reasoning quality scales with model size here more than
+  anywhere else — see Onboarding step 4. Remote `dream_host` needs `allow_remote_llm`.
+  Large KBs are synthesized in batches, then consolidated — transparent, no flag.
+- Run it after ingest runs (same cron, one line later) or on demand when the user asks a
+  cross-folder question and `synthesis.md` is stale/missing. Commit it with the ingest commit.
+- The synthesis cites aggregate paths — treat it as a **map**, not a source of truth: verify
+  facts in the cited aggregate (and its transcripts) before answering from it.
+
+```cron
+0 3 * * 0  cd /path/to/smart-okf && uv run python scripts/ingest_folder.py /path/to/documents && uv run python scripts/dream.py /path/to/documents && uv run python scripts/validate_okf.py /path/to/documents
+```
+
+`validate_okf.py` exits nonzero when anything is flagged, same "cron goes red instead of
+silently green" convention as ingest — put it last in the chain so a bad run surfaces instead
+of quietly leaving a fabricated-looking aggregate in place until someone happens to read it.
+
+## OpenWebUI integration
+
+If pointing an OpenWebUI Knowledge collection at this folder tree: **sync only the `.md`
+aggregates, never the raw document folder.** OpenWebUI's folder sync has no filter — it will
+also pick up PDFs, images, and stray temp files it can't parse and may hang on (observed:
+hung on a `.jpg` in a `temp/`-style folder). Point the sync at a filtered view instead:
+
+```bash
+find /path/to/documents -name '*.md' -not -path '*/.okf-transcripts/*'
+```
+
+or symlink/copy just the `.md` files into a separate folder OpenWebUI syncs from, keeping the
+real tree (originals + aggregates) untouched.
+
+## Conventions (short form)
+
+- Frontmatter: `type` required (`FolderSummary` for aggregates); `sources:` lists original file
+  paths relative to the ingest root — this is the provenance chain, preserve it in any edit.
+- Cross-links between concepts are plain markdown links; broken links are tolerated, not errors.
+- Full format rules, type vocabulary, and spec references: read [docs/OKF_SPEC.md](docs/OKF_SPEC.md)
+  when authoring or editing OKF files by hand.
+
+## Configuration
+
+Environment variables (or `<document_root>/.smart-okf/config.yaml`, see
+[smart-okf.example.yaml](smart-okf.example.yaml)):
+
+| Variable                   | Default                  | Purpose |
+| -------------------------- | ------------------------ | ------- |
+| `SMART_OKF_LLM_HOST`     | `http://localhost:11434` | Extractor: OpenAI-compatible `/v1/chat/completions` server |
+| `SMART_OKF_LLM_MODEL`    | `qwen2.5:3b`             | Extractor model name as the server reports it |
+| `SMART_OKF_LLM_API_KEY`  | `not-needed`             | Only for servers that require auth |
+| `SMART_OKF_VISION_MODEL` | unset                    | Optional vision model on the same host for images |
+| `SMART_OKF_CONFIG`       | `<root>/.smart-okf/config.yaml` | Override: read config from this exact path instead |
+
+YAML-only settings (no env var): `ordering_principle` (provenance/pertinence, see
+[docs/ARCHIVAL_PRINCIPLES.md](docs/ARCHIVAL_PRINCIPLES.md)); `exclude_patterns` /
+`low_priority_patterns` / `priority_patterns` (gating globs); `derive_per_file` (opt-in
+`.okf-facts/` sidecars); `generate_readme` (root navigation README, default on);
+`verify_model` / `verify_host` (mandatory fact-check model, defaults to the extractor).
+
+Remote (non-localhost/RFC1918) LLM hosts are refused unless `allow_remote_llm` is set — keeps
+raw document text off the cloud by default. The orchestrating agent can still be a cloud model;
+it only sees aggregates/transcripts you choose to open, not the ingest subprocess payload.
