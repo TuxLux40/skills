@@ -1,6 +1,6 @@
 # Plasma Style (Desktop Theme) Reference
 
-Source: `/home/user/Projects/develop-kde-org/content/docs/plasma/theme/`
+Source: `/path/to/develop-kde-org/content/docs/plasma/theme/`
 
 ---
 

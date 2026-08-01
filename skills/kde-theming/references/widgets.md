@@ -1,6 +1,6 @@
 # Plasma Widget (Plasmoid) Reference
 
-Source: `/home/user/Projects/develop-kde-org/content/docs/plasma/widget/`
+Source: `/path/to/develop-kde-org/content/docs/plasma/widget/`
 
 ---
 

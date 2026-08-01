@@ -70,18 +70,30 @@ identical every time — it became a script. The script body never
 enters the agent's context; only its output does.
 `─────────────────────────────────────────────────`
 
-## Install
+## Install (this skill only)
 
-Same artifact works in any agent supporting the [Agent Skills](https://agentskills.io) format — only the install path differs:
+```bash
+mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/steam-debugger
+```
 
-| Agent | Install |
-|-------|---------|
-| **Claude Code** | `git clone https://github.com/TuxLux40/steam-debugger ~/.claude/skills/steam-debugger` |
-| **GitHub Copilot CLI** | `git clone https://github.com/TuxLux40/steam-debugger ~/.copilot/skills/steam-debugger` |
-| **Codex** | `git clone https://github.com/TuxLux40/steam-debugger ~/.agents/skills/steam-debugger` |
-| Project-local (any) | clone into `.claude/skills/` (or agent equivalent) inside the project |
+Same one-liner works for other agents — swap the target dir (`~/.copilot/skills`, `~/.agents/skills`, project `.claude/skills/`, …).
 
-Skills in these directories are discovered automatically; the agent loads `SKILL.md` when a gaming symptom matches the description. Diagnostic scripts are plain POSIX sh — they run identically under every agent (and standalone).
+| Agent | Path |
+|-------|------|
+| **Claude Code** | `~/.claude/skills/steam-debugger` |
+| **GitHub Copilot CLI** | `~/.copilot/skills/steam-debugger` |
+| **Codex** | `~/.agents/skills/steam-debugger` |
+
+### Full marketplace (all skills)
+
+```bash
+# Claude:  claude plugin marketplace add TuxLux40/skills && claude plugin install tuxlux-skills
+# Grok:    grok plugin marketplace add TuxLux40/skills && grok plugin install TuxLux40/skills --trust
+```
+
+Canonical home: [TuxLux40/skills](https://github.com/TuxLux40/skills) (`skills/steam-debugger`).
+
+Skills are discovered automatically; the agent loads `SKILL.md` when a gaming symptom matches. Diagnostic scripts are plain POSIX sh.
 
 ## Sources
 
