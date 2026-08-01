@@ -1,0 +1,14 @@
+{
+  "name": "tuxlux-skills",
+  "owner": {
+    "name": "TuxLux40",
+    "url": "https://github.com/TuxLux40"
+  },
+  "plugins": [
+    {
+      "name": "tuxlux-skills",
+      "source": "./",
+      "description": "Alle eigenen Agent-Skills von TuxLux40 in einem Plugin"
+    }
+  ]
+}
