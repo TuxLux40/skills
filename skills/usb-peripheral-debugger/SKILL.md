@@ -121,7 +121,7 @@ Ask before running any commands:
 | Build Polychromatic / OpenRGB plugin for a device | `reverse-engineering.md` Phase 5 + `rgb-control.md` |
 | Unknown device / kernel not binding correct driver | `device-ownership.md` → udevadm section |
 | Service starts wrong / env-var contamination | `daemon-conflicts.md` → systemd safe-start section |
-| Keyboard profile lost on reboot | `rgb-control.md` → onboard profile; example in `examples/logitech-g915.md` |
+| Keyboard profile lost on reboot | `rgb-control.md` → onboard profile; example in `references/examples/logitech-g915.md` |
 
 ### Step 3 — Match fix to user comfort
 

@@ -167,9 +167,9 @@ do not re-read every original PDF for facts that were already distilled.
    `vision_model` / `dream_model` / `dream_host` / `verify_model` / `verify_host` /
    `use_marker` / `ordering_principle` / `exclude_patterns` / `low_priority_patterns` /
    `priority_patterns` / `derive_per_file` / `generate_readme`). Plain YAML — create the
-   `.smart-okf/` folder and write the file directly; there is no `scripts/onboard.py`. The
-   config lives in the document root itself, not the skill repo — it's part of that KB, not
-   part of this install.
+   `.smart-okf/` folder and write the file directly — there is no separate onboarding
+   script for this step. The config lives in the document root itself, not the skill repo —
+   it's part of that KB, not part of this install.
 
 10. Offer a first ingest on one subfolder as a smoke test before the whole tree — see
    **Ingest cautions** below.

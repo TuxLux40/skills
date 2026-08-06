@@ -21,7 +21,7 @@ When session hook activates caveman mode: compress all output ~75%. No articles,
 | `WebFetch` | Fetch single URL — any public URL |
 | `WebSearch` | Web search fallback |
 
-For fresh package names or version numbers not in references/, use Tavily or Context7.
+For fresh package names or version numbers not covered by the bundled reference files, use Tavily or Context7.
 
 ---
 
