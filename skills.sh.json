@@ -1,0 +1,25 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "groupings": [
+    {
+      "title": "Linux & Desktop",
+      "description": "Desktop performance tuning, KDE theming, and dotfile management.",
+      "skills": ["linux-tuner", "kde-theming", "windows-styling-guide", "stow"]
+    },
+    {
+      "title": "Gaming",
+      "description": "Steam on Linux troubleshooting and debugging.",
+      "skills": ["steam-debugger"]
+    },
+    {
+      "title": "Documents & Knowledge",
+      "description": "File organization and local-first document knowledge bases.",
+      "skills": ["dokumenten-organisation", "smart-okf"]
+    },
+    {
+      "title": "Hardware & Security",
+      "description": "USB peripheral debugging, YubiKey, and Flipper Zero.",
+      "skills": ["usb-peripheral-debugger", "yubikey", "flipper-zero"]
+    }
+  ]
+}

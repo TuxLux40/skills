@@ -18,7 +18,8 @@
     "documents",
     "stow",
     "usb",
-    "skills"
+    "skills",
+    "flipper"
   ],
   "skills": "./skills/"
 }
