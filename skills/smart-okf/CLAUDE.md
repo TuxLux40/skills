@@ -68,4 +68,4 @@ Full detail in [`PYTHON_STANDARDS.md`](PYTHON_STANDARDS.md), [`PYTHON_TYPE_SAFET
 
 ## IDE/agent rule duplication
 
-This repo mirrors the same rules across `.cursor/rules/`, `.clinerules/`, `.windsurf/rules/`, `.github/copilot-instructions.md`, `.opencode/AGENTS.md`, and `rules/common/`. If you change a convention (style, type-safety, design process), update the canonical doc (`PYTHON_STANDARDS.md`, `PYTHON_TYPE_SAFETY.md`, `CODING_STANDARDS.md`, or `AGENTS.md`) and keep the IDE-specific copies in sync — don't edit only one. Voice is Hermes/Cortana (host soul); do not re-add a caveman default.
+This repo mirrors the same rules across `.cursor/rules/`, `.clinerules/`, `.windsurf/rules/`, `.github/copilot-instructions.md`, `.opencode/AGENTS.md`, and `rules/common/`. If you change a convention (style, type-safety, caveman mode, design process), update the canonical doc (`PYTHON_STANDARDS.md`, `PYTHON_TYPE_SAFETY.md`, `CODING_STANDARDS.md`, or `AGENTS.md`) and keep the IDE-specific copies in sync — don't edit only one.

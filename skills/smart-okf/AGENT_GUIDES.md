@@ -31,5 +31,6 @@ Read the relevant guide **before** changing code in that area.
 ## Workflows (session skills, not persisted as rules)
 
 - **`/design`** — design-doc writer/reviewer loop; deliverable lands in `docs/DESIGN.md` when committed
+- **`/caveman-init`** — terse communication rules; see `.cursor/rules/caveman.mdc` and peers
 - **`/python-code-style`** — ruff/mypy/pytest; see `PYTHON_STANDARDS.md` and `.github/workflows/python.yml`
 - **`/python-type-safety`** — strict mypy, protocols, aliases; see `PYTHON_TYPE_SAFETY.md`
