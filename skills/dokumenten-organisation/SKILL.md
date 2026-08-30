@@ -1,6 +1,6 @@
 ---
 name: dokumenten-organisation
-description: Ordnet, benennt und erschließt Dateien und Dokumente einheitlich, damit sie später wiederauffindbar sind — angewandte Methodik aus Archiv-, Bibliotheks- und Dokumentationswissenschaft (Aktenplan/Klassifikation, RDA/DIN-ISO-690-Benennungslogik, Boolesche Retrieval-Prinzipien, Aufbewahrung/Kassation). Immer nutzen, wenn der Nutzer eine chaotische Dateiablage, einen vollen Downloads-Ordner oder eine unstrukturierte Dokumentensammlung aufräumen, sortieren, kategorisieren, einheitlich umbenennen oder in ein Dokumentenmanagement-System (DMS) überführen will — auch wenn er nicht explizit "Katalogisieren" oder "Erschließen" sagt. Ebenso nutzen bei Fragen zu Dateinamens-Konventionen, Ordnerstrukturen, Aktenplänen, Aufbewahrungsfristen, Verschlagwortung/Tagging oder wie man eine Sammlung später leichter wiederfindet.
+description: Use when Oliver sends a document scan. File into NAS Aktenplan + git commit. Also: organize, name, and classify files so they stay findable (Aktenplan, RDA/DIN-ISO-690 naming, retrieval, retention). Use for chaotic folders, Downloads cleanup, renaming, tagging, or DMS filing — even without the words cataloguing/Erschließen.
 ---
 
 # Dokumenten-Organisation
@@ -96,3 +96,33 @@ wann Standardregeln nicht reichen: **`references/spezialbestaende.md`**.
   doppelt gelandet, Zielordner enthalten was sie sollen.
 - Bei Unsicherheit über Löschungen: verschieben statt löschen, siehe
   `references/aufbewahrung-und-kassation.md`.
+
+## Oliver: Signal-Scans ablegen
+
+Stehender Auftrag. Scan/Foto/PDF per Signal (oder „leg das ab“) → dieser Abschnitt, nicht nur Inventur.
+
+1. **Lesen.** Bilder: `vision_analyze`. PDFs: Skill `ocr-and-documents`. Inhalt: Absender, Datum, Typ, Aktenzeichen/Vertragsnummer, Betrag. Originalbytes behalten — OCR-Text ist nicht die Akte.
+2. **Ort.** Bestehenden Aktenplan unter `/home/oliver/documents` auf os93-nas. ai-hub sieht denselben Baum **read-only** unter `/mnt/pve/documents` (CIFS). **Keine neuen Unterordner.** Unsicher → eine Rückfrage, nicht raten.
+3. **Name.** Konvention der **Geschwister** im Zielordner. Fallback: `YYYY-MM-DD--Thema_Snake_Case.ext` (siehe `references/benennungskonventionen.md`). Umlaute transliterieren. Keine Leerzeichen. `IMG_…` / `Scan_…` nie stehen lassen.
+4. **Schreiben.** Nicht den CIFS-Mount. Kopieren:
+
+   ```bash
+   scp -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes \
+     <file> oliver@192.168.178.2:/home/oliver/documents/<relpath>/
+   ```
+
+5. **Git, ohne zu fragen.** Nur die neuen Dateien stagen — der Baum ist oft dirty (Bewerbungsunterlagen). Kein `git add -A`.
+
+   ```bash
+   ssh -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes oliver@192.168.178.2 \
+     "git -C /home/oliver/documents add -- <relpath> && \
+      git -C /home/oliver/documents \
+        -c user.name='Hermes Agent' -c user.email='agents@deroliver.me' \
+        commit -m 'docs: <kurz>'"
+   ```
+
+   Message greppbar: Typ + IDs wenn vorhanden. Repo hat **kein Remote** — Commit bleibt auf der NAS.
+6. **Kein** smart-okf-Ingest, außer Oliver verlangt es.
+7. Rückmeldung: Relativpfad + Commit-Hash.
+
+Details: `references/oliver-homelab.md`.
