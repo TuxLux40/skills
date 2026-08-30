@@ -1,6 +1,6 @@
 ---
 name: dokumenten-organisation
-description: Ordnet, benennt und erschließt Dateien und Dokumente einheitlich, damit sie später wiederauffindbar sind — angewandte Methodik aus Archiv-, Bibliotheks- und Dokumentationswissenschaft (Aktenplan/Klassifikation, RDA/DIN-ISO-690-Benennungslogik, Boolesche Retrieval-Prinzipien, Aufbewahrung/Kassation). Immer nutzen, wenn der Nutzer eine chaotische Dateiablage, einen vollen Downloads-Ordner oder eine unstrukturierte Dokumentensammlung aufräumen, sortieren, kategorisieren, einheitlich umbenennen oder in ein Dokumentenmanagement-System (DMS) überführen will — auch wenn er nicht explizit "Katalogisieren" oder "Erschließen" sagt. Ebenso nutzen bei Fragen zu Dateinamens-Konventionen, Ordnerstrukturen, Aktenplänen, Aufbewahrungsfristen, Verschlagwortung/Tagging oder wie man eine Sammlung später leichter wiederfindet.
+description: Use when organizing, naming, and classifying documents. Also: organize, name, and classify files so they stay findable (Aktenplan, RDA/DIN-ISO-690 naming, retrieval, retention). Use for chaotic folders, Downloads cleanup, renaming, tagging, or DMS filing — even without the words cataloguing/Erschließen.
 ---
 
 # Dokumenten-Organisation
