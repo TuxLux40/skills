@@ -120,6 +120,8 @@ amdgpu_top                                       # live utilization, clocks, pow
 
 **Hung GPU indicator:** `dmesg` shows `amdgpu: GPU recovered successfully` or `amdgpu: ring gfx timeout`. If no recovery, system hard-freezes.
 
+**Retroactively confirming a hard hang (not a crash or UI freeze) from a previous boot:** if the current boot's `dmesg`/`journalctl -b 0` shows nothing but the user reports a freeze, check `journalctl --list-boots` and inspect the *suspect* boot's tail directly (`journalctl -b -1` or the relevant offset). A boot whose log simply stops mid-entry — no `-- Reboot --` marker, no shutdown target reached — means journald itself stopped flushing, which is the signature of a kernel/GPU lockup hard enough to take the logger down with it, as opposed to a userspace crash (clean crash-to-desktop) or a Steam/UI-only freeze (system stays alive and keeps logging normally). Cross-reference the freeze's timestamp against `/var/log/pacman.log` for the same window — a `mesa`/`vulkan-radeon`/kernel/firmware bump shortly before onset is a strong lead; confirmed twice on this machine (see `tribal.md`).
+
 ### RADV / Vulkan
 
 ```bash

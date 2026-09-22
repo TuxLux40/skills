@@ -114,6 +114,26 @@ echo "vm.max_map_count=2147483642" | sudo tee /etc/sysctl.d/80-gamecompat.conf &
 | File picker only shows Steam library | Install `xdg-desktop-portal` |
 | Steam Beta breaking bugs | `rm -f ~/.local/share/Steam/package/beta` to revert to stable |
 
+## SteamClient JavaScript API (via CDP / `steam_ui_eval`)
+
+Undocumented quirks in the internal `SteamClient` API, found by direct use over Chrome DevTools Protocol. Signatures aren't publicly documented and can vary between Steam client versions — verify with `Object.keys(SteamClient.<Namespace>)` before relying on any of these.
+
+**`AddShortcut(name, exe, launchOptions, icon)`'s positional args don't map as the signature suggests.** In testing, only `exe` reliably landed correctly — `name` and `launchOptions` came back wrong or empty. Don't trust the return value; fix each field afterward with the dedicated setters (`SetShortcutName`, `SetAppLaunchOptions`) instead.
+
+**`SetShortcutLaunchOptions` persists to disk but does not update the live session — use `SetAppLaunchOptions` instead.** `SetShortcutLaunchOptions` writes to `shortcuts.vdf` (verifiable via `strings ~/.local/share/Steam/userdata/<id>/config/shortcuts.vdf`) but does **not** update Steam's in-memory launch config for the currently-running client — a `RunGame` right after calling only that setter launches the exe with zero args. `SetAppLaunchOptions` updates the live config and takes effect on the next launch. Even with the correct call, there's a **cache-refresh lag**: a relaunch triggered immediately after `SetAppLaunchOptions` can still use the *old* launch string. Workaround: close any running instance of the app, call `SetAppLaunchOptions`, wait a few seconds, then launch.
+
+**`RunGame` needs `gameid`, not `appid`.** Launch via `SteamClient.Apps.RunGame(gameid, "", -1, 100)`, where `gameid` is `info.m_gameid` (a large numeric string) from `appStore.GetAppOverviewByAppID(appid)` — the plain integer `appid` did not trigger anything via `LaunchNonSteamApp`/`RunGame` in testing.
+
+**`Overview` objects update asynchronously.** `appStore.GetAppOverviewByAppID(appid)` fields like `display_name` don't reflect a `Set*` call immediately — re-read after a short delay (~1.5s observed), not right after the call.
+
+**Chrome/CEF non-Steam shortcuts need `--no-sandbox` when launched through Steam, or the renderer silently never spawns.** Steam launches non-Steam shortcuts through its own `reaper`/`pressure-vessel` process wrapper, which conflicts with Chrome's own sandbox: a zygote process starts, but no renderer/GPU process ever follows (one child ends up `<defunct>`) — no window appears, and no error is logged anywhere. The exact same command launched directly from a shell (no Steam wrapper) works fine without `--no-sandbox`. Only needed for the Steam-launched path.
+
+**`--app` mode alone isn't fullscreen in Gaming Mode — add `--kiosk --test-type`.** Chrome's `--app=<url>` opens a normal, non-fullscreen (letterboxed) window under gamescope. Adding `--kiosk` makes it fill the display, but triggers Chrome's "unsupported command-line flag" infobar on its own; add `--test-type` alongside it to suppress that banner.
+
+**Steam Input ships a built-in "Web Browser" controller template for dpad→keyboard mapping — most non-Steam web-app shortcuts default to the wrong template instead.** A new non-Steam shortcut's controller config defaults to a generic gamepad template (e.g. "Gamepad With Joystick Trackpad") that doesn't translate the dpad into anything a webpage understands, even though the page itself may be fully keyboard-navigable. Diagnose by sending raw keyboard key presses directly to the page first — if arrow keys move focus, the content is keyboard-drivable and the problem is purely the controller mapping. Fix: open the per-app controller configurator (`SteamClient.Apps.ShowControllerConfigurator(appid)`) and switch the active template to Valve's own **"Web Browser"** layout (dpad → arrow keys, A → Enter, B → Back). Minor caveat: `SteamClient.Input.StopEditingControllerConfiguration()` doesn't reliably resolve/return when called — non-blocking, but don't wait on it; just verify via a fresh read of the active template instead.
+
+**Custom library art (Hero/Logo/Grid/Icon) for non-Steam shortcuts should come from SteamGridDB, and may need a Steam restart to appear.** Save files to `~/.local/share/Steam/userdata/<userid>/config/grid/<appid>{_hero,_logo,p,,_icon}.png` (same convention other non-Steam shortcuts like RetroDECK/EA App already use). If the shortcut's `Overview` object was already cached in memory for the current session before the art files existed, Steam won't pick them up live even though the files are in exactly the right place — restarting Steam reliably resolves it.
+
 ## NTFS / filesystem
 
 | Symptom | Fix |
