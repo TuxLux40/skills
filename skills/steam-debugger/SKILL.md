@@ -153,7 +153,9 @@ Read-only evidence collectors in `scripts/`. Run these instead of issuing the eq
 | `scripts/gpu-info.sh` | PCI GPU list + kernel driver in use, Vulkan devices, AMD sysfs power state/clocks/VRAM/temps, kernel GPU error messages |
 | `scripts/audio-snapshot.sh` | Audio server identity, PipeWire/WirePlumber service state, sinks/sources, default devices, ALSA card list, 32-bit/ALSA-bridge package presence |
 
-All scripts are POSIX sh, mutate nothing, and print `(skipped: <tool> not found)` for unavailable tools. Some checks need root (`fuser` on `/dev/dri`, `dmesg` on locked-down kernels) — scripts note when output is incomplete for that reason.
+All scripts above are POSIX sh, mutate nothing, and print `(skipped: <tool> not found)` for unavailable tools. Some checks need root (`fuser` on `/dev/dri`, `dmesg` on locked-down kernels) — scripts note when output is incomplete for that reason.
+
+**Exception — `scripts/fix-blank-controller-config.py` is not a diagnostic collector.** It's Python 3, requires the external `websockets` package (`uv pip install websockets`), and actively *applies* the "Controller Settings screen is completely blank" fix from `tribal.md` (calls `SteamClient.Input.ClearSelectedConfigForApp` over Steam's CDP port) rather than just collecting evidence. Confirm the fix applies (tribal.md entry, 🟣 tier) before running it, same as any other tribal-tier fix.
 
 Manual one-liners (when scripts unavailable):
 ```bash
