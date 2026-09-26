@@ -60,6 +60,21 @@ The layer where detection stops tells you where the problem is: kernel = driver/
 3. Or the opposite: force Steam Input on, so only the virtual pad exists
 4. `SteamInput=2` in `localconfig.vdf` for stubborn titles (⚠️ tier)
 
+## Did Steam Input pick the controller up? (`controller.txt`)
+
+`~/.steam/steam/logs/controller.txt` logs every device Steam adopts and what it does with it. Useful lines:
+
+- `Local Device Found` + `type: <vid> <pid>`: the device appeared.
+- `Steam controller device opened for index N`: Steam Input adopted it.
+- `Steam Controller reserving XInput slot N`: which player slot the game sees.
+- `Queueing activation for controller: N app: <appid>`: which config set is active for it. App `769` is Big Picture's own config; the running game's appid means the game's config is applied.
+
+Pair with `window.ControllerStore.GetControllersSorted()` (see `steam-client.md`) for the live slot list. Verified 2026-09-26.
+
+## Virtual controllers need no root
+
+Steam's own udev rule (`60-steam-input.rules`, from `steam-devices`) tags `/dev/uinput` with `uaccess`, so the logged-in user can create uinput devices without sudo (check: `getfacl /dev/uinput` shows `user:<you>:rw-`). A uinput device announcing Xbox 360 IDs (045e:028e) is adopted by Steam Input like a real pad — `controller.txt` shows it opened, given an XInput slot, and the running game's config activated. `/dev/uhid` is **not** covered (root-only by default). Verified 2026-09-26; whether every game reacts to such a pad was not conclusively tested.
+
 ## Works in menus, not in gameplay
 
 Distinct from the double-input bug: some ports use different input paths for menus (DirectInput/window messages) vs gameplay (raw XInput polling). Steam Input's interception feeds the first and starves the second. Fix: disable Steam Input per-game. Details + provenance: `tribal.md` → "Gamepad works in menus but not in gameplay".

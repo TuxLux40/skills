@@ -173,3 +173,13 @@ Hooking has failed somewhere!
 **Cause:** `plugin_loader.service` has `WantedBy=graphical-session.target` only.
 
 **Fix:** Ensure service is enabled for the correct gamescope target. On Bazzite: `ujust setup-decky` handles this. On others: check service install section and add gaming mode target.
+
+### 8. Decky plugin loaded twice / plugin files change ownership
+
+**Cause:** Decky loads **every** directory in `~/homebrew/plugins/` as a plugin, whatever its name. A backup copy like `myplugin.bak-2026…` with the same `plugin.json` name loads alongside the real one (`journalctl -u plugin_loader.service` shows `found plugin:` for both). Decky also changes ownership and permissions on load — for a plugin dir symlinked to a git checkout, the checkout's top directory and `plugin.json` became root-owned and every file was marked executable (git then reports "dubious ownership" and mode changes).
+
+**Fix:** Keep backups outside the plugins dir (e.g. `~/homebrew/plugin-backups/`); install plugins as plain copies, never symlinks. Restore a damaged checkout with `sudo chown -R $USER: <repo>` and revert mode-only changes.
+
+**Update channel:** `DeckyBackend.call("utilities/settings/get", "branch", -1)` / `…/set", "branch", 0)` in `SharedJSContext` reads/sets it (persisted in `~/homebrew/settings/loader.json`); `0` = stable, `1` = pre-release. Stable is safer — Decky updates can break plugins.
+
+Verified 2026-09-26 (Decky Loader 3.2.9, CachyOS).
