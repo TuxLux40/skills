@@ -71,6 +71,43 @@ The layer where detection stops tells you where the problem is: kernel = driver/
 
 Pair with `window.ControllerStore.GetControllersSorted()` (see `steam-client.md`) for the live slot list. Verified 2026-09-26.
 
+## How controller input reaches a game — and how to inject it
+
+Mental model: a game never reads the physical controller. Steam creates one
+**virtual gamepad** per connected controller (evdev name `Microsoft X-Box 360
+pad N`, USB IDs `28de:11ff`, under `/dev/input/eventN`); Steam Input reads the
+real device, applies the per-game config, and writes the result into that
+virtual pad, which the game polls every frame.
+
+To press buttons *as the user's controller* (e.g. to walk a controller-only
+user through graphics settings), write standard evdev events (`EV_KEY`
+`BTN_SOUTH`=A 0x130, `BTN_EAST`=B 0x131, `BTN_TL`/`BTN_TR` 0x136/0x137,
+`BTN_START` 0x13b; D-pad = `EV_ABS` `ABS_HAT0X`/`ABS_HAT0Y` ±1; each followed
+by `EV_SYN`) into that pad's node. Find it via
+`/sys/class/input/event*/device/id/{vendor,product}` = `28de`/`11ff`. Steam's
+`60-steam-input.rules` tags Valve-vendor input devices `uaccess`, so no root.
+Tap ~0.1 s; 0.5 s holds trigger menu auto-repeat. Steam only writes changes,
+so injecting a button the user is holding can cause an early release.
+
+Verified 2026-09-26 in Resident Evil Requiem (appid 3764200, Proton): writing
+into `pad 0` moved menu focus (D-pad), confirmed (A), backed out (B), switched
+tabs (LB/RB), and the game switched its prompts to controller glyphs — no
+second controller appeared. Not yet verified: which `pad N` belongs to which
+controller when several are connected; games built on the Steam Input API
+(they read actions from Steam, not the pad).
+
+Common confusions:
+- Valve's Steamworks **Steam Input API (`ISteamInput`) is the game side** — a
+  game asking Steam which actions are pressed. It is not a way for outside
+  programs to send input.
+- `SteamClient.Input` (Steam's internal JS API) can inject **keyboard** keys
+  (`ControllerKeyboardSetKeyState`, see `steam-client.md`) but has no
+  gamepad-button function.
+- Creating a new uinput pad (below) makes Steam see an **additional**
+  controller with its own player slot — not the user's. Prefer injecting into
+  the existing Steam pad; create a new one only when no controller is
+  connected.
+
 ## Virtual controllers need no root
 
 Steam's own udev rule (`60-steam-input.rules`, from `steam-devices`) tags `/dev/uinput` with `uaccess`, so the logged-in user can create uinput devices without sudo (check: `getfacl /dev/uinput` shows `user:<you>:rw-`). A uinput device announcing Xbox 360 IDs (045e:028e) is adopted by Steam Input like a real pad — `controller.txt` shows it opened, given an XInput slot, and the running game's config activated. `/dev/uhid` is **not** covered (root-only by default). Verified 2026-09-26; whether every game reacts to such a pad was not conclusively tested.
