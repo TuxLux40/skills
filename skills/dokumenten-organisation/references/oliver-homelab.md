@@ -11,19 +11,25 @@ Homelab overlay for Signal scans. Generic method stays in `SKILL.md`.
 
 Do not write through the CIFS mount. Do not invent top-level categories; the tree already has `Anbieter`, `Anwaelte`, `Arbeit_Bildung`, `Behoerden`, `Finanzen`, `Gesundheit`, `Haustiere`, `Import`, `Sport`, `Versicherungen`, `Wohnungen`.
 
-## SSH
+## SSH write path (Oliver 2026-09-27)
 
 ```bash
-ssh -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes oliver@192.168.178.2
+ssh -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes oliver@os93-nas
 ```
 
-LAN preferred (`192.168.178.2`). Key: `ai-hub-nas-sync`. Git identity is **not** set on the NAS user — pass `-c user.name='Hermes Agent' -c user.email='agents@deroliver.me'` on each commit.
+- Host: **`oliver@os93-nas`** (Tailscale MagicDNS). Prefer that over bare `192.168.178.2`.
+- Key: `~/.ssh/nas_sync_key` (`ai-hub-nas-sync`), always `IdentitiesOnly=yes`.
+- **Upload:** stream bytes over SSH stdin — `ssh … "cat > '/home/oliver/documents/…'" < localfile`. Verify size after.
+- **Do not** use: CIFS `/mnt/pve/documents` (RO), SFTP mounts, or `scp` (NAS SFTP subsystem fails: `dest open … No such file` / `stat remote: Unknown status`).
+- Fallback only if SSH file write fails: `tailscale file cp` — not the default.
+- Moves/renames: `ssh … mv` on the NAS, never mount-side moves.
+- Git identity is **not** set on the NAS user — pass `-c user.name='Hermes Agent' -c user.email='agents@deroliver.me'` on each commit.
 
 ## Git pitfalls
 
 - Branch: `main`. No remote configured.
 - Working tree is often dirty under `Arbeit_Bildung/Bewerbungen/`. Stage **only** the files this pass added.
-- `git status` / `git commit` over CIFS is slow and read-only anyway — run git on the NAS over SSH.
+- Run git **on the NAS over SSH** — never via CIFS.
 
 ## Naming vs existing folders
 

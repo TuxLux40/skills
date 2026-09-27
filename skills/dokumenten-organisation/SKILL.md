@@ -104,17 +104,21 @@ Stehender Auftrag. Scan/Foto/PDF per Signal (oder „leg das ab“) → dieser A
 1. **Lesen.** Bilder: `vision_analyze`. PDFs: Skill `ocr-and-documents`. Inhalt: Absender, Datum, Typ, Aktenzeichen/Vertragsnummer, Betrag. Originalbytes behalten — OCR-Text ist nicht die Akte.
 2. **Ort.** Bestehenden Aktenplan unter `/home/oliver/documents` auf os93-nas. ai-hub sieht denselben Baum **read-only** unter `/mnt/pve/documents` (CIFS). **Keine neuen Unterordner.** Unsicher → eine Rückfrage, nicht raten.
 3. **Name.** Konvention der **Geschwister** im Zielordner. Fallback: `YYYY-MM-DD--Thema_Snake_Case.ext` (siehe `references/benennungskonventionen.md`). Umlaute transliterieren. Keine Leerzeichen. `IMG_…` / `Scan_…` nie stehen lassen.
-4. **Schreiben.** Nicht den CIFS-Mount. Kopieren:
+4. **Schreiben.** Direkt per **SSH** (stdin-Pipe). Kein CIFS-Mount, kein SFTP-Mount, kein `scp` (SFTP-Subsystem auf der NAS bricht mit `dest open … No such file`). Host: `oliver@os93-nas` (Tailscale MagicDNS; Key `~/.ssh/nas_sync_key`, `IdentitiesOnly=yes`). Optional: `tailscale file cp` wenn SSH hakt — nicht als Default.
 
    ```bash
-   scp -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes \
-     <file> oliver@192.168.178.2:/home/oliver/documents/<relpath>/
+   ssh -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes oliver@os93-nas \
+     "cat > '/home/oliver/documents/<relpath>/<name.ext>'" \
+     < /local/path/to/file
+   # size check: local stat vs remote stat must match
    ```
+
+   Verschieben/Umbenennen auf der NAS ebenfalls nur per `ssh … mv` / `git mv`, nie über Mounts.
 
 5. **Git, ohne zu fragen.** Nur die neuen Dateien stagen — der Baum ist oft dirty (Bewerbungsunterlagen). Kein `git add -A`.
 
    ```bash
-   ssh -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes oliver@192.168.178.2 \
+   ssh -i ~/.ssh/nas_sync_key -o IdentitiesOnly=yes oliver@os93-nas \
      "git -C /home/oliver/documents add -- <relpath> && \
       git -C /home/oliver/documents \
         -c user.name='Hermes Agent' -c user.email='agents@deroliver.me' \
@@ -123,6 +127,10 @@ Stehender Auftrag. Scan/Foto/PDF per Signal (oder „leg das ab“) → dieser A
 
    Message greppbar: Typ + IDs wenn vorhanden. Repo hat **kein Remote** — Commit bleibt auf der NAS.
 6. **Kein** smart-okf-Ingest, außer Oliver verlangt es.
-7. Rückmeldung: Relativpfad + Commit-Hash.
+7. Rückmeldung: Relativpfad + Commit-Hash. Keine Initialpasswörter aus Zugangsdaten-Schreiben in den Chat.
 
 Details: `references/oliver-homelab.md`.
+
+## Lessons
+
+- NAS writes: SSH `cat >` pipe to `oliver@os93-nas`, never scp/SFTP/CIFS mount — SFTP subsystem on os93-nas fails open; mounts are RO or flaky (Oliver 2026-09-27).
