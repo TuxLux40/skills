@@ -142,6 +142,26 @@ WINEDLLOVERRIDES="d3d11=n" wine game.exe          # force native D3D11 (e.g. for
 
 In winecfg: Libraries tab → add override per-DLL.
 
+### ReShade in D3D9 games: every effect fails with E5002 (⚠️ community-documented)
+
+Symptom: `ReShade.log` shows `Failed to compile '…\Shaders\X.fx'` for nearly all effects with
+`E5002: Static variables cannot have both numeric and resource components`; the game runs without effects (or with only
+a few). Cause: ReShade compiles DX9 (shader model 3) effects through `d3dcompiler_47.dll`; Wine/Proton's built-in
+compiler (vkd3d-shader) cannot split the sampler-plus-pixel-size statics that ReShade's SM3 output emits
+([CeeJayDK/ReShade-Testing-Initiative, DXBC-ON-LINUX.md](https://github.com/CeeJayDK/ReShade-Testing-Initiative/blob/main/docs/DXBC-ON-LINUX.md)).
+DX10+ games are not affected.
+
+Fix: give the game Microsoft's own compiler, matching the game's bitness.
+1. Get it: `winetricks d3dcompiler_47` (or reuse `~/.cache/winetricks/d3dcompiler_47/d3dcompiler_47_32.dll` for 32-bit,
+   `d3dcompiler_47.dll` for 64-bit) and copy it next to the game EXE as `d3dcompiler_47.dll`.
+2. Override it to native for that EXE: launch option `WINEDLLOVERRIDES="d3dcompiler_47=n;d3d9=n,b" %command%`, or in the
+   prefix's `user.reg` under `[Software\\Wine\\AppDefaults\\<game>.exe\\DllOverrides]` add `"d3dcompiler_47"="native"`
+   (edit `user.reg` only while the game and its wineserver are closed; Wine rewrites it on exit).
+3. Verify: `ReShade.log` now says `Successfully compiled …` for each effect. A preset may then visibly change the image
+   (a colour tint is the preset's grading, not a bug; it never applied before).
+Missing-texture errors that remain (`Source 'X.png' … was not found`) come from shader packs copied without their
+`Textures` folder; fetch the PNG from the shader's own repository.
+
 ### MIDI support for old games
 
 90s/00s games often used MIDI for music:
