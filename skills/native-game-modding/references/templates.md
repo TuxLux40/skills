@@ -35,7 +35,7 @@
 <state bytes, order, measured timings>
 
 ## The game's controls
-| Value (address/offset) | Meant for | Normal range | Measured scale |
+| Value (address/offset) | Meant for | Normal range | Measured scale | Evidence (observed / inferred / unknown) |
 
 ## Frame order
 input → … → skeleton → effects (laser) → camera → render
