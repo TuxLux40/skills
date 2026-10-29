@@ -54,6 +54,41 @@ For the subsystem you are about to change, find and write down:
 Confirm guesses at runtime (diag log, memory read) before building on them. Agents misidentify functions
 confidently.
 
+### Doing Phase 1 with REA (preferred) or the Ghidra dump
+
+Condensed from the `reverse-engineer-anything` skill; read it for full tool details. REA tools are deferred MCP
+tools (`mcp__rea__*`): load them with ToolSearch.
+
+1. **Checklist first.** Turn the question into a list of things to answer and the evidence each needs, for
+   example "which function sets the arm pose at the raise, for every weapon?" or "in which order do sway, laser
+   and camera run in a frame?".
+2. **Reuse state.** Call `binary_session` with `{}` first. If the game exe is already open, keep using it. Don't
+   open a duplicate session or repeat an identical analysis.
+3. **Open and orient.** Call `open_binary` on the game exe with provider `ghidra`. Find entry points with
+   `search_strings` (debug strings, file names), `search_procedures` or a known address.
+4. **Dossier.** `analyze_function` gives pseudocode, callers, callees, references and value flow in one call.
+   For more detail, use `inspect_analysis_view` with its Evidence ID instead of re-running the analysis.
+5. **Variants.** Call `procedure_callers` / `xrefs` on the shared helper (the pose init, the effect spawn, and
+   so on). Use `build_call_path` / `trace_call_path` to place a function in the frame. Skipping this is how a
+   fix lands for one weapon only.
+6. **Make names stick.** Use `set_address_name` / `annotate_native_function` for whatever is understood, so
+   later passes read named code instead of `FUN_00753660`. Put the same names into `docs/mechanics/`.
+7. **Observed, inferred or unknown.** Mark every claim as one of these. Pseudocode is analysis, not source, and
+   static analysis never shows what ran. A bounded search stays bounded: "no other callers found in X" is not
+   "no other callers".
+8. **Close the checklist.** Mark each question answered, partial or unresolved before designing. Then call
+   `close_binary`.
+
+**Fallback without REA.** If REA isn't connected, follow the same steps on the Ghidra text dump: `grep -n
+"FUN_xxxx("` finds callers, and `awk` cuts out one function. Repair REA later with its connection guide rather
+than skipping the analysis.
+
+**Runtime confirmation under Proton.** Prefer the mod's own diag log: values plus ms since the event, read from
+inside the game.
+- Debuggers or Frida attached to a Wine process are fragile and may need ptrace rights the agent lacks
+  (`ptrace_scope=1`).
+- Use them only when the log can't answer, and only for single-player games without anti-cheat.
+
 ## Phase 2 — design
 
 Check `references/gameplay-conventions.md` for how shipped modern games solve this, so you're not inventing a
