@@ -109,6 +109,6 @@ Present the design (gate 2) and wait for the go when behaviour changes.
 
 ## Credits
 
-Process ideas adapted from [rehan-remade/universal-modder](https://github.com/rehan-remade/universal-modder)
+Analysis workflow condensed from the `reverse-engineer-anything` (REA) skill. Process ideas adapted from [rehan-remade/universal-modder](https://github.com/rehan-remade/universal-modder)
 (MIT): MODLOG journal, "read the real thing", the running game as the oracle, circuit breaker. Also from
 [vgrichina/re-skill](https://github.com/vgrichina/re-skill) (MIT): dead-ends log and the stuck rule.
