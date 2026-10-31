@@ -108,6 +108,35 @@ Common confusions:
   the existing Steam pad; create a new one only when no controller is
   connected.
 
+## Injecting keyboard input into a game (xdotool)
+
+For keyboard-driven game screens (puzzles, menus), `xdotool` works, but three
+things bite:
+
+- **Right display.** In Gaming Mode gamescope runs more than one Xwayland:
+  `:0` is usually Steam itself, the game sits on `:1` (or higher). Check with
+  `DISPLAY=:1 xdotool getwindowfocus getwindowname`. Keys sent to `:0` land in
+  Steam's Big Picture window, not the game.
+- **Hold, don't tap.** `xdotool key X` sends press and release back to back.
+  Games sample input once per frame, so the tap falls between two samples and
+  is ignored. Hold ~120 ms in one process:
+  `xdotool keydown -- X sleep 0.12 keyup -- X`. That is still under X's
+  ~250 ms autorepeat delay, so menus and text fields get one keystroke.
+- **No `--clearmodifiers` on held keys.** It releases and re-presses the
+  user's modifiers around each subcommand. After a held `Shift_L` sent with
+  `keydown/keyup --clearmodifiers`, a Proton game kept treating a key as held
+  (the character could not walk) although the X server reported every key up.
+  Which key the game saw as held was not pinned down.
+
+**Recovery for "stuck" game input after synthetic keys:** send releases on the
+game's display. Releasing a key that isn't down is harmless.
+`DISPLAY=:1 xdotool keyup Shift_L Shift_R Control_L Control_R Alt_L Alt_R Super_L Return Up Down Left Right`
+
+Verified 2026-10-31 in Resident Evil 4 (2005, appid 254700, Proton 11.0):
+held keys solved its tile puzzle where instant taps did nothing, and the
+`keyup` sweep immediately restored walking. decky-claude's `send_key` holds
+120 ms by default (`hold_ms`, 0 = old instant tap).
+
 ## Virtual controllers need no root
 
 Steam's own udev rule (`60-steam-input.rules`, from `steam-devices`) tags `/dev/uinput` with `uaccess`, so the logged-in user can create uinput devices without sudo (check: `getfacl /dev/uinput` shows `user:<you>:rw-`). A uinput device announcing Xbox 360 IDs (045e:028e) is adopted by Steam Input like a real pad — `controller.txt` shows it opened, given an XInput slot, and the running game's config activated. `/dev/uhid` is **not** covered (root-only by default). Verified 2026-09-26; whether every game reacts to such a pad was not conclusively tested.

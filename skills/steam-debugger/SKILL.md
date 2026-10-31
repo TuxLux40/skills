@@ -79,6 +79,7 @@ Users reporting gaming issues are usually **not Linux experts**. Before suggesti
 | Game on GOG/Epic/itch.io (not in Steam) | `wine-proton.md` → Wine managers |
 | Steam Deck hardware question (firmware, OLED audio, controller) | `steam-deck.md` |
 | Controller not detected / wrong buttons / double input | `input.md` |
+| xdotool keys ignored by a game, or game input stuck after injected keys | `input.md` → Injecting keyboard input |
 | NVIDIA: driver won't load, black screen, post-suspend crashes, version mismatch | `gpu-nvidia.md` |
 | Flatpak Steam: drives invisible, MangoHud/protontricks broken, controller blocked | `steam-client.md` → Flatpak Steam |
 | In-game launcher broken (EA App, Ubisoft Connect, Rockstar) | `wine-proton.md` → In-Game Launchers |
