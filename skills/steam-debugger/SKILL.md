@@ -169,6 +169,10 @@ env | grep -E 'STEAM|LD_PRELOAD|LD_LIBRARY|PROTON|PRESSURE'
 cat ~/.steam/root/steamapps/compatdata/<appid>/version   # which Proton last ran this prefix
 ```
 
+## Learning Loop (local learnings)
+
+`scripts/learning-loop.py` is a Claude Code hook (SessionStart + Stop) that makes this skill grow from use. Each machine keeps its own `~/.local/share/steam-debugger/learnings.md`: **grep it for the symptom before diagnosing from scratch.** After a stretch of debugging the Stop hook asks you to record findings there, each with status (confirmed / observed / unverified) and evidence. Never record what didn't happen. When `~/.config/steam-debugger/repo` names a writable checkout of this skill, confirmed general findings are also promoted into the reference files and pushed. Wiring: see the script's docstring; decky-claude wires it automatically.
+
 ## Mental Model: All Hardware Conflicts Share One Pattern
 
 > **Device → single-owner privilege → arbiter → unexpected second claimant**
