@@ -35,6 +35,13 @@
         "yubikey",
         "flipper-zero"
       ]
+    },
+    {
+      "title": "Shopping & Lifestyle",
+      "description": "Price comparison and product recommendations for the German market.",
+      "skills": [
+        "german-shopping-assistant"
+      ]
     }
   ]
 }
