@@ -1,0 +1,10 @@
+{
+  "skill": "german-shopping-assistant",
+  "test_cases": [
+    {"input": "Find the cheapest e-scooter under 800€ that supports 100kg and is allowed on German trains", "should_trigger": true},
+    {"input": "Compare prices for iPhone 16 on Amazon.de and MediaMarkt", "should_trigger": true},
+    {"input": "Recommend a good gaming laptop available in Germany under 1200€", "should_trigger": true},
+    {"input": "What's the weather in Berlin today?", "should_trigger": false},
+    {"input": "Help me write a German eBay listing for my old laptop", "should_trigger": false}
+  ]
+}
