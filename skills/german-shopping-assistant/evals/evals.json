@@ -1,0 +1,36 @@
+{
+  "skill": "german-shopping-assistant",
+  "test_cases": [
+    {
+      "name": "escooter_commute_weight_train",
+      "input": "I need an escooter for commute. I weigh 90kg. Main routes are a German S-Bahn commute. Under 1000€ and it needs to be allowed on German trains like the RE6 and S8.",
+      "assertions": [
+        "Researches e-scooter rules for German regional trains / NRW",
+        "Filters for weight capacity suitable for 90kg user",
+        "Stays under 1000€ budget",
+        "Compares prices on German sites like Idealo or Amazon.de",
+        "Presents comparison table or clear recommendations with caveats about train rules"
+      ]
+    },
+    {
+      "name": "price_comparison_electronics",
+      "input": "What's the cheapest good RTX 4070 Super in Germany right now? Prefer reliable shops.",
+      "assertions": [
+        "Uses Idealo or Geizhals for comparison",
+        "Includes shipping in total price consideration",
+        "Mentions reliable German shops",
+        "Provides current best offers with links or clear next steps"
+      ]
+    },
+    {
+      "name": "product_recommendation_laptop",
+      "input": "Recommend a mid-range laptop for Linux under 1000€ that has good battery and can be bought in Germany with proper warranty.",
+      "assertions": [
+        "Considers German market availability and warranty",
+        "Filters by budget and use case",
+        "Compares options across shops",
+        "Mentions consumer rights or return policy where relevant"
+      ]
+    }
+  ]
+}
