@@ -29,11 +29,12 @@
     },
     {
       "title": "Hardware & Security",
-      "description": "USB peripheral debugging, YubiKey, and Flipper Zero.",
+      "description": "USB peripheral debugging, YubiKey, Flipper Zero, and hardware repair.",
       "skills": [
         "usb-peripheral-debugger",
         "yubikey",
-        "flipper-zero"
+        "flipper-zero",
+        "ifixit"
       ]
     },
     {

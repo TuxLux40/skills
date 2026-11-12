@@ -19,7 +19,8 @@
     "stow",
     "usb",
     "skills",
-    "flipper"
+    "flipper",
+    "repair"
   ],
   "skills": "./skills/"
 }

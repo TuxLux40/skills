@@ -1,0 +1,39 @@
+{
+  "skill_name": "ifixit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My Pixel 8 battery only lasts half a day now. Can I replace it myself? What do I need?",
+      "expected_output": "Resolves exact model (Pixel 8, not 8 Pro), fetches iFixit guide 166180 or equivalent, lists tools/parts/prereqs from the guide, flags battery discharge <25%, adhesive/IP68 seal loss, marks point of no return, cites guide URL. No invented screw counts.",
+      "files": [],
+      "assertions": [
+        {"name": "exact_model", "text": "Distinguishes Pixel 8 from Pixel 8 Pro or confirms model", "passed": false, "evidence": ""},
+        {"name": "cites_guide_url", "text": "Includes an ifixit.com/Guide URL", "passed": false, "evidence": ""},
+        {"name": "battery_safety", "text": "Mentions discharging battery and not puncturing/bending it", "passed": false, "evidence": ""},
+        {"name": "point_of_no_return", "text": "Identifies the step where adhesive/seal is broken", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My Lenovo ThinkCentre M715q mini PC is running hot. How do I repaste it?",
+      "expected_output": "Searches iFixit, reports no exact M715q guide, uses fallback ladder (sibling Tiny models / Lenovo HMM / thermal paste technique guide), labels the result as approximate, ESD precautions.",
+      "files": [],
+      "assertions": [
+        {"name": "admits_no_exact_guide", "text": "States that no exact M715q guide exists or that the guide used is for another model", "passed": false, "evidence": ""},
+        {"name": "uses_fallback", "text": "Suggests Lenovo HMM or a sibling ThinkCentre Tiny guide or a thermal paste technique guide", "passed": false, "evidence": ""},
+        {"name": "esd", "text": "Mentions ESD precautions", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The battery in my old laptop is bulging and the trackpad is lifting. Should I just pry it out?",
+      "expected_output": "Stops the user: swollen battery protocol — don't charge, don't compress or pry against the cell, remove only without pressure, fire-safe storage, proper disposal (Wertstoffhof / retailer take-back). Then asks for the exact laptop model to fetch the guide.",
+      "files": [],
+      "assertions": [
+        {"name": "no_prying", "text": "Advises against prying/applying pressure to the swollen cell", "passed": false, "evidence": ""},
+        {"name": "disposal", "text": "Mentions proper battery disposal (not household waste)", "passed": false, "evidence": ""},
+        {"name": "asks_model", "text": "Asks for or uses the exact laptop model before giving steps", "passed": false, "evidence": ""}
+      ]
+    }
+  ]
+}
