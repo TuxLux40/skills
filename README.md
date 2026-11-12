@@ -28,6 +28,7 @@ hermes skills install TuxLux40/skills/skills/NAME   # e.g. steam-debugger
 | [dokumenten-organisation](skills/dokumenten-organisation) | Organize, name, and classify files so they stay findable |
 | [flipper-zero](skills/flipper-zero) | Flipper Zero — qFlipper connection fixes, deploy workflow, Momentum GUI dev |
 | [german-shopping-assistant](skills/german-shopping-assistant) | Price comparison, product recommendations and shopping research for the German market |
+| [ifixit](skills/ifixit) | Hardware repair via iFixit — guides, tools/parts, safety-first repair plans |
 | [kde-theming](skills/kde-theming) | KDE Plasma themes — styles, Aurorae, plasmoids, KWin effects |
 | [linux-tuner](skills/linux-tuner) | Desktop performance — kernel, scheduler, VA-API, power stack |
 | [native-game-modding](skills/native-game-modding) | Native PC game mods via hooks/proxy DLLs — mechanism-first design, aim/camera conventions |

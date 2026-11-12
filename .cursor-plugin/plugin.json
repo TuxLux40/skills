@@ -17,7 +17,8 @@
     "yubikey",
     "documents",
     "skills",
-    "flipper"
+    "flipper",
+    "repair"
   ],
   "skills": "./skills/"
 }
