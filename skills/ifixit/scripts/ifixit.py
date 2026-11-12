@@ -52,6 +52,8 @@ def strip_markup(s: str) -> str:
     # iFixit raw text uses [link|...] and [guide|id|text] wiki markup; keep the label.
     s = re.sub(r"\[(?:link|guide|product)\|[^|\]]*\|([^\]]*)\]", r"\1", s)
     s = re.sub(r"\[(?:link|guide|product)\|([^\]]*)\]", r"\1", s)
+    # MediaWiki leftovers: [[Link|Text]] -> Text, [[Text]] -> Text
+    s = re.sub(r"\[\[(?:[^\]]+\|)?([^\]]+)\]\]", r"\1", s)
     return s.replace("''", "")
 
 

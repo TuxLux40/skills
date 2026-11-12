@@ -249,8 +249,8 @@ to prevent.
    4, case refs) as the join key across folders and commits:
 
    ```bash
-   git -C /path/to/documents log --all --grep='123456789' -i
-   git -C /path/to/documents log -S '123456789' -- '*.md'
+   git -C /path/to/documents log --all --grep='PQ90RS1234' -i
+   git -C /path/to/documents log -S 'PQ90RS1234' -- '*.md'
    ```
 
 5. **Answer** citing source **filenames** (provenance lines), not only the aggregate path.
@@ -303,7 +303,7 @@ Re-ingest after the extraction prompt was fixed to stop dropping footer-block
 identifiers; both folders previously collapsed a second employer into the first.
 
 Folders: insurances/social_insurance, insurances/pension_insurance
-IDs: rentenversicherungsnummer=12345678X901, personalnummer=87654321, betriebsnummer=11122233, betriebsnummer=44455566
+IDs: rentenversicherungsnummer=00000000X000, personalnummer=XY98ZT7654, betriebsnummer=CD34EF5678, betriebsnummer=GH56IJ7890
 EOF
 )"
 
@@ -325,7 +325,7 @@ being a useful join key once it's everything.
 ```bash
 git -C /path/to/documents log --stat
 git -C /path/to/documents diff HEAD~1 -- '*.md'
-git -C /path/to/documents log --grep='123456789' -i
+git -C /path/to/documents log --grep='PQ90RS1234' -i
 ```
 
 Root-level per-matter files (**R2**, `<root>/matters/<slug>.md`) are written automatically by

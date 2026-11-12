@@ -11,10 +11,12 @@ from app.services.matter_grouping import (
 
 
 def test_extract_numeric_tokens_finds_five_plus_digit_runs() -> None:
-    tokens = extract_numeric_tokens("Vertrag 999888777, Zähler 1ABC0012345678, Az. 1122334455, kurz 1234")
+    # 000000000 / 0000000000 are obviously fake all-zero IDs; kept numeric because
+    # this test covers extract_numeric_tokens' pure digit-run path (min 5 digits).
+    tokens = extract_numeric_tokens("Vertrag 000000000, Zähler 1ABC0012345678, Az. 0000000000, kurz 1234")
 
-    assert "999888777" in tokens
-    assert "1122334455" in tokens
+    assert "000000000" in tokens
+    assert "0000000000" in tokens
     assert "1234" not in tokens  # below the 5-digit floor
 
 
@@ -41,8 +43,8 @@ def test_pertinence_forms_a_group_a_conservative_run_would_miss() -> None:
 
 def test_two_aggregates_sharing_a_token_form_one_group() -> None:
     digests = {
-        Path("providers/eon.md"): "Sources: contract_999888777.pdf",
-        Path("finances/statement.md"): "Summary: payment ref 999888777 to ACME",
+        Path("providers/eon.md"): "Sources: contract_AB12CD3456.pdf",
+        Path("finances/statement.md"): "Summary: payment ref AB12CD3456 to ACME",
         Path("health/visit.md"): "Summary: dentist appointment",
     }
 
@@ -95,13 +97,13 @@ def test_unrelated_pair_and_related_pair_form_separate_groups() -> None:
 
 def test_group_tokens_returns_the_shared_token() -> None:
     digests = {
-        Path("providers/eon.md"): "Sources: contract_999888777.pdf",
-        Path("finances/statement.md"): "Summary: payment ref 999888777 to ACME",
+        Path("providers/eon.md"): "Sources: contract_AB12CD3456.pdf",
+        Path("finances/statement.md"): "Summary: payment ref AB12CD3456 to ACME",
     }
 
     tokens = group_tokens([Path("providers/eon.md"), Path("finances/statement.md")], digests)
 
-    assert tokens == ["999888777"]
+    assert tokens == ["AB12CD3456"]
 
 
 def test_group_tokens_includes_both_tokens_in_a_chained_group() -> None:
@@ -120,16 +122,16 @@ def test_group_tokens_includes_both_tokens_in_a_chained_group() -> None:
 
 def test_alphanumeric_reference_token_forms_a_group() -> None:
     digests = {
-        Path("insurances/social.md"): "Identifiers: versicherungsnummer: 12345678X901",
-        Path("work/employment.md"): "Identifiers: versicherungsnummer: 12345678X901",
-        Path("unrelated.md"): "Identifiers: kundennummer: 999888777",
+        Path("insurances/social.md"): "Identifiers: versicherungsnummer: 00000000X000",
+        Path("work/employment.md"): "Identifiers: versicherungsnummer: 00000000X000",
+        Path("unrelated.md"): "Identifiers: kundennummer: AB12CD3456",
     }
 
     groups = group_by_shared_tokens(digests)
 
     assert len(groups) == 1
     assert set(groups[0]) == {Path("insurances/social.md"), Path("work/employment.md")}
-    assert "12345678X901" in extract_numeric_tokens(digests[Path("insurances/social.md")])
+    assert "00000000X000" in extract_numeric_tokens(digests[Path("insurances/social.md")])
 
 
 def test_shared_year_alone_does_not_form_a_group() -> None:
