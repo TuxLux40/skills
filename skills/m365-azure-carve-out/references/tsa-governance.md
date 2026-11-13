@@ -46,6 +46,19 @@ Choose by system, not by programme.
 
 **M365 "logical separation" reality check:** inside one tenant you can partition with administrative units, Exchange RBAC scopes / address book policies, information barriers, SharePoint site permissions and `Sites.Selected` app access. But Global Admins, tenant-wide app permissions, audit logs and eDiscovery still see both sides. State this explicitly in the TSA and the DPA.
 
+## RACI: who decides, who does, who's told
+
+Cross-company separations stall because a decision sits between two IT departments and nobody owns it. A RACI matrix fixes that: for each workstream and each big entanglement decision, name —
+
+- **R — Responsible**: does the work (can be several people).
+- **A — Accountable**: owns the outcome and signs off. **Exactly one** per row — if there's no single A, the task isn't fully defined. A can also be an R.
+- **C — Consulted**: has input and must be asked *before* the decision (the other side's system owner, the works council, the DPO, Legal on licences).
+- **I — Informed**: told of the outcome (affected users, service desk, steering committee).
+
+Template: `templates/raci-matrix.csv`. Build it alongside the entanglement register — the register's `decision_owner` column *is* the Accountable, and the Consulted column should name the other company's system owner for every shared node.
+
+Variants you may meet: **RASCI** adds S (Support — actively helps R, vs C who only advises); **RACI-VS** adds Verify + Sign-off for acceptance. In German-speaking IT the **VIMA/VIMAF** matrix is common and avoids the R-vs-A confusion: *Verantwortlich* (does it), *Informiert*, *Mitwirkung* (contributes), *Abstimmung* (must agree beforehand), *Freigabe* (must approve/release). Use whichever the organisation already uses; don't impose a new scheme mid-programme.
+
 ## Programme steps, outputs, owners
 
 | Step | Output | Owner |

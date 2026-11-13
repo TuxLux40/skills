@@ -1,13 +1,15 @@
 ---
 name: m365-azure-carve-out
-description: IT carve-out / divestiture / tenant split for Microsoft 365, Entra ID, on-prem Active Directory and Azure — discovery, infrastructure and topology mapping, dependency and relationship analysis, separation approach per system, Day One design, TSA scoping and exit, and Microsoft-native tenant-to-tenant migration (cross-tenant mailbox, OneDrive, SharePoint, Migration Orchestrator, Azure subscription directory transfer). Use whenever the user mentions carve-out, divestiture, spin-off, separation, TSA / transition services agreement, entanglement, "split the tenant", "move users to the new company's tenant", tenant-to-tenant (T2T) migration, cross-tenant migration, M&A IT integration, domain move between tenants, AD forest separation, or asks how to find which apps, groups, sites, subscriptions, networks or identities are shared between two business units. Also use for building an inventory, dependency graph or entanglement register of an M365/Azure estate, even when no deal is mentioned.
+description: IT carve-out / divestiture / tenant split for Microsoft 365, Entra ID, on-prem Active Directory and Azure — discovery, infrastructure and topology mapping, dependency and relationship analysis, separation approach per system, Day One design, TSA scoping and exit, and Microsoft-native tenant-to-tenant migration (cross-tenant mailbox, OneDrive, SharePoint, Migration Orchestrator, Azure subscription directory transfer). Use whenever the user mentions carve-out, divestiture, spin-off, separation, TSA / transition services agreement, entanglement, "split the tenant", "move users to the new company's tenant", tenant-to-tenant (T2T) migration, cross-tenant migration, M&A IT integration, domain move between tenants, AD forest separation, or asks how to find which apps, groups, sites, subscriptions, networks or identities are shared between two business units. Also use for building an inventory, dependency graph or entanglement register of an M365/Azure estate, even when no deal is mentioned, and when a standard non-admin user wants to find out what apps, sites, groups and resources exist and what they depend on without admin rights or cooperation from the other side.
 ---
 
 # M365 / Azure carve-out
 
-Goal: turn "we're selling business unit X" into a **sourced, dated, dependency-ordered separation plan** — where every shared object is known, every one has an owner and a separation approach, and nothing is found for the first time after signing.
+Goal: turn a split ("we're separating from the parent company", "we're selling business unit X") into a **sourced, dated, dependency-ordered separation plan** — where every shared object is known, every one has an owner and a separation approach, and nothing is found for the first time after signing.
 
 The method in one line: **inventory everything → express it as a graph → label the nodes by owner (divest / retain) → the edges between the two sides are your entanglements → each entanglement gets an approach, a Day One answer and, if needed, a TSA line with an end date.**
+
+Assume the user is **non-technical and wants you to do the work.** Don't hand them a wall of PowerShell and walk away: tell them in plain language what you need from them (a sign-in, a screenshot, an export, an answer), do the analysis yourself, and explain findings like a colleague, not a console. Many users on the divested side **have no admin rights and little cooperation from the other company's IT** — the skill is built to work from that position, not to assume you run the tenant.
 
 ## Ground rules
 
@@ -18,6 +20,14 @@ The method in one line: **inventory everything → express it as a graph → lab
 - **Labour and privacy law apply in Germany and the EU.** Analysing sign-in logs per employee is monitoring data: involve the works council (*Betriebsrat*, BetrVG §87(1) Nr. 6) and the DPO, and aggregate where you can. Seller-run TSA services that touch the buyer's personal data need a GDPR Art. 28 DPA. Staff who move with the business: Directive 2001/23/EC / §613a BGB. Flag these; don't give legal advice.
 
 ## Workflow
+
+### Start here: what access do you have?
+The discovery method depends entirely on this. Establish it before choosing tools:
+
+- **Posture B — standard user, no admin, limited or no cooperation (the baseline — start here).** You are an ordinary account on the estate and the other company's IT won't hand over an inventory. This is normal on the divested side. You can still map a great deal from your own footprint and your colleagues' footprints, **read-only, using only what your own account can already see.** Start with `references/discovery-without-admin.md` and `scripts/user-footprint.ps1`, then **make "read-only access or a data export" an explicit early ask / TSA line** — getting it is itself a carve-out deliverable, not a prerequisite you wait on.
+- **Posture A — admin / cooperation (fallback / later).** If you (or someone who will run commands for you) later get Global Reader, Exchange View-Only, SharePoint admin, Azure Reader, or the other side shares exports → add the full collectors in step 1 on top of what you already found.
+
+Either way the output feeds the same graph (step 2). Posture B gives a sparser graph built mostly from *observed* evidence (what people actually log into and open); name the gaps rather than guessing. Treat admin collectors as the enrichment, not the prerequisite — you can produce a useful register from the user-level view alone.
 
 ### 0. Frame the deal (ask before anything else)
 Ask these first. Each answer changes the plan:
@@ -31,11 +41,14 @@ Ask these first. Each answer changes the plan:
 ### 1. Inventory: collect raw facts per layer
 Run, or have the user run, the collectors in `scripts/`. They emit raw CSVs and one normalized `edges.csv`:
 
-| Layer | Collector | What it finds |
-|---|---|---|
-| Entra ID, Exchange Online, SharePoint/OneDrive, Teams | `scripts/m365-inventory.ps1` | users, groups (+nesting), app registrations / enterprise apps and who is assigned, OAuth consents, directory roles, CA policies, domains, mailboxes + delegations + holds, connectors, transport rules, sites + owners + group links, teams |
-| Azure | `scripts/azure_inventory.py` (Azure Resource Graph via `az graph`) | management groups/subscriptions, resources with tenant-bound properties, managed identities, RBAC, VNet peerings, private endpoints, private DNS links, gateways/ExpressRoute, UDR next hops, IaC provenance (`yor_trace`/`mapping_tag` → Defender for Cloud IaC mapping) |
-| On-prem AD | `scripts/ad-inventory.ps1` | trusts, OUs, GPO links, SPNs (service accounts → servers), DNS zones, sites, ADFS relying parties, Entra Connect scope |
+| Layer | Collector | Access | What it finds |
+|---|---|---|---|
+| **Your own + colleagues' footprint** (posture B) | `scripts/user-footprint.ps1` + `templates/colleague-survey.md` | **standard user** | your group memberships, apps on your My Apps tile, teams/sites you're in, who shares files with you, which systems email you; aggregated across colleagues → the org's real app and dependency map |
+| Entra ID, Exchange Online, SharePoint/OneDrive, Teams | `scripts/m365-inventory.ps1` | admin / reader | users, groups (+nesting), app registrations / enterprise apps and who is assigned, OAuth consents, directory roles, CA policies, domains, mailboxes + delegations + holds, connectors, transport rules, sites + owners + group links, teams |
+| Azure | `scripts/azure_inventory.py` (Azure Resource Graph via `az graph`) | Reader | management groups/subscriptions, resources with tenant-bound properties, managed identities, RBAC, VNet peerings, private endpoints, private DNS links, gateways/ExpressRoute, UDR next hops, IaC provenance (`yor_trace`/`mapping_tag` → Defender for Cloud IaC mapping) |
+| On-prem AD | `scripts/ad-inventory.ps1` | domain user (most reads) | trusts, OUs, GPO links, SPNs (service accounts → servers), DNS zones, sites, ADFS relying parties, Entra Connect scope |
+
+In posture B, the footprint collector and the survey **are** your step 1. `references/discovery-without-admin.md` covers the UI-only sources (Outlook GAL, My Apps, myaccount, mapped drives, installed software, certificates, email signatures) that need no PowerShell at all.
 
 Static config misses runtime dependencies. Pair it with **observed** evidence, `references/discovery-dependency-mapping.md` §Runtime: Entra sign-in logs (users → apps, service principals → resources), DC Kerberos/LDAP/NTLM events, VNet flow logs / Traffic Analytics, Azure Migrate agentless dependency analysis, mail flow / message trace for connectors.
 
@@ -66,8 +79,12 @@ Typical M365/Azure split: **extract-and-migrate** for identity, mail, OneDrive, 
 ### 4. Design: Day One minimum + TSA schedule
 Day One must cover at least: identity and sign-in for the divested users, email and domains (inbound mail must not bounce), payroll/finance access, customer-facing systems, security monitoring/EDR coverage, endpoint management. Everything the buyer can't run itself on Day One becomes a **TSA service line** with service level (= historical level), cost-based price, base term, extension option with notice period and stepped price, and an **exit milestone** tied to a migration wave. Template: `templates/entanglement-register.csv`.
 
+**Assign ownership with RACI.** Every workstream and every big entanglement decision needs one **Accountable** person (exactly one — sign-off), the **Responsible** doers, who is **Consulted** (the other side's system owner, the works council, the DPO) and who is **Informed**. Without it, cross-company decisions stall because no one owns them. Template and the German VIMA variant: `templates/raci-matrix.csv` and `references/tsa-governance.md` §RACI.
+
 ### 5. Sequence: migration waves in dependency order
 Order from the graph: **identity → domains/mail routing → mailboxes → OneDrive + Teams chats → SharePoint/Teams shared data → apps/SSO → Azure workloads → endpoints → decommission.** Each wave: test with real data, go/no-go criteria, rollback criteria defined *before* cutover. The M365 tool details, prerequisites and known limits are in `references/m365-tenant-migration.md`. Azure in `references/azure-separation.md`. AD/Entra identity in `references/identity-ad-entra.md`.
+
+General migration discipline that applies to every wave (not M365-specific): prefer **parallel-run / expand-contract** over a big bang — stand the new thing up beside the old, move in slices, remove the old only once the new is proven; keep a **rollback written before you start, not during the incident**; for any data-moving script, run a **dry-run first**, process in batches, make it **resumable and idempotent**, and **reconcile counts/samples after**. A "temporary" coexistence bridge that never gets removed is the classic failure — give it a deadline (same point the TSA makes about services that never end).
 
 ### 6. Exit: per service, with evidence
 Switch off each TSA service only once its replacement is proven. Get a confirmation that data has been returned or deleted (an exit certificate). Remove cross-tenant access settings, B2B guests, org relationships, app consents and Lighthouse delegations. Resolve the seller's **stranded costs**: licenses, reserved instances and contracts sized for the combined group.
@@ -84,7 +101,8 @@ When the user asks for a plan, deliver (adjust to what they asked):
 If the user keeps a knowledge base, offer to write the register and decisions there. A carve-out runs for months and decisions get lost.
 
 ## References
-- `references/discovery-dependency-mapping.md`: **how to find relations**: per-layer queries, runtime evidence, graph schema, interpretation heuristics
+- `references/discovery-without-admin.md`: **posture B — the baseline**: what a standard non-admin account can see and collect read-only (UI sources + `/me` Graph), and how to crowdsource the org map from colleagues
+- `references/discovery-dependency-mapping.md`: **how to find relations** (posture A): per-layer queries, runtime evidence, graph schema, interpretation heuristics
 - `references/m365-tenant-migration.md`: Microsoft-native cross-tenant tools, prerequisites, limits, licensing, what does *not* move
 - `references/azure-separation.md`: subscription directory transfer impact matrix, resource-move-then-transfer pattern, Lighthouse for the TSA period
 - `references/identity-ad-entra.md`: AD forest/domain separation, Entra Connect re-scoping, cross-tenant sync / MTO for coexistence, domain move

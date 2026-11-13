@@ -20,3 +20,7 @@ Checked 2026-11-13.
 | Cross-tenant synchronization https://learn.microsoft.com/entra/identity/multi-tenant-organizations/cross-tenant-synchronization-overview | coexistence provisioning settings |
 | Migrate mailboxes across tenants (legacy / third-party guidance) https://learn.microsoft.com/exchange/mailbox-migration/migrate-mailboxes-across-tenants | domain removal steps, MX/TTL cutover |
 | Power Platform tenant-to-tenant https://learn.microsoft.com/power-platform/admin/move-environment-tenant | environment moves need destination approval |
+| RACI (de.wikipedia.org/wiki/RACI) | responsibility matrix (R/A/C/I, one Accountable), RASCI/RACI-VS variants, German VIMA/VIMAF |
+| SkillDB *Migration Strategies* https://skilldb.dev/skills/autonomous-agent-skills/migration-strategies | general migration discipline: expand/contract (parallel-run), dry-run + idempotent + resumable scripts, reconcile after, rollback written before cutover, "temporary bridge" anti-pattern |
+
+Considered and not integrated (recorded so the choice is visible): os-migrate/migration-skills (OpenStack VM migration + skill-repo structure — different domain), mcpmarket ai-code-migration-agent (Java/Python code modernization — different domain). Other generic agent meta-skills were out of scope for a domain carve-out skill.

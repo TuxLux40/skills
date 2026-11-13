@@ -1,0 +1,11 @@
+workstream_or_decision,Accountable (one only),Responsible (doers),Consulted,Informed,notes
+Programme governance / go-live sign-off,Buyer CIO,Separation PMO,Seller CIO; Legal,All staff,one Accountable only
+Entanglement register upkeep,Buyer separation lead,Buyer IT + Seller system owners,App owners,Steering committee,shared document both sides
+Identity & sign-in (Day One),Buyer IT lead,Buyer identity team,Seller identity team,Service desk,
+Email & domain cutover,Buyer IT lead,Messaging engineer,Seller messaging; DNS owner,All staff,⚠ domain release up to 72h
+Shared mailbox / delegation rebuild,Buyer IT lead,Service desk,Affected users,Team leads,from survey Q4
+ERP access during TSA,Buyer CFO,ERP admin,Seller ERP owner; Legal (licence),Finance users,affiliate licence clause
+Azure subscription separation,Buyer infra lead,Cloud engineer,Seller platform team,Security,⚠ RBAC deleted on transfer
+Works council / data protection,Buyer HR,DPO,Betriebsrat,All staff,BetrVG §87(1) Nr.6; GDPR Art.28
+TSA exit per service,Buyer separation lead,Service owner,Seller TSA manager,Finance,exit certificate + stranded cost
+Request read-only access/export (posture B),Buyer separation lead,Buyer IT,Seller IT,PMO,early ask; unblocks full discovery
