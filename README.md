@@ -31,6 +31,7 @@ hermes skills install TuxLux40/skills/skills/NAME   # e.g. steam-debugger
 | [ifixit](skills/ifixit) | Hardware repair via iFixit — guides, tools/parts, safety-first repair plans |
 | [kde-theming](skills/kde-theming) | KDE Plasma themes — styles, Aurorae, plasmoids, KWin effects |
 | [linux-tuner](skills/linux-tuner) | Desktop performance — kernel, scheduler, VA-API, power stack |
+| [m365-azure-carve-out](skills/m365-azure-carve-out) | IT carve-out / tenant split — M365, Entra, AD, Azure dependency mapping, TSA, cross-tenant migration |
 | [native-game-modding](skills/native-game-modding) | Native PC game mods via hooks/proxy DLLs — mechanism-first design, aim/camera conventions |
 | [smart-okf](skills/smart-okf) | Local-first document knowledge base (ingest + retrieval) |
 | [steam-debugger](skills/steam-debugger) | Steam on Linux — gamescope, Proton, GPU, audio, sessions |
