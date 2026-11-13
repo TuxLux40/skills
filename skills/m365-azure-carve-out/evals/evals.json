@@ -1,0 +1,52 @@
+{
+  "skill_name": "m365-azure-carve-out",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We're selling our logistics division (about 800 users) to a buyer who already has their own M365 tenant. Closing is in 5 months. Where do I start?",
+      "expected_output": "Asks the framing questions first (direction = into existing buyer tenant, seed attribute, dates, EA/CSP, hybrid, holds/Customer Key). Proposes inventory -> graph -> entanglement register -> approach per system -> Day One -> TSA -> waves. Points to the collectors. Mentions Cross-Tenant User Data Migration licence per user and that the Orchestrator does not move Teams channels/SharePoint sites.",
+      "files": [],
+      "assertions": [
+        {"name": "asks_framing", "text": "Asks for the seed attribute / how divested users are identified, or for dates/licensing channel, before giving a final plan", "passed": false, "evidence": ""},
+        {"name": "discovery_first", "text": "Puts inventory/dependency mapping before choosing tools", "passed": false, "evidence": ""},
+        {"name": "licence", "text": "Mentions the Cross-Tenant User Data Migration licence", "passed": false, "evidence": ""},
+        {"name": "shared_data_gap", "text": "States that Teams teams/channels or SharePoint sites are not covered by the Orchestrator / user data migration", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Can we just transfer the Azure subscription of the divested unit to the buyer's Entra tenant? It has App Services, an Azure SQL DB with Entra auth, Key Vault with CMK on a storage account.",
+      "expected_output": "Explains the directory transfer deletes all RBAC and custom roles permanently, breaks managed identities, Key Vault needs a tenant ID update; Azure SQL with Entra auth cannot transfer while enabled; CMK tied to a transferred vault can become unrecoverable, so switch vault/disable CMK first; CSP subscriptions cannot change directory. Offers alternatives (re-deploy from IaC, Lighthouse during TSA) and the resource-move-then-transfer pattern. Marks the step irreversible.",
+      "files": [],
+      "assertions": [
+        {"name": "rbac_deleted", "text": "States role assignments/custom roles are permanently deleted", "passed": false, "evidence": ""},
+        {"name": "sql_entra", "text": "States Azure SQL with Entra auth must have it disabled before transfer", "passed": false, "evidence": ""},
+        {"name": "cmk_risk", "text": "Warns about CMK / Key Vault dependency being unrecoverable", "passed": false, "evidence": ""},
+        {"name": "alternatives", "text": "Mentions re-deploy/copy or Azure Lighthouse as alternatives", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "How do I find out which apps, groups and shared mailboxes are used by both the part we sell and the part we keep?",
+      "expected_output": "Explains declared vs observed evidence; Graph transitive group membership, app role assignments, OAuth grants; EXO FullAccess/SendAs/SendOnBehalf; sign-in logs KQL pivot by side; runs collectors and entanglement_graph.py with seeds; interprets shared hubs and unknowns; notes 30-day log window and works council / Betriebsrat for per-employee log analysis in Germany.",
+      "files": [],
+      "assertions": [
+        {"name": "declared_and_observed", "text": "Uses both configuration data and sign-in/audit logs", "passed": false, "evidence": ""},
+        {"name": "transitive", "text": "Mentions nested/transitive group membership", "passed": false, "evidence": ""},
+        {"name": "graph_tool", "text": "Uses entanglement_graph.py or an equivalent graph/labelling method with seeds", "passed": false, "evidence": ""},
+        {"name": "privacy", "text": "Flags works council / privacy considerations for per-user log analysis", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "We want to move contoso-logistics.com to the new tenant. How long will mail be down?",
+      "expected_output": "A domain can be verified in only one tenant; remove it from all objects in source, release can take up to 72 h, verify in target, re-stamp, MX/SPF/DKIM/DMARC; lower TTL in advance, backup MX/queueing; or avoid the window with a new domain plus forwarding under TSA. Doesn't promise a fixed number.",
+      "files": [],
+      "assertions": [
+        {"name": "one_tenant", "text": "States a domain can exist in only one tenant at a time", "passed": false, "evidence": ""},
+        {"name": "remove_refs", "text": "Says all references must be removed from source objects first", "passed": false, "evidence": ""},
+        {"name": "ttl_mx", "text": "Mentions lowering TTL and/or backup MX/queueing", "passed": false, "evidence": ""}
+      ]
+    }
+  ]
+}

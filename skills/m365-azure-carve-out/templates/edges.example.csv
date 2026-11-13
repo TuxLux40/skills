@@ -1,0 +1,15 @@
+src_id,src_type,rel,dst_id,dst_type,evidence,source
+alice@contoso.com,user,member_of,grp-sales-emea,group,direct,entra
+bob@contoso.com,user,member_of,grp-sales-emea,group,direct,entra
+carol@contoso.com,user,member_of,grp-all-staff,group,direct,entra
+grp-sales-emea,group,member_of,grp-all-staff,group,nested,entra
+grp-all-staff,group,assigned_to,sap-erp,enterprise_app,app role User,entra
+carol@contoso.com,user,delegate_of,shared-orders@contoso.com,mailbox,FullAccess,exo
+alice@contoso.com,user,owns,shared-orders@contoso.com,mailbox,manager,exo
+alice@contoso.com,user,signs_into,salesforce,enterprise_app,412 sign-ins/90d,signinlogs
+dave@contoso.com,user,signs_into,salesforce,enterprise_app,88 sign-ins/90d,signinlogs
+/subscriptions/11111111-1111-1111-1111-111111111111,subscription,contains,/subscriptions/1111/resourcegroups/rg-sales-app,resourcegroup,,arg
+/subscriptions/1111/resourcegroups/rg-sales-app,resourcegroup,contains,vnet-sales,vnet,,arg
+vnet-sales,vnet,peers_with,vnet-hub-weu,vnet,Connected,arg
+dave@contoso.com,user,role_on,/subscriptions/11111111-1111-1111-1111-111111111111,subscription,Owner,arg
+orphan-svc,service_principal,consented,microsoft graph,service_principal,Mail.Read (Application),entra

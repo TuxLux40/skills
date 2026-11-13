@@ -29,7 +29,10 @@
         "usb",
         "skills",
         "flipper",
-        "repair"
+        "repair",
+        "m365",
+        "azure",
+        "migration"
       ]
     }
   ]

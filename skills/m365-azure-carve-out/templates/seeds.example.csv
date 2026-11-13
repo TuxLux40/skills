@@ -1,0 +1,6 @@
+node_id,side
+alice@contoso.com,divest
+bob@contoso.com,divest
+carol@contoso.com,retain
+dave@contoso.com,retain
+/subscriptions/11111111-1111-1111-1111-111111111111,divest
