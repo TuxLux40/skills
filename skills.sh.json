@@ -48,7 +48,8 @@
       "title": "Enterprise IT",
       "description": "Microsoft 365 / Azure carve-outs, tenant-to-tenant migration and dependency mapping.",
       "skills": [
-        "m365-azure-carve-out"
+        "m365-azure-carve-out",
+        "migration-planner"
       ]
     }
   ]
