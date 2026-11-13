@@ -1,0 +1,52 @@
+{
+  "skill_name": "migration-planner",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to move off Gmail to my own domain with a new email provider, and take 15 years of mail and my Google Drive files with me. How do I do this without losing anything or locking myself out?",
+      "expected_output": "Individual lane: back up first; migrate mail (imapsync/import) and files (rclone) with count/size checks; CRITICAL order — repoint recovery email + re-enrol 2FA on important accounts BEFORE closing Gmail; forward old address during grace; keep Gmail until verified, close last (one-way door); DNS/MX + SPF/DKIM/DMARC for the new domain. Points to individual-checklist.",
+      "files": [],
+      "assertions": [
+        {"name": "backup_first", "text": "Says make and verify a backup before moving", "passed": false, "evidence": ""},
+        {"name": "recovery_before_close", "text": "Repoint recovery email / 2FA before closing the old account", "passed": false, "evidence": ""},
+        {"name": "verify_counts", "text": "Check message counts / file sizes rather than assuming it worked", "passed": false, "evidence": ""},
+        {"name": "close_last", "text": "Keep old account until verified; deleting is the last one-way step", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Our 60-person company is moving our on-prem file server, Exchange, and a line-of-business app with its SQL database to the cloud. What order, and how do we not break anything?",
+      "expected_output": "KMU lane: inventory + dependencies; a strategy per system (7 Rs — e.g. repurchase email, rehost files, replatform the DB); dependency-ordered waves (identity/DNS first, app after its DB); data migration with reconciliation; a cutover window per system with a tested rollback; keep source until reconciled. Suggests wave_planner.",
+      "files": [],
+      "assertions": [
+        {"name": "dependency_order", "text": "Orders by dependency (DB before the app on it; identity/DNS early)", "passed": false, "evidence": ""},
+        {"name": "strategy_per_item", "text": "Assigns a strategy (7 Rs) per system rather than one blanket approach", "passed": false, "evidence": ""},
+        {"name": "reconcile", "text": "Reconciles data (counts/totals) after moving", "passed": false, "evidence": ""},
+        {"name": "rollback", "text": "Plans a rollback and keeps the source until verified", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Give me the migration strategy options — I keep hearing lift-and-shift, replatform, refactor and I don't know which to pick for our 200 apps.",
+      "expected_output": "Explains the 7 Rs (retire, retain, rehost=lift-and-shift, relocate, repurchase, replatform, refactor) with when each fits; stresses Retire/Retain (don't move dead weight), default to lowest-effort R, and avoid refactoring during the move. Frames it as tag-every-app-with-an-R portfolio assessment.",
+      "files": [],
+      "assertions": [
+        {"name": "names_7rs", "text": "Covers the 7 Rs including retire and retain", "passed": false, "evidence": ""},
+        {"name": "retire_retain_value", "text": "Highlights retiring/retaining as cheap wins", "passed": false, "evidence": ""},
+        {"name": "refactor_caution", "text": "Warns against refactoring during the migration", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "We have a big-bang cutover planned for our ERP this weekend. What should be in place before we flip the switch?",
+      "expected_output": "Verified backup; rehearsed runbook with owners/durations/critical path; final rehearsal timings fit the window; reconciliation checkpoint after load; go/no-go criteria with named evidence and one decision owner; rollback written and tested with a defined point of no return; comms; hypercare after. May suggest whether big-bang is even right vs phased/parallel.",
+      "files": [],
+      "assertions": [
+        {"name": "tested_rollback", "text": "Requires a rollback written and tested before cutover, with a point of no return", "passed": false, "evidence": ""},
+        {"name": "go_no_go", "text": "Go/no-go criteria with named evidence and a single decision owner", "passed": false, "evidence": ""},
+        {"name": "rehearsed", "text": "Runbook rehearsed on a copy with real timings", "passed": false, "evidence": ""},
+        {"name": "reconciliation_checkpoint", "text": "Reconciliation checkpoint before opening to users", "passed": false, "evidence": ""}
+      ]
+    }
+  ]
+}

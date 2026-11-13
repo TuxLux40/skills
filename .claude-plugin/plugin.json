@@ -23,7 +23,8 @@
     "repair",
     "m365",
     "azure",
-    "migration"
+    "migration",
+    "carve-out"
   ],
   "skills": "./skills/"
 }

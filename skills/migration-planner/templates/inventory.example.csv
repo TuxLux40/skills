@@ -1,0 +1,13 @@
+id,name,type,strategy,effort,risk,owner
+dns,Company DNS zone,dns,replatform,2,5,IT
+idp,Identity / SSO,identity,rehost,3,5,IT
+mail,Email (mailboxes),email,repurchase,3,4,IT
+files,File server / shares,storage,rehost,4,3,IT
+crm,CRM (SaaS),saas,repurchase,3,3,Sales
+erp,ERP,application,replatform,5,5,Finance
+erp_db,ERP database,database,rehost,4,5,Finance
+website,Public website,web,replatform,2,2,Marketing
+old_wiki,Legacy intranet wiki,application,retire,1,1,IT
+backup,Backup system,infra,retain,1,2,IT
+automation,Nightly integration jobs,integration,refactor,4,4,IT
+laptops,Employee laptops,endpoint,rehost,3,2,IT

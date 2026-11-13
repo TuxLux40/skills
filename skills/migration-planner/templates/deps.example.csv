@@ -1,0 +1,16 @@
+item,depends_on
+idp,dns
+mail,idp
+mail,dns
+files,idp
+crm,idp
+erp,erp_db
+erp,idp
+erp_db,files
+website,dns
+automation,erp
+automation,crm
+automation,mail
+laptops,idp
+laptops,files
+erp_db,backup
