@@ -67,7 +67,55 @@ MyHeritage knowledge base before quoting a number.
 6. Verdict uses the normal status vocabulary. DNA alone never yields
    *belegt* for a specific ancestor; documents plus consistent DNA can.
 
-## 5. Unexpected results
+## 5. Linking matches, clusters and segments to the tree
+
+Master copy is a **local table** built from the files the user downloads from
+MyHeritage (match list, shared segments); a chromosome-mapping tool such as
+DNA Painter is fed from that table for display, never the other way round.
+
+Three linked tables (CSV or Markdown, in the user's storage):
+
+**matches** — one row per match worth working on
+
+| match_id | Name | cM gesamt | Segmente | größtes Segment | Baum vorhanden | gemeinsame Matches (bekannte Verwandte) | Cluster | Familienseite | Ahnenpaar (Hypothese) | Status | Beleg | zuletzt geprüft |
+
+**segments** — one row per shared segment
+
+| match_id | Chromosom | Start | Ende | cM | SNPs | Ahnenpaar | Seite (v/m) | Status | Grundlage |
+
+**clusters** — one row per cluster
+
+| Cluster | Quelle (Lauf, Datum, Schwellen) | Mitglieder | Ahnenpaar | Status | Grundlage |
+
+Rules:
+
+1. **Person in the tree first.** A match is linked to a tree person only
+   when the match's descent from the common ancestors is documented to the
+   usual standard. Until then `Ahnenpaar` is a hypothesis with status.
+2. **Cluster → couple** needs at least **two members whose descent from that
+   couple is documented**, on different child lines where possible. One
+   documented member makes a cluster "möglich".
+3. **Segment → couple** needs **triangulation**: at least three people, not
+   all from one nuclear family, who share the *same* segment and are each
+   documented descendants of the couple. Two people sharing a segment with
+   you is not triangulation unless they also share it with each other.
+4. Assign the segment to the **couple**, not to one spouse, unless a match
+   descends from only one of them (other marriage).
+5. Ignore very small segments for assignment; they are frequently false.
+   Record the threshold used in `Grundlage`.
+6. In endogamous or pedigree-collapse lines a segment can come from more
+   than one couple — mark it `mehrdeutig` rather than forcing it.
+7. Status vocabulary as everywhere; a segment assignment is at most
+   *wahrscheinlich* unless rule 3 is met.
+8. Into the tree goes the **documented descent**, cited to records. The DNA
+   observation goes into the note of the relationship as supporting,
+   indirect evidence: match, cM, segment, date, table reference.
+9. Re-running AutoClusters changes cluster numbering: record run date and
+   settings, and key clusters by their members, not by number.
+10. Raw DNA files and match lists stay in the user's storage; nothing from
+    them is pasted into public trees.
+
+## 6. Unexpected results
 
 DNA can reveal unknown parentage, half-siblings or adoptions. Report such a
 finding plainly and only as far as the data supports it (list the

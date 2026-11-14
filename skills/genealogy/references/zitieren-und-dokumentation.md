@@ -85,6 +85,25 @@ Rules:
 
 ## 3. Files and folders
 
+**The user's existing storage structure (e.g. on a NAS) takes precedence.**
+At the first filing task ask once how the storage is organised (root path,
+top-level folders, existing naming habits), note the answer in the project's
+research log, and file accordingly. The structure below is the fallback when
+none exists. Independent of the structure, these rules hold:
+
+- **Master files are never altered**: the scan, download or recording as
+  received. Edited versions (crop, contrast, transcript) sit beside the
+  master with a suffix (`_bearb`, `_ausschnitt`, `_transkript`).
+- **Provenance stays visible**: repository and Signatur in the file name or
+  in a sidecar note (`<datei>.md`) holding citation, access date, original
+  URL and a checksum.
+- **Relative links** from person and log notes to files, so the tree of
+  folders can move between machines.
+- **One place per file**; link, do not duplicate.
+- Media types: scans as TIFF/PNG or the JPEG as delivered; documents PDF/A;
+  audio WAV/FLAC as master; DNA exports as downloaded plus a dated copy.
+- A NAS is not a backup: keep a second copy elsewhere and test restoring.
+
 Name files so they sort and identify themselves without the folder:
 
 ```

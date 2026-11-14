@@ -1,6 +1,6 @@
 ---
 name: genealogy
-description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, DNA match, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree.
+description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, DNA match, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree, archive request / Archivanfrage, oral history interview, brick wall / toter Punkt, emigration, military or POW records abroad.
 ---
 
 # Genealogy / Ahnenforschung (DE · EN)
@@ -64,9 +64,10 @@ Defaults; ask once per project if the user's setup differs.
 - **Führender Baum / master tree:** the user's online tree (MyHeritage) is
   authoritative. Before each round of match decisions the user pulls a
   **dated GEDCOM export** as backup and for the plausibility check.
-- **Belege / documents:** local folder in the fixed Markdown structure from
-  `references/zitieren-und-dokumentation.md`. The skill itself stores no
-  personal data.
+- **Belege / documents:** the user's own storage (e.g. a NAS). Ask once how
+  it is organised and file accordingly; the Markdown structure in
+  `references/zitieren-und-dokumentation.md` is the fallback. Master files
+  are never altered. The skill itself stores no personal data.
 - **Umfang / scope:** direct ancestors, and for every ancestral couple the
   complete family group (all children, further marriages) — the family group
   is what exposes mix-ups. Remote collateral lines only on request.
@@ -74,9 +75,12 @@ Defaults; ask once per project if the user's setup differs.
   ancestors first, generation by generation upwards, then collateral lines.
   Never by MyHeritage's "Value Add" order.
 - **Eigene Recherche / own searching:** search freely accessible sources
-  yourself (GenWiki, GOV, Matricula and archive finding aids, archive
-  websites). For sources behind a login (Archion, Ancestry, MyHeritage) tell
-  the user exactly where to look: portal, parish/office, volume, years.
+  yourself, systematically where useful (GenWiki, GOV, Matricula and archive
+  finding aids, newspapers, archive websites) — order of access and what
+  each interface is worth in `references/schnittstellen-katalog.md`. For
+  sources behind a login (Archion, Ancestry, MyHeritage) tell the user
+  exactly where to look: portal, parish/office, volume, years. A blocked or
+  failed request is "nicht geprüft", never "nicht gefunden".
 - **Lesungen / readings:** your own reading of handwriting is provisional.
   Mark it "maschinell gelesen, ungeprüft", flag uncertain words, and treat
   names, dates and numbers as evidence only after the user has confirmed them
@@ -215,6 +219,10 @@ then work.
 | `references/region-nrw-rheinland.md` | Research in the Rhineland, Ruhr area, Essen, Mülheim an der Ruhr, NRW |
 | `references/land-niederlande.md` | Dutch lines, Lower Rhine border families |
 | `references/land-ungarn.md` | Lines from the Kingdom of Hungary, Danube Swabians |
-| `references/dna-myheritage.md` | Any DNA match, Theory of Family Relativity, AutoClusters, ethnicity estimate |
+| `references/dna-myheritage.md` | Any DNA match, Theory of Family Relativity, AutoClusters, ethnicity estimate; linking matches, clusters and segments to tree persons |
+| `references/archive-und-anfragen.md` | Which archive holds what; drafting, sending-ready checks and tracking of requests |
+| `references/interview-oral-history.md` | Preparing, conducting, transcribing and evaluating interviews with relatives |
+| `references/erweiterte-recherche.md` | Brick walls, events abroad, newspapers/directories/cluster search, finding and contacting relatives |
+| `references/schnittstellen-katalog.md` | APIs, exports, open standards, fetching web pages; evidence value of machine-retrieved data |
 | `references/glossar-de-en.md` | Terminology DE↔EN, Latin terms and abbreviations in registers |
 | `assets/vorlagen.md` | Copy-paste templates (DE + EN) |

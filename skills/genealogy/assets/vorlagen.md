@@ -247,7 +247,85 @@ Could you tell me which source your <parents | birth date | …> is based on
 documentation in return. Thank you!
 ```
 
-## 8. Sitzungszusammenfassung für die Wissensbasis / Session summary for the KB
+## 8. Interview
+
+```markdown
+# Interview <JJJJ-MM-TT> – <Name>, <Verhältnis>, <Ort>
+Einwilligung / consent: Aufnahme <ja|nein>; Nutzung: <nur Familie | Veröffentlichung nach Rücksprache | …>
+Dateien: <audio> · <transkript> · Transkript-Status: <maschinell, ungeprüft | geprüft am …>
+Mitgebracht / prompts: <Fotos, Dokumente>
+
+## Vorbereitung: offene Punkte im Baum, die diese Person klären könnte
+- <Lücke/Widerspruch> — <Frage dazu, offen formuliert>
+
+## Auswertung
+| Aussage | Zeitmarke | Woher bekannt | Information (primär/sekundär) | Prüfbar durch | Status |
+|---------|-----------|---------------|-------------------------------|---------------|--------|
+
+## Neue Forschungsfragen
+1. <Frage> — <Quelle, Stelle>
+
+## Hinweise auf weitere Personen und Unterlagen
+- <wen noch fragen, wer hat Papiere/Fotos>
+```
+
+## 9. Anfragenliste / Request tracking
+
+```markdown
+| Datum | Stelle | Betreff / Person | Weg | Aktenzeichen | Gebühr | Status | Antwort am | Ergebnis | Nächster Schritt |
+|-------|--------|------------------|-----|--------------|--------|--------|------------|----------|------------------|
+```
+Status: entwurf · gesendet · eingangsbestätigung · rückfrage · beantwortet · negativ · keine antwort
+
+Erinnerung / reminder:
+
+```text
+Sehr geehrte Damen und Herren,
+am <Datum> habe ich Sie um <Gegenstand> zu <Person> gebeten (<Aktenzeichen,
+falls vorhanden>). Darf ich höflich nach dem Stand fragen? Sollten weitere
+Angaben oder Nachweise nötig sein, reiche ich sie gern nach.
+Mit freundlichen Grüßen
+```
+
+```text
+Dear Sir or Madam,
+on <date> I asked for <item> concerning <person> (<reference, if any>). May I
+kindly ask about the status? If further details or proof are needed, I will
+gladly supply them.
+Yours faithfully,
+```
+
+## 10. Erstkontakt zu Verwandten / First contact with a relative or DNA match
+
+```text
+Guten Tag <Name>,
+ich heiße <Name> und forsche zu meiner Familie. Nach meinen Unterlagen sind
+wir beide Nachkommen von <Ahnenpaar, Lebensdaten, Ort> – <bei DNA: MyHeritage
+zeigt uns als Match mit rund … cM>. Ich habe dazu <Belege, kurz> und teile sie
+gern. Wissen Sie, <eine konkrete Frage>?
+Über eine Antwort freue ich mich; wenn Sie keinen Kontakt wünschen, ist das
+selbstverständlich in Ordnung.
+```
+
+```text
+Hello <name>,
+my name is <name> and I am researching my family. According to my records we
+both descend from <ancestral couple, dates, place> – <for DNA: MyHeritage
+shows us as a match of about … cM>. I have <documents, brief> and am happy to
+share them. Do you happen to know <one concrete question>?
+I would be glad to hear from you; if you would rather not be in touch, that
+is of course fine.
+```
+
+## 11. DNA-Tabellen / DNA tables
+
+```markdown
+matches:  | match_id | Name | cM gesamt | Segmente | größtes Segment | Baum vorhanden | gemeinsame Matches | Cluster | Familienseite | Ahnenpaar (Hypothese) | Status | Beleg | zuletzt geprüft |
+segments: | match_id | Chromosom | Start | Ende | cM | SNPs | Ahnenpaar | Seite (v/m) | Status | Grundlage |
+clusters: | Cluster | Quelle (Lauf, Datum, Schwellen) | Mitglieder | Ahnenpaar | Status | Grundlage |
+```
+
+## 12. Sitzungszusammenfassung für die Wissensbasis / Session summary for the KB
 
 ```markdown
 # Genealogie-Sitzung <JJJJ-MM-TT>

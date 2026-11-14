@@ -24,6 +24,10 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/land-niederlande.md` | Netherlands — short reference |
 | `references/land-ungarn.md` | Hungary — short reference |
 | `references/dna-myheritage.md` | DNA basics with MyHeritage's tools |
+| `references/archive-und-anfragen.md` | Core list of archives, request workflow and tracking |
+| `references/interview-oral-history.md` | Interviews with relatives: guide, transcription, evaluation |
+| `references/erweiterte-recherche.md` | Advanced tactics: events abroad, cluster search, finding relatives |
+| `references/schnittstellen-katalog.md` | APIs, exports and open standards, with evidence value |
 | `references/glossar-de-en.md` | DE↔EN glossary, register Latin, abbreviations |
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |
