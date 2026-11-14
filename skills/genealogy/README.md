@@ -1,4 +1,4 @@
-# ahnenforschung
+# genealogy
 
 Bilingual (DE/EN) genealogy research skill focused on Germany: Genealogical Proof Standard + Quellenkritik, fact-level citations, research log, and a strict verification protocol for MyHeritage Smart Matches and other tree hints to keep false positives out of the tree.
 
@@ -7,7 +7,7 @@ Zweisprachiger Ahnenforschungs-Skill: wissenschaftliche Methodik, saubere Quelle
 ## Install
 
 ```bash
-mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/ahnenforschung
+mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archive/refs/heads/master.tar.gz | tar -xz --strip-components=2 -C ~/.claude/skills skills-master/skills/genealogy
 ```
 
 ## Contents
@@ -20,6 +20,7 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/quellen-deutschland.md` | Record types, archives, portals, access rules |
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confession, script |
 | `references/zitieren-und-dokumentation.md` | Citation format, file naming, folder structure, research log |
+| `references/genealogy-mcp.md` | Using the optional third-party genealogy-mcp server within this skill's rules |
 | `references/glossar-de-en.md` | DE↔EN glossary, register Latin, abbreviations |
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |
