@@ -588,3 +588,172 @@ Terms of use at receipt: <private research only | publication with permission | 
 Tags: <from the tag list>
 Derived versions: <file names>
 ```
+
+## 18. OKF-Notizen / OKF notes
+
+Every note starts with the frontmatter of its type, then the body. Rules for
+fields and links: `references/notizen-okf.md`. Frontmatter keys stay as
+written here in both languages; `conclusion` uses the German status words.
+
+Frontmatter for the types whose body is one of the templates above:
+
+```yaml
+---
+type: Source                 # body: §2 (+ §17 for provenance, §8 for interviews)
+title: "<Ereignis> <NACHNAME, Vorname> – <Ort>, <Datum>"
+description: <ein Satz>
+tags: [quelle/<Art>, familie/<Name>, ort/<Ort>]
+status: draft
+record_type: <Taufe | Heirat | Tod | Brief | Foto | Interview | …>
+record_date: <JJJJ-MM-TT>
+repository: <verwahrende Stelle | Verwahrer>
+call_number: "<Bestand, Signatur>"
+locator: "<S./Bl., Nr.>"
+source_class: <Original | Derivat | Kompilation | Index>
+seen_as: <Original | Digitalisat | Kopie | Index>
+seen_at: <JJJJ-MM-TT>
+resource: "<Permalink>"
+file: <Dateiname des Masters>
+sha256: <Prüfsumme>
+script: <Kurrent | Sütterlin | Fraktur | Antiqua | Maschinenschrift | digital>
+language: <…>
+terms_of_use: <nur private Forschung | Veröffentlichung mit Genehmigung | frei | unbekannt>
+generated: { by: <agent>/<version>, at: <JJJJ-MM-TTThh:mm:ssZ> }
+# verified: { by: human:<id>, at: <…> }   ← erst nach Prüfung am Bild durch den Nutzer
+---
+```
+
+```yaml
+---
+type: Hypothesis             # body: §3 (match), or Kandidaten / Beleglage / Vorhersage / Nächster Schritt
+id: H0001
+title: "<Frage in einem Satz>"
+description: <ein Satz>
+tags: [familie/<Name>]
+conclusion: <möglich | ungeklärt | widerlegt | wahrscheinlich>
+status: draft
+generated: { by: <agent>/<version>, at: <…> }
+---
+```
+
+```yaml
+---
+type: <Proof | ResearchLog | Session | Register>   # body: §4–5 | §1, §13, §14 | §12 | §9, §15, §16
+title: "<…>"
+description: <ein Satz>
+tags: [familie/<Name>, ort/<Ort>]
+status: <draft | stable>
+generated: { by: <agent>/<version>, at: <…> }
+---
+```
+
+Person, Familie, Ort:
+
+```markdown
+---
+type: Person
+id: P0001
+title: "NACHNAME, Vorname(n) (*JJJJ Ort)"
+description: <ein Satz: wer das ist>
+aliases:
+  - <Namensform aus Quelle>
+tags:
+  - familie/<Name>
+  - ort/<Ort>
+conclusion: <belegt | wahrscheinlich>
+status: draft
+kekule: <Nr.>
+myheritage_id: <…>
+generated: { by: <agent>/<version>, at: <…> }
+---
+
+# NACHNAME, Vorname(n) (*JJJJ Ort)
+
+## Lebensdaten
+
+| Ereignis | Datum | Ort | Status | Quelle |
+|----------|-------|-----|--------|--------|
+| Taufe | <JJJJ-MM-TT> | [<Ort>](<relativer Pfad>.md) | <Status> | [<Kurzzitat>](<relativer Pfad zur Quellen-Notiz>.md) |
+
+## Familie
+
+- Kind in: [<F-ID NAME ∞ NAME>](<relativer Pfad>.md) – <belegt | wahrscheinlich>
+- Ehe: [<F-ID NAME ∞ NAME>](<relativer Pfad>.md) – <belegt | wahrscheinlich>
+
+## Offene Fragen
+
+- [<H-ID Frage>](<relativer Pfad>.md)
+
+## Nicht identisch mit
+
+- <P-ID NAME (*JJJJ Ort)> – <Grund>   ← nur Text, kein Link
+
+## Forschung
+
+- [<Forschungsprotokoll>](<relativer Pfad>.md)
+```
+
+```markdown
+---
+type: Family
+id: F0001
+title: "NACHNAME, Vorname ∞ NACHNAME, Vorname (JJJJ Ort)"
+description: <ein Satz>
+tags:
+  - familie/<Name>
+  - familie/<Name>
+conclusion: <belegt | wahrscheinlich>
+status: draft
+generated: { by: <agent>/<version>, at: <…> }
+---
+
+# NACHNAME, Vorname ∞ NACHNAME, Vorname
+
+## Paar
+
+- Ehemann: [<Ansetzungsform>](<relativer Pfad>.md)
+- Ehefrau: [<Ansetzungsform>](<relativer Pfad>.md)
+- Heirat: <JJJJ-MM-TT Ort> – <Status> – [<Kurzzitat>](<relativer Pfad zur Quellen-Notiz>.md)
+
+## Kinder
+
+| Kind | Geburt/Taufe | Zuordnung | Quelle |
+|------|--------------|-----------|--------|
+| [<Ansetzungsform>](<relativer Pfad>.md) | <JJJJ-MM-TT> | <belegt | wahrscheinlich> | [<Kurzzitat>](<relativer Pfad>.md) |
+
+## Kandidaten (nur Text, kein Link)
+
+- <Name, Jahr, Ort> – siehe [<H-ID>](<relativer Pfad>.md)
+```
+
+```markdown
+---
+type: Place
+title: <Ansetzungsform des Ortes>
+description: <ein Satz>
+aliases:
+  - <historischer Name>
+tags:
+  - ort/<Ort>
+status: draft
+gov_id: "<GOV-ID>"
+generated: { by: <agent>/<version>, at: <…> }
+---
+
+# <Ort>
+
+| Zeitraum | Pfarrei | Zivilstand / Standesamt | Territorium |
+|----------|---------|-------------------------|-------------|
+|          |         |                         |             |
+
+Verwechslungsgefahr: <gleichnamige Orte>
+```
+
+English bodies use the same frontmatter and these headings: `## Vital
+events` (Event · Date · Place · Status · Source), `## Family` ("Child in",
+"Marriage"), `## Open questions`, `## Not identical with` (text only),
+`## Research`; for a family `## Couple`, `## Children` (Child · Birth/baptism
+· Assignment · Source), `## Candidates (text only, no link)`; for a place the
+columns Period · Parish · Civil registration · Territory.
+
+A worked example of every type: `evals/fixtures/okf-beispiel/`.

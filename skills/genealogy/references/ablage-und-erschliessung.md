@@ -122,7 +122,10 @@ not a backup: keep a second copy elsewhere and test restoring it.
 ## 5. Ansetzung und Register / Authority forms and registers
 
 The thesaurus principle applied to people and places: one preferred form,
-every variant mapped to it. Templates: `assets/vorlagen.md` §15.
+every variant mapped to it. Templates: `assets/vorlagen.md` §15. Where notes
+are kept as OKF Markdown (`notizen-okf.md`), the person note is the register
+row — `title` holds the preferred form, `aliases` the variants — and the
+table is a generated listing rather than a second place to maintain.
 
 - **Personenregister** — one row per person: ID (`P0001`, stable and
   independent of any website) · Ansetzungsform `NACHNAME, Vorname(n) (*JJJJ
@@ -151,9 +154,9 @@ Every file must be reachable two ways — by walking the provenance tree, and
 by searching for a person, place or record type. Filed by provenance alone,
 a record is hidden from everyone it names.
 
-- **Links.** The person note links to every source file for that person;
-  the sidecar of a source lists the IDs of the persons it names. Relative
-  links, so the tree of folders can move.
+- **Links.** The person note links to every source for that person; the
+  note of a source links the persons it names, once their identity stands
+  (`notizen-okf.md` §3). Relative links, so the tree of folders can move.
 - **Kontrollierte Schlagwörter / controlled tags.** Fixed facets, fixed
   terms. A synonym is mapped to the term, not added as a tag — otherwise
   "Heiratsurkunde", "Eheurkunde" and "marriage certificate" split one
@@ -161,11 +164,13 @@ a record is hidden from everyone it names.
 
   | Facet | Term | Example |
   |-------|------|---------|
-  | person | person ID | `P0042` |
   | familie | surname in register spelling | `Muster` |
   | ort | preferred place name | `Beispieldorf` |
   | quelle | record type from the fixed list | `Taufe`, `Heirat`, `Sterbeeintrag`, `Urkunde`, `Brief`, `Foto`, `Militär`, `Zeitung`, `Interview` |
   | lesung | only where it applies | `maschinell-ungeprüft` |
+
+  Persons are not a facet: naming a person on a file is an identity claim
+  and needs a status, so it is a link from the note, not a tag.
 
   The list of allowed terms lives in `05_register/`; a new term is a
   decision. Tags suggested by a tool are free text — map them to this list

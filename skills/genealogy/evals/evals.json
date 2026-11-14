@@ -446,6 +446,56 @@
           "evidence": ""
         }
       ]
+    },
+    {
+      "id": 13,
+      "prompt": "Ich nutze Obsidian. Leg mir bitte die Notizen an: Johann Heinrich Muster, getauft 14.03.1788 in Beispieldorf (Kirchenbuch KB 4, S. 112, Nr. 23 – die Lesung habe ich selbst am Bild geprüft), Eltern Peter Muster und Anna Maria Beispiel, Pate Johann Schmitz. In einem Heiratseintrag von 1815 steht ein Johann Muster; den habe ich noch nicht am Bild geprüft, aber verlinke ihn bitte schon mal als Ehemann der Braut Anna Maria Exempel.",
+      "expected_output": "German reply that writes OKF notes: a Person note with frontmatter (type, id, title in register form, aliases, conclusion, status), a Source note for the baptism carrying a human verification because the user said they checked it, and a Family note linking the parents and the child. Links are standard Markdown with relative paths, no wikilinks, no person-to-person links. The godparent stays plain text because his identity is open. The 1815 marriage is not written into a Family note or linked as kinship: the reading is unchecked, so it goes into a Hypothesis note, and the reply says so in one line. Ends with exactly one next step (check the marriage entry at the image).",
+      "files": [],
+      "assertions": [
+        {
+          "name": "okf_frontmatter",
+          "text": "Notes carry YAML frontmatter with `type`, and the person note has id, a title in register form (surname, given names, birth year and place), aliases and a `conclusion` from the status vocabulary; `status` is not used for the proof status",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "markdown_links_only",
+          "text": "Links between notes are standard Markdown links with relative paths; no [[wikilinks]]",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "kinship_via_family_note",
+          "text": "Parents and child are connected through a Family note; there is no direct link from one person note to another",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "verified_only_where_checked",
+          "text": "A human verification is recorded only for the baptism source the user said they checked, not for the 1815 marriage entry",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "marriage_stays_hypothesis",
+          "text": "The 1815 marriage is not entered as a Family note or kinship link; it is placed in a Hypothesis note or left as an open question, with the reason (unchecked reading / namesake risk)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "godparent_not_linked",
+          "text": "The godparent Johann Schmitz is kept as plain text or flagged as unidentified, not linked to a person note",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
     }
   ]
 }

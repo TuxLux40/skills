@@ -26,7 +26,7 @@ Tool names differ per client; map these classes to what the session offers.
 | Tool / MCP (examples) | What it can reach | Used for |
 |-----------------------|-------------------|----------|
 | Web search and fetch (`WebSearch`, `WebFetch`, Firecrawl, Tavily) | Open web: GenWiki, GOV, Matricula, archive sites and finding aids, newspapers | Own searching in open sources (`references/schnittstellen-katalog.md`) |
-| File tools and shell (`Read`, `Write`, `Bash`) | Local files, mounted storage (NAS) | GEDCOM export, scans, research log; `scripts/gedcom_plausi.py` reads one GEDCOM and writes nothing |
+| File tools and shell (`Read`, `Write`, `Bash`) | Local files, mounted storage (NAS) | GEDCOM export, scans, notes; `scripts/gedcom_plausi.py` and `scripts/okf_check.py` read and write nothing |
 | Sub-agent tool (`Agent`, `Task`) | Isolated model calls without shared context | Fächer-Modus branches |
 | Interactive choice (`AskUserQuestion`) | The user | Grill-Modus, single clarifying questions |
 | MyHeritage, Ancestry, Archion | **No tool access** — login sites | The user looks up and exports; you say exactly where |
@@ -237,6 +237,25 @@ session summary where the user keeps their notes, in the log format (question,
 sources searched incl. negative results, findings with status, open questions,
 next step) so the next session can resume without re-deriving anything.
 
+### Notizen / Notes (OKF Markdown, Obsidian)
+
+Person profiles, family groups, source sheets with transcription,
+hypotheses and logs are written as Markdown with OKF frontmatter, so the
+folder opens as an Obsidian vault and its graph. Read
+`references/notizen-okf.md` before writing or linking a note.
+
+- Frontmatter: `type` always; `conclusion` for the proof status, `status`
+  only for the note's lifecycle (draft, stable, deprecated).
+- A reading counts as checked when the Source note carries `verified` by a
+  `human:` actor. Never set that yourself — only when the user says they
+  have checked it at the image.
+- Links are standard Markdown with relative paths. No wikilinks.
+- **A link is a claim.** Kinship runs Person ↔ Family, only at *belegt* or
+  *wahrscheinlich*. Everything weaker lives in a Hypothesis note. Never
+  link person to person; "nicht identisch mit" is text. A name in a record
+  is linked to a person only once the identity stands.
+- After a batch of notes run `scripts/okf_check.py <root>` (read-only).
+
 ## GEDCOM-Plausibilitätsprüfung
 
 `scripts/gedcom_plausi.py <file.ged>` (Python stdlib, read-only) flags
@@ -312,6 +331,7 @@ then work.
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confessions, scripts — the German pitfalls |
 | `references/zitieren-und-dokumentation.md` | Citation formats incl. published works, fact-level sourcing in the tree, research log, publishing |
 | `references/ablage-und-erschliessung.md` | Filing or naming files, scanning family papers and photos, person and place register, tags, Findbuch, what to keep |
+| `references/notizen-okf.md` | Writing or linking any note: person profile, family group, source sheet, hypothesis; frontmatter fields; Obsidian graph setup |
 | `references/region-nrw-rheinland.md` | Research in the Rhineland, Ruhr area, Essen, Mülheim an der Ruhr, NRW |
 | `references/land-niederlande.md` | Dutch lines, Lower Rhine border families |
 | `references/land-ungarn.md` | Lines from the Kingdom of Hungary, Danube Swabians |

@@ -31,13 +31,16 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/schnittstellen-katalog.md` | APIs, exports and open standards, with evidence value |
 | `references/ausgabeform.md` | Output shape: verdict first, one next step, and what brevity never removes |
 | `references/faecher-modus.md` | Divergent mode for dead ends: isolated branches, genealogy frame pack, leads as testable predictions |
+| `references/notizen-okf.md` | Notes as OKF Markdown: note types, frontmatter, link rules, Obsidian graph setup |
 | `references/glossar-de-en.md` | DE↔EN glossary, register Latin, abbreviations |
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |
-| `evals/` | Scenario prompts and a test GEDCOM |
+| `scripts/okf_check.py` | Read-only check of the notes: OKF conformance, link rules, unchecked readings (stdlib) |
+| `evals/` | Scenario prompts, a test GEDCOM, and an example note bundle that opens as an Obsidian vault (`fixtures/okf-beispiel/`) |
 
 ```bash
 python3 scripts/gedcom_plausi.py tree.ged --lang de        # or --lang en, --json
+python3 scripts/okf_check.py path/to/notes --lang de       # or --lang en, --json
 ```
 
 ## Works with
