@@ -1,0 +1,73 @@
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+1 CHAR UTF-8
+0 @S1@ SOUR
+1 TITL Bistumsarchiv Musterstadt, Pfarrei St. Peter Beispieldorf, KB 4 (Taufen 1770-1809)
+0 @S2@ SOUR
+1 TITL MyHeritage Family Trees
+0 @I1@ INDI
+1 NAME Johann Heinrich /Muster/
+1 SEX M
+1 BIRT
+2 DATE 12 MAR 1788
+2 PLAC Beispieldorf
+2 SOUR @S1@
+3 PAGE S. 112, Nr. 23
+1 BAPM
+2 DATE 14 MAR 1788
+2 SOUR @S1@
+1 DEAT
+2 DATE 3 FEB 1850
+2 SOUR @S2@
+1 FAMS @F1@
+1 FAMC @F2@
+0 @I2@ INDI
+1 NAME Anna Maria /Schmitz/
+1 SEX F
+1 BIRT
+2 DATE ABT 1795
+1 DEAT
+2 DATE 10 JAN 1830
+1 FAMS @F1@
+0 @I3@ INDI
+1 NAME Wilhelm /Muster/
+1 SEX M
+1 BIRT
+2 DATE 5 MAY 1832
+1 FAMC @F1@
+0 @I4@ INDI
+1 NAME Peter /Muster/
+1 SEX M
+1 BIRT
+2 DATE 1 JAN 1780
+1 FAMS @F2@
+0 @I5@ INDI
+1 NAME Catharina /Meyer/
+1 SEX F
+1 BIRT
+2 DATE 1730
+1 FAMS @F2@
+0 @I6@ INDI
+1 NAME Johan Henrich /Muster/
+1 SEX M
+1 BIRT
+2 DATE 1788
+1 DEAT
+2 DATE 1780
+0 @I7@ INDI
+1 NAME Erika /Muster/
+1 SEX F
+1 BIRT
+2 DATE 4 APR 1960
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 CHIL @I3@
+1 MARR
+2 DATE 16 MAY 1791
+0 @F2@ FAM
+1 HUSB @I4@
+1 WIFE @I5@
+1 CHIL @I1@
+0 TRLR

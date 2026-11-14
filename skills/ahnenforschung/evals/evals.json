@@ -1,0 +1,54 @@
+{
+  "skill_name": "ahnenforschung",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "MyHeritage zeigt mir einen Smart Match: Johann Schmitz, geboren 1812 in Neuss, in einem anderen Stammbaum mit Eltern Peter Schmitz und Anna Maria Müller. Bei mir steht Johann Schmitz, geb. ca. 1812, Heirat 1838 in Neuss mit Gertrud Esser, Eltern unbekannt. 14 andere Bäume haben dieselben Eltern. Soll ich bestätigen und die Eltern übernehmen?",
+      "expected_output": "German reply. Does not recommend confirming. Explains that 14 trees are not 14 sources, name + year + town is insufficient for a common name, asks for/points to the 1838 marriage record naming the parents, requires a namesake search, outputs the fixed verdict format with verdict 'möglich' or 'ungeklärt' and action 'offen lassen'.",
+      "files": [],
+      "assertions": [
+        {"name": "does_not_confirm", "text": "Response recommends leaving the match pending (offen lassen / nicht bestätigen) and taking over no data", "passed": false, "evidence": ""},
+        {"name": "trees_not_independent", "text": "Response states that multiple agreeing trees are likely copies and do not count as independent sources", "passed": false, "evidence": ""},
+        {"name": "points_to_original_record", "text": "Response names a concrete original record to check, e.g. the 1838 marriage entry (Heiratsurkunde/Kirchenbuch Neuss) naming the parents", "passed": false, "evidence": ""},
+        {"name": "namesake_search", "text": "Response calls for a search for other Johann Schmitz baptisms in/around Neuss (Namensvetter/Gegenprobe)", "passed": false, "evidence": ""},
+        {"name": "verdict_format", "text": "Response contains a matrix of identifiers and an explicit verdict from the status vocabulary", "passed": false, "evidence": ""},
+        {"name": "answers_in_german", "text": "Response is written in German", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A Smart Match says my ancestor Heinrich Brinkmann (b. 1840, emigrated to Missouri 1866) is the Heinrich Brinkmann baptised 3 May 1840 in Lienen, Westphalia. The other tree lists his father as Johann Schulte genannt Brinkmann. My US records give his father as 'John Brinkman'. Same person?",
+      "expected_output": "English reply. Explains Hofname/genannt naming so the surname difference is not a conflict by itself, flags the emigrant-graft pattern, asks for linking evidence (emigration file, passenger list with last residence, US church record naming the parish), verdict at most 'possible/probable', action leave pending.",
+      "files": [],
+      "assertions": [
+        {"name": "explains_genannt", "text": "Response explains farm names / 'genannt' naming in Westphalia and that it is not a conflict by itself", "passed": false, "evidence": ""},
+        {"name": "emigrant_link_required", "text": "Response requires a record linking the emigrant to the German parish (emigration file, passenger list, US church record)", "passed": false, "evidence": ""},
+        {"name": "no_confirmation", "text": "Response does not recommend confirming the match yet", "passed": false, "evidence": ""},
+        {"name": "answers_in_english", "text": "Response is written in English with German terms glossed", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Ich habe die Sterbeurkunde meines Ururgroßvaters von 1893 (Standesamt Düsseldorf). Dort steht geboren 1821 in Kaiserswerth, im Taufbuch Kaiserswerth finde ich ihn aber 1819. Welches Datum trage ich ein?",
+      "expected_output": "German reply. Classifies the death record's birth data as secondary information depending on the informant, baptism entry as original with primary information, asks who the Anzeigende was, checks for a same-named sibling born 1821 / died child 1819 (Nachbenennung), keeps both values with a written conflict resolution, cites both sources properly.",
+      "files": [],
+      "assertions": [
+        {"name": "information_classification", "text": "Response distinguishes primary vs secondary information and mentions the informant (Anzeigender) of the death record", "passed": false, "evidence": ""},
+        {"name": "checks_namesake_sibling", "text": "Response suggests checking for a sibling of the same name (Nachbenennung) before equating the two", "passed": false, "evidence": ""},
+        {"name": "keeps_both_values", "text": "Response says to keep the conflicting value documented with reasoning rather than deleting it", "passed": false, "evidence": ""},
+        {"name": "no_fabricated_citation", "text": "Response does not invent a Signatur, page or entry number", "passed": false, "evidence": ""}
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Bitte prüfe meine GEDCOM-Datei auf Unstimmigkeiten, bevor ich weitere Matches bestätige.",
+      "expected_output": "Runs scripts/gedcom_plausi.py on the file (or a backup copy), reports errors/warnings grouped by severity, points out facts sourced only by trees, and states that a clean report means consistent, not correct.",
+      "files": ["evals/fixtures/beispiel.ged"],
+      "assertions": [
+        {"name": "runs_script", "text": "Response uses scripts/gedcom_plausi.py and reports its findings", "passed": false, "evidence": ""},
+        {"name": "flags_tree_only_sources", "text": "Response highlights facts whose only source is another tree / MyHeritage Family Trees", "passed": false, "evidence": ""},
+        {"name": "consistency_not_correctness", "text": "Response notes that passing the check does not prove the tree is correct", "passed": false, "evidence": ""}
+      ]
+    }
+  ]
+}

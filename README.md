@@ -25,6 +25,7 @@ hermes skills install TuxLux40/skills/skills/NAME   # e.g. steam-debugger
 
 | Skill | Description |
 |-------|-------------|
+| [ahnenforschung](skills/ahnenforschung) | Genealogy research (DE/EN), Germany-focused — GPS + Quellenkritik, citations, research log, MyHeritage Smart Match verification |
 | [dokumenten-organisation](skills/dokumenten-organisation) | Organize, name, and classify files so they stay findable |
 | [flipper-zero](skills/flipper-zero) | Flipper Zero — qFlipper connection fixes, deploy workflow, Momentum GUI dev |
 | [german-shopping-assistant](skills/german-shopping-assistant) | Price comparison, product recommendations and shopping research for the German market |
