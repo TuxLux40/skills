@@ -123,6 +123,26 @@ Geprüfte Originalquelle / record examined: <Zitat | keine>
 **Nächste Quellen / next sources:** <…>
 ```
 
+### Abgelehnter Match / Rejected match (Kurzform)
+
+```markdown
+# Abgelehnt <JJJJ-MM-TT> – <eigene Person, ID> ≠ <Gegenprofil, Baum, Verwalter>
+Konflikt / conflict: <harter Konflikt in einem Satz>
+Belege / sources: <Zitat eigene Seite> ↔ <Zitat/Angabe Gegenseite>
+Namensvetter / namesake: <wer das Gegenprofil vermutlich ist>
+```
+
+### Überstimmung / Override
+
+```markdown
+# Überstimmt <JJJJ-MM-TT> – <Person, ID> ← <Gegenprofil, Baum>
+Urteil des Skills / verdict: <möglich | ungeklärt | wahrscheinlich>
+Nicht erfüllt / not met: <z. B. keine Originalquelle, Namensvetter-Suche offen>
+Grund des Nutzers / user's reason: <… | nicht genannt>
+Übernommen / adopted: <Felder> — Status: [wahrscheinlich] | [möglich]
+Nachprüfen: <Quelle, Archiv, Signatur falls bekannt>
+```
+
 ## 4. Widerspruchsanalyse / Conflict analysis
 
 ```markdown

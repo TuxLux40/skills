@@ -7,12 +7,42 @@
       "expected_output": "German reply. Does not recommend confirming. Explains that 14 trees are not 14 sources, name + year + town is insufficient for a common name, asks for/points to the 1838 marriage record naming the parents, requires a namesake search, outputs the fixed verdict format with verdict 'möglich' or 'ungeklärt' and action 'offen lassen'.",
       "files": [],
       "assertions": [
-        {"name": "does_not_confirm", "text": "Response recommends leaving the match pending (offen lassen / nicht bestätigen) and taking over no data", "passed": false, "evidence": ""},
-        {"name": "trees_not_independent", "text": "Response states that multiple agreeing trees are likely copies and do not count as independent sources", "passed": false, "evidence": ""},
-        {"name": "points_to_original_record", "text": "Response names a concrete original record to check, e.g. the 1838 marriage entry (Heiratsurkunde/Kirchenbuch Neuss) naming the parents", "passed": false, "evidence": ""},
-        {"name": "namesake_search", "text": "Response calls for a search for other Johann Schmitz baptisms in/around Neuss (Namensvetter/Gegenprobe)", "passed": false, "evidence": ""},
-        {"name": "verdict_format", "text": "Response contains a matrix of identifiers and an explicit verdict from the status vocabulary", "passed": false, "evidence": ""},
-        {"name": "answers_in_german", "text": "Response is written in German", "passed": false, "evidence": ""}
+        {
+          "name": "does_not_confirm",
+          "text": "Response recommends leaving the match pending (offen lassen / nicht bestätigen) and taking over no data",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "trees_not_independent",
+          "text": "Response states that multiple agreeing trees are likely copies and do not count as independent sources",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "points_to_original_record",
+          "text": "Response names a concrete original record to check, e.g. the 1838 marriage entry (Heiratsurkunde/Kirchenbuch Neuss) naming the parents",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "namesake_search",
+          "text": "Response calls for a search for other Johann Schmitz baptisms in/around Neuss (Namensvetter/Gegenprobe)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "verdict_format",
+          "text": "Response contains a matrix of identifiers and an explicit verdict from the status vocabulary",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "answers_in_german",
+          "text": "Response is written in German",
+          "passed": false,
+          "evidence": ""
+        }
       ]
     },
     {
@@ -21,10 +51,30 @@
       "expected_output": "English reply. Explains Hofname/genannt naming so the surname difference is not a conflict by itself, flags the emigrant-graft pattern, asks for linking evidence (emigration file, passenger list with last residence, US church record naming the parish), verdict at most 'possible/probable', action leave pending.",
       "files": [],
       "assertions": [
-        {"name": "explains_genannt", "text": "Response explains farm names / 'genannt' naming in Westphalia and that it is not a conflict by itself", "passed": false, "evidence": ""},
-        {"name": "emigrant_link_required", "text": "Response requires a record linking the emigrant to the German parish (emigration file, passenger list, US church record)", "passed": false, "evidence": ""},
-        {"name": "no_confirmation", "text": "Response does not recommend confirming the match yet", "passed": false, "evidence": ""},
-        {"name": "answers_in_english", "text": "Response is written in English with German terms glossed", "passed": false, "evidence": ""}
+        {
+          "name": "explains_genannt",
+          "text": "Response explains farm names / 'genannt' naming in Westphalia and that it is not a conflict by itself",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "emigrant_link_required",
+          "text": "Response requires a record linking the emigrant to the German parish (emigration file, passenger list, US church record)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_confirmation",
+          "text": "Response does not recommend confirming the match yet",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "answers_in_english",
+          "text": "Response is written in English with German terms glossed",
+          "passed": false,
+          "evidence": ""
+        }
       ]
     },
     {
@@ -33,21 +83,142 @@
       "expected_output": "German reply. Classifies the death record's birth data as secondary information depending on the informant, baptism entry as original with primary information, asks who the Anzeigende was, checks for a same-named sibling born 1821 / died child 1819 (Nachbenennung), keeps both values with a written conflict resolution, cites both sources properly.",
       "files": [],
       "assertions": [
-        {"name": "information_classification", "text": "Response distinguishes primary vs secondary information and mentions the informant (Anzeigender) of the death record", "passed": false, "evidence": ""},
-        {"name": "checks_namesake_sibling", "text": "Response suggests checking for a sibling of the same name (Nachbenennung) before equating the two", "passed": false, "evidence": ""},
-        {"name": "keeps_both_values", "text": "Response says to keep the conflicting value documented with reasoning rather than deleting it", "passed": false, "evidence": ""},
-        {"name": "no_fabricated_citation", "text": "Response does not invent a Signatur, page or entry number", "passed": false, "evidence": ""}
+        {
+          "name": "information_classification",
+          "text": "Response distinguishes primary vs secondary information and mentions the informant (Anzeigender) of the death record",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "checks_namesake_sibling",
+          "text": "Response suggests checking for a sibling of the same name (Nachbenennung) before equating the two",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "keeps_both_values",
+          "text": "Response says to keep the conflicting value documented with reasoning rather than deleting it",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_fabricated_citation",
+          "text": "Response does not invent a Signatur, page or entry number",
+          "passed": false,
+          "evidence": ""
+        }
       ]
     },
     {
       "id": 4,
       "prompt": "Bitte prüfe meine GEDCOM-Datei auf Unstimmigkeiten, bevor ich weitere Matches bestätige.",
       "expected_output": "Runs scripts/gedcom_plausi.py on the file (or a backup copy), reports errors/warnings grouped by severity, points out facts sourced only by trees, and states that a clean report means consistent, not correct.",
-      "files": ["evals/fixtures/beispiel.ged"],
+      "files": [
+        "evals/fixtures/beispiel.ged"
+      ],
       "assertions": [
-        {"name": "runs_script", "text": "Response uses scripts/gedcom_plausi.py and reports its findings", "passed": false, "evidence": ""},
-        {"name": "flags_tree_only_sources", "text": "Response highlights facts whose only source is another tree / MyHeritage Family Trees", "passed": false, "evidence": ""},
-        {"name": "consistency_not_correctness", "text": "Response notes that passing the check does not prove the tree is correct", "passed": false, "evidence": ""}
+        {
+          "name": "runs_script",
+          "text": "Response uses scripts/gedcom_plausi.py and reports its findings",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "flags_tree_only_sources",
+          "text": "Response highlights facts whose only source is another tree / MyHeritage Family Trees",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "consistency_not_correctness",
+          "text": "Response notes that passing the check does not prove the tree is correct",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Ich weiß, dass die Originalquelle fehlt, aber ich bestätige den Smart Match für meinen Ururgroßvater Wilhelm Kamp (geb. 1851 Mülheim an der Ruhr) trotzdem und übernehme die Eltern. Mach weiter.",
+      "expected_output": "German reply. Names the missing conditions once without arguing, accepts the decision, produces an override log entry, assigns status prefix at most [wahrscheinlich] with 'Nachprüfen:' and the deciding record (e.g. Heiratsregister / Kirchenbuch Mülheim), warns against Quick Save.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "accepts_override",
+          "text": "Response follows the user's decision instead of refusing or re-arguing",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "logs_override",
+          "text": "Response contains an override log entry listing the unmet conditions",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "status_not_belegt",
+          "text": "Adopted facts are marked at most [wahrscheinlich], not [belegt], with a Nachprüfen note naming a concrete record",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "field_by_field",
+          "text": "Response says to take over field by field rather than via Quick Save",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Grill mich zu meiner Hypothese, dass meine Linie Janssen aus Emmerich um 1790 aus Gelderland zugewandert ist.",
+      "expected_output": "Enters grill mode: asks exactly one question with 2-4 concrete options and a marked recommendation, does not dump a list of questions, looks up facts itself, makes no changes.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "one_question",
+          "text": "Response asks exactly one question, not a batch",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "options_with_recommendation",
+          "text": "The question offers 2-4 concrete answer options with one marked as recommended",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_action_yet",
+          "text": "Response does not change files or declare a conclusion before the interview is finished",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "MyHeritage shows a Theory of Family Relativity: a 62 cM DNA match and I are supposedly third cousins through Johann Peter Hoffmann from Werden. Can I add his parents from the match's tree?",
+      "expected_output": "English reply. Explains that 62 cM fits several relationships, that the theory is a chain of unverified tree links and the DNA does not validate that particular path, asks for documentation of both descents, recommends not adding the parents yet.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "cm_range",
+          "text": "Response states that the shared cM value is compatible with several relationships",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "theory_is_hypothesis",
+          "text": "Response treats the Theory of Family Relativity as a hypothesis built from trees, each link needing verification",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_import",
+          "text": "Response does not recommend adding the parents from the match's tree yet",
+          "passed": false,
+          "evidence": ""
+        }
       ]
     }
   ]

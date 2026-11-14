@@ -1,6 +1,6 @@
 ---
 name: genealogy
-description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree.
+description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, DNA match, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree.
 ---
 
 # Genealogy / Ahnenforschung (DE · EN)
@@ -36,9 +36,11 @@ spelling; translate separately.
    lost.
 6. **Unsicherheit sichtbar halten / Label confidence** using the status
    vocabulary below. Do not upgrade a status without new evidence.
-7. **Lebende Personen schützen / Protect the living.** See "Datenschutz".
-8. **Keine Massenoperationen / No bulk actions.** Never recommend confirming
+7. **Keine Massenoperationen / No bulk actions.** Never recommend confirming
    matches, merging persons, or importing branches in bulk.
+8. **Die Entscheidung liegt beim Nutzer / The user decides.** State the
+   verdict and what is missing, then follow the user's decision — including a
+   decision to confirm below the threshold (see "Überstimmen").
 
 ## Status-Vokabular / Conclusion status
 
@@ -50,8 +52,35 @@ spelling; translate separately.
 | **ungeklärt** | unresolved | Evidence insufficient or contradictory |
 | **widerlegt** | disproven | Positively contradicted; keep the record of *why* |
 
-Only **belegt** and (flagged) **wahrscheinlich** belong in the main tree. Park
-everything else in a hypothesis/working area with its status.
+Only **belegt** and (flagged) **wahrscheinlich** belong in the tree. Because
+tree sites have no status field, put the status as a fixed prefix at the start
+of the fact's source citation or note — `[belegt]`, `[wahrscheinlich]`,
+`[möglich]` — so it travels with the GEDCOM export and can be searched.
+
+## Arbeitsgrundlage / Working setup
+
+Defaults; ask once per project if the user's setup differs.
+
+- **Führender Baum / master tree:** the user's online tree (MyHeritage) is
+  authoritative. Before each round of match decisions the user pulls a
+  **dated GEDCOM export** as backup and for the plausibility check.
+- **Belege / documents:** local folder in the fixed Markdown structure from
+  `references/zitieren-und-dokumentation.md`. The skill itself stores no
+  personal data.
+- **Umfang / scope:** direct ancestors, and for every ancestral couple the
+  complete family group (all children, further marriages) — the family group
+  is what exposes mix-ups. Remote collateral lines only on request.
+- **Reihenfolge / order of work:** by closeness of relationship — direct
+  ancestors first, generation by generation upwards, then collateral lines.
+  Never by MyHeritage's "Value Add" order.
+- **Eigene Recherche / own searching:** search freely accessible sources
+  yourself (GenWiki, GOV, Matricula and archive finding aids, archive
+  websites). For sources behind a login (Archion, Ancestry, MyHeritage) tell
+  the user exactly where to look: portal, parish/office, volume, years.
+- **Lesungen / readings:** your own reading of handwriting is provisional.
+  Mark it "maschinell gelesen, ungeprüft", flag uncertain words, and treat
+  names, dates and numbers as evidence only after the user has confirmed them
+  against the image.
 
 ## Arbeitsablauf / Workflow
 
@@ -106,6 +135,20 @@ FamilySearch/Geni profile, or GEDBAS entry.** Short form:
   citing the underlying record — not "MyHeritage Family Trees".
 - Always output the verdict in the fixed format from the reference (Urteil /
   Verdict, matrix, conflicts, recommended MyHeritage action, next sources).
+- **Dokumentiert wird / what gets written down:** rejected matches (with the
+  conflict) and overrides. Matches left pending get no note.
+
+### Überstimmen / Override
+
+The threshold is fixed, but the user may confirm a match that does not meet
+it. Then: name the missing conditions once, do not argue further, and
+
+1. add a research-log entry: match, date, which conditions were not met, the
+   user's reason if given;
+2. give the adopted facts the status the evidence supports — at most
+   `[wahrscheinlich]`, never `[belegt]` — as citation prefix, plus
+   `Nachprüfen:` and the record that would settle it;
+3. still take over field by field, not via Quick Save.
 
 ## Dokumentation / Documentation
 
@@ -129,22 +172,36 @@ steps) so the next session can resume without re-deriving anything.
 ## GEDCOM-Plausibilitätsprüfung
 
 `scripts/gedcom_plausi.py <file.ged>` (Python stdlib, read-only) flags
-chronological impossibilities, facts without source citations, possible
-duplicates, and possibly-living persons. Run it on a backup copy before and
-after any batch of accepted matches and diff the reports. A clean report means
+chronological impossibilities, facts without source citations, facts whose
+only source is another tree, and possible duplicates. Run it on the dated
+export before and after any batch of accepted matches and diff the reports. A clean report means
 the file is *consistent*, not that it is *correct*.
 
-## Datenschutz / Privacy
+## DNA
 
-- GDPR/DSGVO does not cover the deceased, but living relatives named in records
-  are covered, and German archive and civil-status law set access periods
-  (PStG: births 110, marriages 80, deaths 30 years; then archive law applies).
-- Treat anyone born < 100 years ago without a known death as living. Do not
-  publish them, and warn before the user uploads their data to public trees.
-- Remind the user once per project that records shared in a cloud AI session
-  leave their machine; sensitive material on living persons should stay out.
-- Online-tree photos and texts are other people's work — cite, don't copy
-  wholesale.
+A DNA match is indirect evidence and never names the common ancestor by
+itself; MyHeritage's Theory of Family Relativity is a chain of unverified tree
+links. Read `references/dna-myheritage.md` before interpreting any DNA result.
+
+## Grill-Modus (nur auf Zuruf / on request only)
+
+Only when the user asks for it ("grill mich", "grill me", "nimm das
+auseinander", "stress-test this"). Any project decision can be grilled:
+hypotheses, matches, proof arguments, research plans, filing, publication,
+tooling.
+
+- Map the topic as a decision tree; ask only questions whose prerequisites
+  are settled.
+- **One question at a time**, as an interactive choice where the client
+  offers one (otherwise a numbered list): 2–4 concrete options, your
+  recommended option first and marked, plus free text.
+- Finding facts is your job — look them up instead of asking. Decisions are
+  the user's.
+- When no open question is left, summarise the decisions and ask for
+  confirmation. Change nothing before that confirmation.
+
+Outside this mode do not interrogate: a single clarifying question is fine,
+then work.
 
 ## Referenzen / Reference files
 
@@ -155,5 +212,9 @@ the file is *consistent*, not that it is *correct*.
 | `references/quellen-deutschland.md` | Planning where to search: record types, archives, portals, access rules |
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confessions, scripts — the German pitfalls |
 | `references/zitieren-und-dokumentation.md` | Citation formats, file naming, folder/KB structure, research log |
+| `references/region-nrw-rheinland.md` | Research in the Rhineland, Ruhr area, Essen, Mülheim an der Ruhr, NRW |
+| `references/land-niederlande.md` | Dutch lines, Lower Rhine border families |
+| `references/land-ungarn.md` | Lines from the Kingdom of Hungary, Danube Swabians |
+| `references/dna-myheritage.md` | Any DNA match, Theory of Family Relativity, AutoClusters, ethnicity estimate |
 | `references/glossar-de-en.md` | Terminology DE↔EN, Latin terms and abbreviations in registers |
 | `assets/vorlagen.md` | Copy-paste templates (DE + EN) |

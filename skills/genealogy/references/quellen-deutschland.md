@@ -156,8 +156,8 @@ Template: `assets/vorlagen.md`.
   typically 30 years after file closure and 10 years after death (or 100 years
   after birth if death unknown) for person-related files; details differ by
   Land and can be shortened on application.
-- **DSGVO/GDPR** — living persons only; the Länder and churches have their own
-  additional rules (KDG, DSG-EKD) for church records.
+- **Church data-protection rules** (KDG, DSG-EKD) govern access to recent
+  church records.
 - **Urheberrecht** — old records are public domain, but portals' terms of use
   and archives' reproduction rules govern publication of images; photos and
   texts in other users' trees are protected.

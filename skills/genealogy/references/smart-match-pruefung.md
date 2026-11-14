@@ -166,13 +166,22 @@ FamilySearch, Landesarchiv) where one exists.
 | Verdict | Condition | MyHeritage action | Data transfer |
 |---------|-----------|-------------------|---------------|
 | **belegt** | No hard conflict; ≥ 3 concordant *independent* identifiers from the top-9 list beyond name/year, at least one of them a relationship (parents or spouse); namesake search done; ≥ 1 original record examined | Confirm | Only verified facts, field by field, each cited to the underlying record |
-| **wahrscheinlich** | As above, but one named gap (e.g. namesake search incomplete, or record seen only as index) | Leave pending; note the gap | None yet; add as hypothesis with source to fetch |
+| **wahrscheinlich** | As above, but one named gap (e.g. namesake search incomplete, or record seen only as index) | Leave pending | None yet |
 | **möglich** | Compatible, but < 3 discriminating identifiers or an uneliminated namesake | Leave pending | None |
 | **ungeklärt** | Too little data, or soft conflicts unexplained | Leave pending | None |
-| **widerlegt** | Documented hard conflict | Reject; record the reason in the research log | None; note the namesake so the hint is recognised next time |
+| **widerlegt** | Documented hard conflict | Reject; **document**: conflict, sources, date | None; note the namesake so the hint is recognised next time |
 
 The thresholds are a floor for discipline, not a score to game. Three weak
 identifiers copied from one tree are one identifier. When in doubt, downgrade.
+
+Only rejections and overrides are written down (template in
+`assets/vorlagen.md`); pending matches get no note. If the user confirms
+below the threshold, follow "Überstimmen" in SKILL.md: log the missing
+conditions, status prefix at most `[wahrscheinlich]`, `Nachprüfen:` with the
+deciding record.
+
+Work the backlog by closeness of relationship (direct ancestors first, one
+generation at a time), not in the site's default order.
 
 Never: confirm in bulk; accept "extract all info"; let a match overwrite an
 existing sourced value; adopt a photo, parents or a whole branch because the

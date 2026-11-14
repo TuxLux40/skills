@@ -72,11 +72,16 @@ Rules:
   `BET … AND …`), with a note saying from what they were derived.
 - Keep a marker (tag/custom fact) for **unverified hypotheses** so they can be
   filtered out of exports and never synchronise to public trees.
-- Local master, online copy: keep the authoritative tree in local software
-  (Gramps, Ahnenblatt, webtrees, Family Tree Builder …) with regular GEDCOM
-  exports; treat MyHeritage/Ancestry as publication and hint sources. GEDCOM
-  transfer loses data (custom tags, media links, some citation detail) — check
-  after each round trip.
+- **Status prefix:** where the tree is kept on a site without a status field
+  (MyHeritage), begin the fact's citation or note with `[belegt]`,
+  `[wahrscheinlich]` or `[möglich]`; for overridden matches add
+  `Nachprüfen: <record that would settle it>`.
+- **Online tree as master:** the default setup is the MyHeritage tree as the
+  authoritative copy plus a **dated GEDCOM export** before every round of
+  match decisions (`90_export/JJJJ-MM-TT_<baum>.ged`). The export is the
+  backup and the input for `scripts/gedcom_plausi.py`. GEDCOM transfer loses
+  data (custom tags, media links, some citation detail) — do not treat a
+  re-import as lossless.
 
 ## 3. Files and folders
 
@@ -102,7 +107,7 @@ genealogie/
   10_quellen/                 by repository → Bestand → unit (provenance!)
   20_personen/                one note per person, ID in the filename
   30_familien-orte/           place and family-group notes
-  40_hypothesen/              unproven links, match evaluations
+  40_hypothesen/              unproven links, rejected matches, overrides
   50_korrespondenz/           archive requests and replies
   90_export/                  dated GEDCOM backups
 ```
@@ -141,7 +146,6 @@ open → hypotheses rejected and why → next steps → files added.
 
 ## 6. Publishing
 
-- Remove or anonymise living persons; check each platform's privacy settings.
 - Mark hypotheses as such in text and charts (dashed lines, "vermutlich").
 - State the cut-off date of the research and how AI tools were used.
 - Deposit a copy (GEDCOM + sources + log) where it survives you: family,

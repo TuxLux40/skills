@@ -20,6 +20,10 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/quellen-deutschland.md` | Record types, archives, portals, access rules |
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confession, script |
 | `references/zitieren-und-dokumentation.md` | Citation format, file naming, folder structure, research log |
+| `references/region-nrw-rheinland.md` | Rhineland, Ruhr area, Essen, Mülheim an der Ruhr |
+| `references/land-niederlande.md` | Netherlands — short reference |
+| `references/land-ungarn.md` | Hungary — short reference |
+| `references/dna-myheritage.md` | DNA basics with MyHeritage's tools |
 | `references/glossar-de-en.md` | DE↔EN glossary, register Latin, abbreviations |
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |

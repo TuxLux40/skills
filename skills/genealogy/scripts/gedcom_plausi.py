@@ -6,12 +6,11 @@ Read-only. Python standard library only. Flags items for human review:
   * chronological impossibilities (parent ages, events after death, ...)
   * facts without a source citation, and "sources" that are just other trees
   * possible duplicate individuals
-  * possibly living persons (privacy)
 
 A clean report means the file is internally consistent, not that it is correct.
 
 Usage:
-    python3 gedcom_plausi.py tree.ged [--lang de|en] [--json] [--year YYYY]
+    python3 gedcom_plausi.py tree.ged [--lang de|en] [--json]
 """
 from __future__ import annotations
 
@@ -62,7 +61,6 @@ T = {
         "tree_source": "Nur Stammbaum/Match als Quelle (kein Beleg): {ev}",
         "no_events": "Keine datierten Ereignisse",
         "duplicate": "Mögliches Duplikat von {o}",
-        "living": "Möglicherweise lebend (Datenschutz)",
         "bad_date": "Datum nicht interpretierbar: {ev} '{d}'",
         "multi_famc": "Mehreren Elternfamilien zugeordnet ({n})",
     },
@@ -90,7 +88,6 @@ T = {
         "tree_source": "Only a tree/match cited (not evidence): {ev}",
         "no_events": "No dated events",
         "duplicate": "Possible duplicate of {o}",
-        "living": "Possibly living (privacy)",
         "bad_date": "Unparseable date: {ev} '{d}'",
         "multi_famc": "Child in several parent families ({n})",
     },
@@ -218,7 +215,7 @@ def years(a: int, b: int) -> int:
     return int((b - a) / 365.25)
 
 
-def check(indi, fam, sources, this_year: int):
+def check(indi, fam, sources):
     out = []  # (severity, id, name, key, params)
 
     def add(sev, p, key, **kw):
@@ -265,11 +262,6 @@ def check(indi, fam, sources, this_year: int):
         if len(p["famc"]) > 1:
             add("INFO", p, "multi_famc", n=len(p["famc"]))
 
-        # privacy
-        if not death and "DEAT" not in p["ev"] and "BURI" not in p["ev"]:
-            if (birth and this_year - date.fromordinal(birth[0]).year < 100) or not birth:
-                if birth:  # unknown birth is too noisy to flag
-                    add("INFO", p, "living")
 
     for f in fam.values():
         father, mother = indi.get(f["husb"]), indi.get(f["wife"])
@@ -335,11 +327,10 @@ def main() -> int:
     ap.add_argument("gedcom")
     ap.add_argument("--lang", choices=("de", "en"), default="de")
     ap.add_argument("--json", action="store_true", help="machine-readable output (stable for diffing)")
-    ap.add_argument("--year", type=int, default=date.today().year, help="reference year for the living check")
     args = ap.parse_args()
 
     indi, fam, sources = parse(args.gedcom)
-    findings = check(indi, fam, sources, args.year)
+    findings = check(indi, fam, sources)
     order = {"ERROR": 0, "WARN": 1, "INFO": 2}
     findings.sort(key=lambda f: (order[f["severity"]], f["id"], f["key"], json.dumps(f["params"], sort_keys=True)))
 
