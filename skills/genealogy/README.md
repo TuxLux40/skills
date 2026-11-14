@@ -20,7 +20,6 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/quellen-deutschland.md` | Record types, archives, portals, access rules |
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confession, script |
 | `references/zitieren-und-dokumentation.md` | Citation format, file naming, folder structure, research log |
-| `references/genealogy-mcp.md` | Using the optional third-party genealogy-mcp server within this skill's rules |
 | `references/glossar-de-en.md` | DE↔EN glossary, register Latin, abbreviations |
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |

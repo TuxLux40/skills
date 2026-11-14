@@ -134,16 +134,6 @@ duplicates, and possibly-living persons. Run it on a backup copy before and
 after any batch of accepted matches and diff the reports. A clean report means
 the file is *consistent*, not that it is *correct*.
 
-## Werkzeug: genealogy-mcp (optional)
-
-If the `genealogy-mcp` MCP server is connected, use its tools for date and
-calendar conversion, name variants, place history, source lookup, tree audit
-and citation coverage — read `references/genealogy-mcp.md` first. Its
-`check_match` verdict is an input to the Smart-Match protocol, not a
-replacement: it confirms on two facts, this skill requires more. Its write
-tools edit a GEDCOM in place — backup, preview, explicit permission. If the
-server is not connected, work from the references and say nothing ran.
-
 ## Datenschutz / Privacy
 
 - GDPR/DSGVO does not cover the deceased, but living relatives named in records
@@ -165,6 +155,5 @@ server is not connected, work from the references and say nothing ran.
 | `references/quellen-deutschland.md` | Planning where to search: record types, archives, portals, access rules |
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confessions, scripts — the German pitfalls |
 | `references/zitieren-und-dokumentation.md` | Citation formats, file naming, folder/KB structure, research log |
-| `references/genealogy-mcp.md` | The genealogy-mcp server is connected, or the user asks to set it up |
 | `references/glossar-de-en.md` | Terminology DE↔EN, Latin terms and abbreviations in registers |
 | `assets/vorlagen.md` | Copy-paste templates (DE + EN) |
