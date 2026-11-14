@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200">
+  <rect width="640" height="200" fill="#f4f1ea" stroke="#9c755f"/>
+  <text x="320" y="95" font-family="serif" font-size="22" text-anchor="middle" fill="#5b4636">Platzhalter für den Scan</text>
+  <text x="320" y="125" font-family="serif" font-size="14" text-anchor="middle" fill="#5b4636">Beispiel-Bündel mit fiktiven Daten – hier läge das Bild des Eintrags</text>
+</svg>

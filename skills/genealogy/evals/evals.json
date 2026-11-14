@@ -1,0 +1,501 @@
+{
+  "skill_name": "genealogy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "MyHeritage zeigt mir einen Smart Match: Johann Schmitz, geboren 1812 in Neuss, in einem anderen Stammbaum mit Eltern Peter Schmitz und Anna Maria Müller. Bei mir steht Johann Schmitz, geb. ca. 1812, Heirat 1838 in Neuss mit Gertrud Esser, Eltern unbekannt. 14 andere Bäume haben dieselben Eltern. Soll ich bestätigen und die Eltern übernehmen?",
+      "expected_output": "German reply. Does not recommend confirming. Explains that 14 trees are not 14 sources, name + year + town is insufficient for a common name, asks for/points to the 1838 marriage record naming the parents, requires a namesake search, outputs the fixed verdict format with verdict 'möglich' or 'ungeklärt' and action 'offen lassen'.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "does_not_confirm",
+          "text": "Response recommends leaving the match pending (offen lassen / nicht bestätigen) and taking over no data",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "trees_not_independent",
+          "text": "Response states that multiple agreeing trees are likely copies and do not count as independent sources",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "points_to_original_record",
+          "text": "Response names a concrete original record to check, e.g. the 1838 marriage entry (Heiratsurkunde/Kirchenbuch Neuss) naming the parents",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "namesake_search",
+          "text": "Response calls for a search for other Johann Schmitz baptisms in/around Neuss (Namensvetter/Gegenprobe)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "verdict_format",
+          "text": "Response contains a matrix of identifiers and an explicit verdict from the status vocabulary",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "answers_in_german",
+          "text": "Response is written in German",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A Smart Match says my ancestor Heinrich Brinkmann (b. 1840, emigrated to Missouri 1866) is the Heinrich Brinkmann baptised 3 May 1840 in Lienen, Westphalia. The other tree lists his father as Johann Schulte genannt Brinkmann. My US records give his father as 'John Brinkman'. Same person?",
+      "expected_output": "English reply. Explains Hofname/genannt naming so the surname difference is not a conflict by itself, flags the emigrant-graft pattern, asks for linking evidence (emigration file, passenger list with last residence, US church record naming the parish), verdict at most 'possible/probable', action leave pending.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "explains_genannt",
+          "text": "Response explains farm names / 'genannt' naming in Westphalia and that it is not a conflict by itself",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "emigrant_link_required",
+          "text": "Response requires a record linking the emigrant to the German parish (emigration file, passenger list, US church record)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_confirmation",
+          "text": "Response does not recommend confirming the match yet",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "answers_in_english",
+          "text": "Response is written in English with German terms glossed",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Ich habe die Sterbeurkunde meines Ururgroßvaters von 1893 (Standesamt Düsseldorf). Dort steht geboren 1821 in Kaiserswerth, im Taufbuch Kaiserswerth finde ich ihn aber 1819. Welches Datum trage ich ein?",
+      "expected_output": "German reply. Classifies the death record's birth data as secondary information depending on the informant, baptism entry as original with primary information, asks who the Anzeigende was, checks for a same-named sibling born 1821 / died child 1819 (Nachbenennung), keeps both values with a written conflict resolution, cites both sources properly.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "information_classification",
+          "text": "Response distinguishes primary vs secondary information and mentions the informant (Anzeigender) of the death record",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "checks_namesake_sibling",
+          "text": "Response suggests checking for a sibling of the same name (Nachbenennung) before equating the two",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "keeps_both_values",
+          "text": "Response says to keep the conflicting value documented with reasoning rather than deleting it",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_fabricated_citation",
+          "text": "Response does not invent a Signatur, page or entry number",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Bitte prüfe meine GEDCOM-Datei auf Unstimmigkeiten, bevor ich weitere Matches bestätige.",
+      "expected_output": "Runs scripts/gedcom_plausi.py on the file (or a backup copy), reports errors/warnings grouped by severity, points out facts sourced only by trees, and states that a clean report means consistent, not correct.",
+      "files": [
+        "evals/fixtures/beispiel.ged"
+      ],
+      "assertions": [
+        {
+          "name": "runs_script",
+          "text": "Response uses scripts/gedcom_plausi.py and reports its findings",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "flags_tree_only_sources",
+          "text": "Response highlights facts whose only source is another tree / MyHeritage Family Trees",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "consistency_not_correctness",
+          "text": "Response notes that passing the check does not prove the tree is correct",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Ich weiß, dass die Originalquelle fehlt, aber ich bestätige den Smart Match für meinen Ururgroßvater Wilhelm Kamp (geb. 1851 Mülheim an der Ruhr) trotzdem und übernehme die Eltern. Mach weiter.",
+      "expected_output": "German reply. Names the missing conditions once without arguing, accepts the decision, produces an override log entry, assigns status prefix at most [wahrscheinlich] with 'Nachprüfen:' and the deciding record (e.g. Heiratsregister / Kirchenbuch Mülheim), warns against Quick Save.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "accepts_override",
+          "text": "Response follows the user's decision instead of refusing or re-arguing",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "logs_override",
+          "text": "Response contains an override log entry listing the unmet conditions",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "status_not_belegt",
+          "text": "Adopted facts are marked at most [wahrscheinlich], not [belegt], with a Nachprüfen note naming a concrete record",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "field_by_field",
+          "text": "Response says to take over field by field rather than via Quick Save",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Grill mich zu meiner Hypothese, dass meine Linie Janssen aus Emmerich um 1790 aus Gelderland zugewandert ist.",
+      "expected_output": "Enters grill mode: asks exactly one question with 2-4 concrete options and a marked recommendation, does not dump a list of questions, looks up facts itself, makes no changes.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "one_question",
+          "text": "Response asks exactly one question, not a batch",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "options_with_recommendation",
+          "text": "The question offers 2-4 concrete answer options with one marked as recommended",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_action_yet",
+          "text": "Response does not change files or declare a conclusion before the interview is finished",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "MyHeritage shows a Theory of Family Relativity: a 62 cM DNA match and I are supposedly third cousins through Johann Peter Hoffmann from Werden. Can I add his parents from the match's tree?",
+      "expected_output": "English reply. Explains that 62 cM fits several relationships, that the theory is a chain of unverified tree links and the DNA does not validate that particular path, asks for documentation of both descents, recommends not adding the parents yet.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "cm_range",
+          "text": "Response states that the shared cM value is compatible with several relationships",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "theory_is_hypothesis",
+          "text": "Response treats the Theory of Family Relativity as a hypothesis built from trees, each link needing verification",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_import",
+          "text": "Response does not recommend adding the parents from the match's tree yet",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Ich habe im Kirchenbuch Kettwig die Taufe von Wilhelm Kamp am 3.4.1821 gefunden, Eltern Heinrich Kamp und Gertrud Oberdick. In meinem Baum heiratet ein Wilhelm Kamp 1846 in Mülheim an der Ruhr; im Heiratseintrag steht als Vater 'Henrich Kamp, Ackerer zu Kettwig', Alter des Bräutigams 25. Ist das derselbe? Was mache ich als Nächstes?",
+      "expected_output": "German reply in the compact output shape. First line is the verdict with a status word (wahrscheinlich or möglich, not belegt) and the deciding evidence. Persons are named with year and place. Compares the identifiers (father's name, occupation and place, age 25 fits 1821), says the namesake search for other Wilhelm Kamp baptisms in and around Kettwig is still open, lists hard conflicts or says there are none. Ends with exactly one concrete next step. No preamble, no recap, no closing offer.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "verdict_first",
+          "text": "The first line states a verdict with a status word (wahrscheinlich or möglich) instead of an introduction or a description of what will be done",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "not_belegt_yet",
+          "text": "Response does not call the identification 'belegt' and names the outstanding namesake search (other Wilhelm Kamp baptisms in/around Kettwig in the matching years)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "persons_with_year_place",
+          "text": "Persons are referred to with year and place (e.g. 'Wilhelm Kamp *1821 Kettwig'), not only by pronoun or 'der andere Wilhelm'",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "status_and_source_kept",
+          "text": "Every stated fact keeps its source (baptism entry, marriage entry) and the conclusion carries a status word",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_filler",
+          "text": "Response contains no preamble (e.g. 'Gute Frage', 'Ich schaue mir das an') and no closing offer (e.g. 'Sag Bescheid, wenn …')",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Toter Punkt: Mein Vorfahr Peter Janssen heiratet 1832 in Mülheim an der Ruhr (ev.), im Heiratseintrag steht nur 'gebürtig aus dem Clevischen', keine Eltern. Die Kirchenbücher von Mülheim (ev. und kath.) 1795–1832 habe ich vollständig durchgesehen und protokolliert, kein Taufeintrag; der Sterbeeintrag 1871 nennt nur das Alter 66. In anderen Stammbäumen steht ein Peter Janssen *1805 in Kleve. Ich brauche neue Ansätze.",
+      "expected_output": "German reply that runs the Fächer-Modus because new angles were asked for. Writes a neutral brief that separates proven facts from the claim in other trees. Uses isolated sub-agents per frame, or labels the run 'Ersatzlauf ohne Isolation'. Returns a shortlist of two to four leads with T/M/N scores, each with a prediction (what the source shows if the hypothesis holds and if not) and a first step, one of them marked as the non-obvious pick. Lists traps, among them taking the Peter Janssen *1805 Kleve from other trees as the same person. Gives no lead a status above möglich and does not suggest entering anything in the tree. Leads go beyond re-checking the Mülheim church books. Ends with one next step; the full list of leads is offered on request or placed in the log.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "runs_divergent_mode",
+          "text": "Response generates research leads from several distinct vantage points (frames) rather than a single linear suggestion",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "isolation_or_labelled",
+          "text": "Response either used isolated sub-agents for the branches or explicitly labels the run as done without isolation (Ersatzlauf)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shortlist_with_predictions",
+          "text": "Response gives a shortlist of 2–4 leads, each with a testable prediction (what the source must show if the hypothesis is true / false) and a first step",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "traps_include_namesake_tree",
+          "text": "Response flags as a trap adopting the Peter Janssen *1805 Kleve from other online trees on the strength of the name",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_lead_as_finding",
+          "text": "No lead is presented as a finding: nothing is given a status above 'möglich' and nothing is recommended for entry in the tree",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "beyond_standard_sources",
+          "text": "Leads go beyond re-reading the Mülheim parish registers (e.g. godparents and witnesses of his children, residence or citizenship files, occupation records, parishes of the former Duchy of Cleves incl. the Dutch border area, estate or guardianship files)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step and does not dump all leads unranked",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Ich habe ein Foto der Heiratsurkunde von 1891 (Vordruck, handschriftlich ausgefüllt) von einem KI-Tool auslesen und zusammenfassen lassen. Ergebnis: 'Bräutigam Wilhelm Kamp, geboren 12.03.1864 in Kettwig, Sohn des Ackerers Heinrich Kamp'. Dann kann ich das Geburtsdatum ja als belegt in den Baum eintragen, oder?",
+      "expected_output": "German reply: no, not yet. A summary by a tool is a finding aid, not the source; the entry is handwritten, so name and date are a machine reading until the user has confirmed them at the image; until then at most möglich and not in the tree. Asks for one concrete check at the image as the next step. Says the citation must name the document itself and how it was seen, not the summary. Notes that a birth date in a marriage record is secondary information and points to the birth or baptism record.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "not_into_tree_as_belegt",
+          "text": "Response does not agree to enter the birth date as 'belegt' on the strength of the tool's summary",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "machine_reading_needs_image_check",
+          "text": "Response treats name and date as a machine reading of handwriting that the user has to confirm against the image before it counts as evidence",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "summary_is_not_the_source",
+          "text": "Response says a machine-made summary or extract is a finding aid and that the citation has to name the document itself and how it was seen",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "secondary_information",
+          "text": "Response notes that a birth date given in a marriage record is secondary information and points to the birth or baptism record as the better source",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_concrete_request",
+          "text": "Response ends with one concrete next step, e.g. checking the birth-date line in the image",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Meine Tante hat mir das Fotoalbum meiner Urgroßmutter geliehen, etwa 60 Fotos, einige mit Beschriftung auf der Rückseite. Ich will es einscannen und auf mein NAS legen. Wie gehe ich vor, damit das für die Ahnenforschung sauber ist?",
+      "expected_output": "German reply as a short numbered procedure. Records the provenance first (who holds the album, how it reached her). Keeps the original order: scan page by page in sequence and keep the scanner's numbering. Scans front and back. Leaves the masters untouched, metadata included, and puts descriptions in a sidecar or working copy. Treats who is pictured as a statement by someone: ask the aunt and record who said it, when and how sure. Keeps the album together as one unit under its keeper's name, linked from person notes, with an entry in the finding aid. Names files by the pattern with an estimated date. Ends with exactly one next step.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "provenance_recorded",
+          "text": "Response has the user record who holds the album now and how it came to her (line of custody) before anything else",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "original_order_kept",
+          "text": "Response keeps the original order of the album (scan in page sequence, keep the numbering, do not re-sort into person folders)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "front_and_back",
+          "text": "Response says to scan the backs (inscriptions, studio stamps) as well as the fronts",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "master_untouched",
+          "text": "Response keeps the scan masters unaltered and puts descriptions or metadata into a sidecar note or a working copy, not into the master file",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "identification_has_informant",
+          "text": "Response treats the identification of pictured persons as a statement with an informant (ask the aunt; record who said it, when, how sure), not as fact",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "unit_stays_together",
+          "text": "Response files the album as one unit under its keeper or provenance and links it from person notes instead of splitting it up by person",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "In meinem Baum hängt seit zwei Jahren ein ganzer Ast über Johann Schmitz (*1812 Neuss): Eltern, Großeltern und rund 40 weitere Personen, die ich damals per Smart Match übernommen habe. Inzwischen glaube ich, dass schon die Eltern nicht stimmen. Soll ich den Ast einfach löschen?",
+      "expected_output": "German reply: not by bulk deletion. First a dated GEDCOM export, and the note that it is a record, not an undo. Then check the lowest link (Johann Schmitz *1812 Neuss to the claimed parents) with the match protocol, because everything above hangs on it. Depending on the verdict keep, mark, or detach. Detach the connection (MyHeritage: Remove connection) rather than delete the persons; what happens to the detached profiles is the user's decision. Log what was removed and why, keep the branch as a hypothesis because the same Smart Match will come back. Ends with exactly one next step.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "no_bulk_delete",
+          "text": "Response advises against simply deleting the whole branch",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "export_first",
+          "text": "Response has the user pull a dated GEDCOM export before changing anything",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "lowest_link_first",
+          "text": "Response says to check the link between Johann Schmitz *1812 Neuss and the claimed parents first, since the rest of the branch depends on it",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "detach_before_delete",
+          "text": "Response prefers removing the connection over deleting the persons and leaves the fate of the detached profiles to the user",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "logged_and_kept_as_hypothesis",
+          "text": "Response has the removal logged (what, why, when) and the branch kept as a documented hypothesis or rejected match",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Ich nutze Obsidian. Leg mir bitte die Notizen an: Johann Heinrich Muster, getauft 14.03.1788 in Beispieldorf (Kirchenbuch KB 4, S. 112, Nr. 23 – die Lesung habe ich selbst am Bild geprüft), Eltern Peter Muster und Anna Maria Beispiel, Pate Johann Schmitz. In einem Heiratseintrag von 1815 steht ein Johann Muster; den habe ich noch nicht am Bild geprüft, aber verlinke ihn bitte schon mal als Ehemann der Braut Anna Maria Exempel.",
+      "expected_output": "German reply that writes OKF notes: a Person note with frontmatter (type, id, title in register form, aliases, conclusion, status), a Source note for the baptism carrying a human verification because the user said they checked it, and a Family note linking the parents and the child. Links are standard Markdown with relative paths, no wikilinks, no person-to-person links. The godparent stays plain text because his identity is open. The 1815 marriage is not written into a Family note or linked as kinship: the reading is unchecked, so it goes into a Hypothesis note, and the reply says so in one line. Ends with exactly one next step (check the marriage entry at the image).",
+      "files": [],
+      "assertions": [
+        {
+          "name": "okf_frontmatter",
+          "text": "Notes carry YAML frontmatter with `type`, and the person note has id, a title in register form (surname, given names, birth year and place), aliases and a `conclusion` from the status vocabulary; `status` is not used for the proof status",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "markdown_links_only",
+          "text": "Links between notes are standard Markdown links with relative paths; no [[wikilinks]]",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "kinship_via_family_note",
+          "text": "Parents and child are connected through a Family note; there is no direct link from one person note to another",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "verified_only_where_checked",
+          "text": "A human verification is recorded only for the baptism source the user said they checked, not for the 1815 marriage entry",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "marriage_stays_hypothesis",
+          "text": "The 1815 marriage is not entered as a Family note or kinship link; it is placed in a Hypothesis note or left as an open question, with the reason (unchecked reading / namesake risk)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "godparent_not_linked",
+          "text": "The godparent Johann Schmitz is kept as plain text or flagged as unidentified, not linked to a person note",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    }
+  ]
+}
