@@ -39,13 +39,16 @@ article) before building an argument on them.
   carry different names; successive unrelated holders share one name. Prussia
   fixed surnames in the 19th century, sometimes as "X genannt Y". Track the
   **Hof** (Stätte, house number, Kolonat) as an identifier of its own.
-- **Patronymics** in Ostfriesland (until 1811 and in practice longer),
-  Schleswig (abolished 1771 in the duchy, later in practice), parts of the
+- **Patronymics** in Ostfriesland (fixed surnames decreed 1811 under French
+  rule, widely ignored for decades), Schleswig (fixed surnames by royal decree
+  of 8 Nov 1771, in practice later), parts of the
   Lower Rhine: the "surname" changes each generation (Harm Janssen's son is
   Jan Harms). Fixed-surname adoption lists exist for the Napoleonic period.
 - **Jewish families** adopted fixed surnames by state decree between c. 1787
-  and the 1840s depending on territory (French decree 1808 on the left bank;
-  Prussia 1812/1845); adoption lists (Namensannahmelisten) link old and new.
+  and the 1840s depending on territory (French decree of 20 July 1808 on the
+  left bank; Prussian edict of 11 March 1812 for the then Prussian provinces,
+  later rules for the others); adoption lists (Namensannahmelisten) link old
+  and new.
 - **Illegitimacy and legitimation:** child under mother's name, later under
   the (step)father's after marriage — look for the Randvermerk.
 - **Translated and adapted names** on emigration (Schmidt→Smith, Müller→
@@ -98,7 +101,8 @@ coexisted in many towns before the 19th-century unions (Prussia 1817).
 
 ## 6. Script and language
 
-- **Kurrent** (to c. 1941) and **Sütterlin** (1915–41) for German text; Latin
+- **Kurrent** (to c. 1941) and **Sütterlin** (introduced in Prussian schools
+  from 1915, dominant from the 1920s, dropped 1941) for German text; Latin
   script for Latin and often for names. Easy confusions: e/n/r, u/n (u has a
   bow), long s/f, h/y, B/L/C, K/R, St/Fl; double-m/n written with a stroke.
 - **Latin in Catholic books** until c. 1800–1810; formulae and kinship terms

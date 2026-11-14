@@ -16,17 +16,23 @@ before telling the user a specific volume is online. Do not invent a Signatur.
 ## 2. Civil registration (Standesamt)
 
 - **Reich-wide from 1 Jan 1876**; Prussia from 1 Oct 1874.
-- **Earlier under French law:** left bank of the Rhine from 1798; Grand Duchy
-  of Berg (right bank, e.g. Düsseldorf) from 1810; other Napoleonic territories
-  (Kgr. Westphalen, Hanseatic departments) c. 1808–1814, often discontinued
-  afterwards. Several states and free cities had their own earlier systems —
-  check the territory's GenWiki article for exact dates.
+- **Earlier under French law:** left bank of the Rhine from 1798 (kept until
+  1875); Grand Duchy of Berg (right bank, e.g. Düsseldorf) from 1810; Kingdom
+  of Westphalia from 1808/1810; Hanseatic departments from 1811. After 1813/14
+  most right-bank territories went back to church registration, while Bremen
+  and Lübeck continued their civil registers. Baden introduced state civil
+  registration on 1 Feb 1870. Other states and free cities had their own
+  systems — check GenWiki "Personenstandsregister" and the territory's article
+  for exact dates.
 - **Access periods (PStG, since 2009):** births 110 years, marriages 80 years,
-  deaths 30 years after the entry. Within the period: only the person, spouse,
-  ancestors and descendants, or others showing a legal interest
-  (rechtliches Interesse); siblings may show a justified interest. After the
-  period the registers become archive material and are open under the
-  respective Archivgesetz.
+  deaths 30 years after the entry. Within the period (§ 62 PStG): the person
+  concerned, spouse/partner, ancestors and descendants; anyone else must show
+  a legal interest (rechtliches Interesse). For **birth and death** registers
+  a sibling only needs a justified interest (berechtigtes Interesse). A
+  justified interest also suffices for anyone once 30 years have passed since
+  the death of the last participant (parents and child for births, the
+  spouses for marriages). After the period the registers become archive
+  material and are open under the respective Archivgesetz.
 - **What to order:** a copy of the full register entry (*beglaubigte
   Registerabschrift* / *Kopie des Registereintrags mit Randvermerken*), not a
   short Urkunde — only the full entry shows informant, witnesses, occupations,
@@ -69,13 +75,17 @@ Verein für Computergenealogie — the central German-language infrastructure:
   stable IDs, administrative and parish affiliations over time. Record the
   GOV-ID with every place.
 - **GEDBAS** — user-submitted trees (lead quality, like any tree).
-- **Online-OFB** (online-ofb.de) — Ortsfamilienbücher; plus the bibliography of
-  printed OFBs.
+- **Online-OFB** (ofb.genealogy.net) — Ortsfamilienbücher; plus the
+  bibliography of printed OFBs.
 - **DES** — indexed data-entry projects: Verlustlisten 1. Weltkrieg,
   Adressbücher, civil registers of some cities.
-- **Historische Adressbücher**, **Grabstein-Projekt**, **Familienanzeigen**,
-  **Totenzettel**, **FOKO** (who researches which surname where),
-  **Metasuche** across these databases.
+- **Historische Adressbücher**, **Grabstein-Projekt**
+  (grabsteine.genealogy.net), **Familienanzeigen**
+  (familienanzeigen.genealogy.net), **Verlustlisten 1. WK**
+  (verlustlisten.de), **Totenzettel**, **FOKO** (who researches which surname
+  where), **DigiBib** (digitised genealogical literature), and the
+  **Metasuche** (meta.genealogy.net) across these databases — use the
+  Metasuche first.
 - Mailing lists/forums by region — good for local parish-affiliation questions.
 
 Regional societies add their own holdings, e.g. **WGfF** (Westdeutsche
@@ -97,9 +107,11 @@ former eastern territories.
 
 - **Archivportal-D / Deutsche Digitale Bibliothek** — cross-archive search of
   finding aids; DDB **Zeitungsportal** for digitised newspapers.
-- **State archives:** e.g. Landesarchiv NRW — the Personenstandsarchive
-  (Rheinland in Duisburg; Westfalen-Lippe in Detmold) hold civil-register
-  duplicates and church-book duplicates, much of it digitised. Every Land has
+- **State archives:** e.g. Landesarchiv NRW — Abteilung Rheinland (Duisburg)
+  and Abteilung Ostwestfalen-Lippe (Detmold, responsible for genealogy for all
+  of Westphalia and Lippe) hold the Personenstandsarchive: civil-register
+  duplicates, Zivilstandsregister and church-book duplicates, much of it
+  digitised on archive.nrw.de (partly via FamilySearch). Every Land has
   an equivalent; search its online finding aid (e.g. Arcinsys in Hessen,
   Niedersachsen, Schleswig-Holstein).
 - **Municipal archives (Stadt-/Gemeinde-/Kreisarchiv):** civil registers past
@@ -117,7 +129,8 @@ former eastern territories.
 - **Volksbund Gräbersuche online** — war dead; **DRK-Suchdienst** — missing
   persons and expellees.
 - **Emigration:** Hamburg passenger lists (Staatsarchiv Hamburg; indexed on
-  Ancestry), Bremen lists mostly lost (fragments 1920–39), state-archive
+  Ancestry); Bremen lists mostly destroyed — about 3,000 of originally over
+  4,500 lists from 1920–1939 survive (passagierlisten.de); state-archive
   emigration files (Auswanderungsakten), plus arrival records abroad.
 - **Former eastern territories:** Polish state archives
   (szukajwarchiwach.gov.pl), Geneteka and other Polish indexing projects,

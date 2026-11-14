@@ -26,11 +26,27 @@ Two errors are possible, and they are not symmetric:
   the tree, and every generation above it is then wrong. It propagates to other
   users through the same matching system. Expensive, hard to detect later.
 - **False negative** (rejecting a right match) loses a lead. On MyHeritage a
-  rejected match is hidden from the list, so a wrong rejection is easy to
-  forget — reject only on a documented hard conflict, otherwise leave pending.
+  rejected match leaves the default view and is only reachable through the
+  "Rejected" status filter, so a wrong rejection is easy to forget — reject
+  only on a documented hard conflict, otherwise leave pending.
 
 Hence the asymmetry in the rules: **confirm strictly, reject strictly, and
 leave everything in between pending with a note.**
+
+MyHeritage mechanics that matter here (per its own knowledge base; verify
+against the current UI):
+
+- Matches carry a status: Pending, New, Confirmed, Rejected — all filterable.
+- After confirming, a separate page offers to **extract** information into the
+  tree. Extraction can be done manually field by field, also later.
+- **"Quick Save"** copies *everything new* from the match into the tree in one
+  step and attaches a citation that points at the match, not at a record.
+  Never use it: it is a bulk import that looks sourced.
+- The default sort is by **"Value Add"** — how much new data a match would
+  bring. That puts the matches with the most unverified content first; it is
+  not a measure of correctness.
+- Record Matches can be filtered by a confidence level. Use it to prioritise
+  review, not as a substitute for it.
 
 ## 2. Procedure
 
@@ -131,6 +147,9 @@ the step that prevents most false positives:
   same-named first cousins of similar age in one village are normal.
 - Follow each candidate forward (marriage, children, burial) until all but one
   are eliminated — by early death, different spouse, different farm.
+- Two same-named people appearing **in the same record or list** (both as
+  godparents, two households in one tax list or address book) are proof of
+  distinct persons — never merge across that.
 
 If a candidate cannot be eliminated, the verdict is at most **möglich**.
 
