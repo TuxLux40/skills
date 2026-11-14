@@ -191,10 +191,15 @@ identity question** and gets its own pass through this protocol.
 ## 3. Output format
 
 Use this structure for every evaluation (German labels if the user writes
-German):
+German). The verdict comes first, the matrix stays complete, and the reply
+ends with exactly one next step (`ausgabeform.md`):
 
 ```
 SMART-MATCH-PRÜFUNG / MATCH EVALUATION
+URTEIL / VERDICT: belegt | wahrscheinlich | möglich | ungeklärt | widerlegt
+Aktion in MyHeritage: bestätigen | offen lassen | ablehnen
+Grund / deciding reason: <one sentence: the identifier or conflict that decides, with its source>
+
 Person (eigener Baum / own tree): <name, *date place, ID>
 Gegenprofil / matched profile:    <name, tree/site, owner, URL or ID>
 Anker / anchor facts (belegt):    <fact — source>
@@ -202,17 +207,16 @@ Anker / anchor facts (belegt):    <fact — source>
 Matrix
 | Merkmal / identifier | Eigener Baum (Quelle) | Gegenprofil (Quelle) | ＝ ≈ ≠ ∅ |
 
-Harte Konflikte / hard conflicts:  <none | list>
+Harte Konflikte / hard conflicts:  <none | list — every one, never shortened>
 Weiche Abweichungen / soft:        <list with explanation>
 Abhängigkeit / dependency:         <n trees → m independent origins>
 Gegenprobe Namensvetter / namesake search: <done: scope, result | not done>
 Geprüfte Originalquelle / record examined: <citation | none>
 
-URTEIL / VERDICT: belegt | wahrscheinlich | möglich | ungeklärt | widerlegt
-Begründung / reasoning: <2–5 sentences>
-Aktion in MyHeritage: bestätigen | offen lassen | ablehnen
+Begründung / reasoning: <2–5 sentences, only what the lines above do not already say>
 Übernehmen / take over: <explicit list of fields, or "nichts / nothing">
-Nächste Quellen / next sources: <ranked, with repository and signature if known>
+Nächste Quellen / next sources: <ranked, at most five shown, with repository and signature if known>
+Nächster Schritt / next step: <exactly one, precise enough to start now>
 ```
 
 If information needed for the matrix is missing, ask for it or mark ∅ — never

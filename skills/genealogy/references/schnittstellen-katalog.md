@@ -51,6 +51,7 @@ logged as **"nicht geprüft"**, never as "nicht gefunden".
 | **Europeana** | Public API *(verify)* | key | Aggregated cultural-heritage metadata | Finding aid |
 | **Transkribus** | API for handwritten-text recognition (public models incl. Kurrent) | account, usage-based | Machine transcription | Provisional reading — same status as any machine reading |
 | **DNA Painter** | Import of segment data into a chromosome map (map settings → "Import segment data") | account | Visual segment map | Presentation of the user's own table |
+| **The user's document knowledge base** (e.g. `smart-okf` aggregates) | File system, or an MCP connector to the site that serves the Markdown (e.g. Grav) | the user's own | Per-folder aggregates, transcripts, cross-folder synthesis of family papers | Finding aid and machine reading — `dokumenten-wissensbasis.md` |
 
 ## 3. Rules for anything fetched by machine
 

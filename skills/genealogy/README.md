@@ -28,6 +28,9 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/interview-oral-history.md` | Interviews with relatives: guide, transcription, evaluation |
 | `references/erweiterte-recherche.md` | Advanced tactics: events abroad, cluster search, finding relatives |
 | `references/schnittstellen-katalog.md` | APIs, exports and open standards, with evidence value |
+| `references/ausgabeform.md` | Output shape: verdict first, one next step, and what brevity never removes |
+| `references/faecher-modus.md` | Divergent mode for dead ends: isolated branches, genealogy frame pack, leads as testable predictions |
+| `references/dokumenten-wissensbasis.md` | Using smart-okf / OKF Markdown of family papers: evidence value, citing, coverage |
 | `references/glossar-de-en.md` | DE↔EN glossary, register Latin, abbreviations |
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |
@@ -36,5 +39,18 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 ```bash
 python3 scripts/gedcom_plausi.py tree.ged --lang de        # or --lang en, --json
 ```
+
+## Works with
+
+- [`smart-okf`](../smart-okf) — turns the document archive into Markdown; this skill defines what those files may carry as genealogical evidence.
+- [`dokumenten-organisation`](../dokumenten-organisation) — naming and filing of the documents themselves.
+
+## Credits
+
+Three modes adapt methods from other skills, re-expressed for genealogical research (all MIT):
+
+- **Ausgabeform** — [i-have-adhd](https://github.com/ayghri/i-have-adhd) © 2026 Ayoub Ghriss
+- **Fächer-Modus** — [ADHD — a skill for agents](https://github.com/UditAkhourii/adhd) © 2026 ADHD contributors
+- **Grill-Modus** — [grill-me](https://github.com/mattpocock/skills) © 2026 Matt Pocock
 
 Full marketplace: [TuxLux40/skills](https://github.com/TuxLux40/skills) · details in `SKILL.md`

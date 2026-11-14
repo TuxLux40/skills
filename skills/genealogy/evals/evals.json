@@ -220,6 +220,144 @@
           "evidence": ""
         }
       ]
+    },
+    {
+      "id": 8,
+      "prompt": "Ich habe im Kirchenbuch Kettwig die Taufe von Wilhelm Kamp am 3.4.1821 gefunden, Eltern Heinrich Kamp und Gertrud Oberdick. In meinem Baum heiratet ein Wilhelm Kamp 1846 in Mülheim an der Ruhr; im Heiratseintrag steht als Vater 'Henrich Kamp, Ackerer zu Kettwig', Alter des Bräutigams 25. Ist das derselbe? Was mache ich als Nächstes?",
+      "expected_output": "German reply in the compact output shape. First line is the verdict with a status word (wahrscheinlich or möglich, not belegt) and the deciding evidence. Persons are named with year and place. Compares the identifiers (father's name, occupation and place, age 25 fits 1821), says the namesake search for other Wilhelm Kamp baptisms in and around Kettwig is still open, lists hard conflicts or says there are none. Ends with exactly one concrete next step. No preamble, no recap, no closing offer.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "verdict_first",
+          "text": "The first line states a verdict with a status word (wahrscheinlich or möglich) instead of an introduction or a description of what will be done",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "not_belegt_yet",
+          "text": "Response does not call the identification 'belegt' and names the outstanding namesake search (other Wilhelm Kamp baptisms in/around Kettwig in the matching years)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "persons_with_year_place",
+          "text": "Persons are referred to with year and place (e.g. 'Wilhelm Kamp *1821 Kettwig'), not only by pronoun or 'der andere Wilhelm'",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "status_and_source_kept",
+          "text": "Every stated fact keeps its source (baptism entry, marriage entry) and the conclusion carries a status word",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_filler",
+          "text": "Response contains no preamble (e.g. 'Gute Frage', 'Ich schaue mir das an') and no closing offer (e.g. 'Sag Bescheid, wenn …')",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Toter Punkt: Mein Vorfahr Peter Janssen heiratet 1832 in Mülheim an der Ruhr (ev.), im Heiratseintrag steht nur 'gebürtig aus dem Clevischen', keine Eltern. Die Kirchenbücher von Mülheim (ev. und kath.) 1795–1832 habe ich vollständig durchgesehen und protokolliert, kein Taufeintrag; der Sterbeeintrag 1871 nennt nur das Alter 66. In anderen Stammbäumen steht ein Peter Janssen *1805 in Kleve. Ich brauche neue Ansätze.",
+      "expected_output": "German reply that runs the Fächer-Modus because new angles were asked for. Writes a neutral brief that separates proven facts from the claim in other trees. Uses isolated sub-agents per frame, or labels the run 'Ersatzlauf ohne Isolation'. Returns a shortlist of two to four leads with T/M/N scores, each with a prediction (what the source shows if the hypothesis holds and if not) and a first step, one of them marked as the non-obvious pick. Lists traps, among them taking the Peter Janssen *1805 Kleve from other trees as the same person. Gives no lead a status above möglich and does not suggest entering anything in the tree. Leads go beyond re-checking the Mülheim church books. Ends with one next step; the full list of leads is offered on request or placed in the log.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "runs_divergent_mode",
+          "text": "Response generates research leads from several distinct vantage points (frames) rather than a single linear suggestion",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "isolation_or_labelled",
+          "text": "Response either used isolated sub-agents for the branches or explicitly labels the run as done without isolation (Ersatzlauf)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "shortlist_with_predictions",
+          "text": "Response gives a shortlist of 2–4 leads, each with a testable prediction (what the source must show if the hypothesis is true / false) and a first step",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "traps_include_namesake_tree",
+          "text": "Response flags as a trap adopting the Peter Janssen *1805 Kleve from other online trees on the strength of the name",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "no_lead_as_finding",
+          "text": "No lead is presented as a finding: nothing is given a status above 'möglich' and nothing is recommended for entry in the tree",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "beyond_standard_sources",
+          "text": "Leads go beyond re-reading the Mülheim parish registers (e.g. godparents and witnesses of his children, residence or citizenship files, occupation records, parishes of the former Duchy of Cleves incl. the Dutch border area, estate or guardianship files)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step and does not dump all leads unranked",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "In meiner Dokumenten-Wissensbasis (smart-okf) steht im Aggregat `Familie_Kamp/Urkunden/Urkunden.md` unter 'Heiratsurkunde 1891': 'Bräutigam Wilhelm Kamp, geboren 12.03.1864 in Kettwig, Sohn des Ackerers Heinrich Kamp'. Quelle laut sources: `heirat_1891.jpg`, keine FLAGGED-Zeile. Dann kann ich das Geburtsdatum ja als belegt in den Baum eintragen, oder?",
+      "expected_output": "German reply: no, not yet. The aggregate is a finding aid; a missing FLAGGED line only says the extraction matches the transcript, not that the image was read correctly. The source file is a photo of a register entry or certificate, so names and dates are a machine reading until the user has confirmed them at the image; until then at most möglich and not in the tree. Asks for one concrete check at the image as the next step. Says the citation must name the document (path from sources, hash, layer used), not the aggregate. Notes that a birth date in a marriage record is secondary information and points to the birth or baptism record.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "not_into_tree_as_belegt",
+          "text": "Response does not agree to enter the birth date as 'belegt' on the strength of the aggregate",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "explains_guarantee_limit",
+          "text": "Response explains that the absence of a FLAGGED line vouches for extraction versus transcript only, not for the reading of the image",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "machine_reading_needs_image_check",
+          "text": "Response treats name and date as a machine reading that the user has to confirm against the image (heirat_1891.jpg) before it counts as evidence",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "cites_document_not_aggregate",
+          "text": "Response says the citation has to name the document itself (with file path and/or hash and the layer looked at), not the aggregate Markdown",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "secondary_information",
+          "text": "Response notes that a birth date given in a marriage record is secondary information and points to the birth or baptism record as the better source",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_concrete_request",
+          "text": "Response ends with one concrete next step, e.g. checking the birth-date line in the image",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
     }
   ]
 }

@@ -103,6 +103,15 @@ none exists. Independent of the structure, these rules hold:
 - Media types: scans as TIFF/PNG or the JPEG as delivered; documents PDF/A;
   audio WAV/FLAC as master; DNA exports as downloaded plus a dated copy.
 - A NAS is not a backup: keep a second copy elsewhere and test restoring.
+- **If an ingest pipeline indexes the storage** (e.g. `smart-okf`): check
+  which formats it reads and keep a readable derivative beside masters it
+  skips (TIFF). Keep your own notes — logs, source sheets, proof arguments —
+  out of the set it treats as documents, or the next ingest hands your
+  conclusions back as document facts. Details and the citation form for
+  documents found through such a knowledge base:
+  `dokumenten-wissensbasis.md`.
+- Building a filing structure from scratch: the sibling skill
+  `dokumenten-organisation` covers classification and naming.
 
 Name files so they sort and identify themselves without the folder:
 
@@ -159,9 +168,15 @@ One entry per search, written at the time:
 Negative results with their scope are the most valuable entries: they stop
 repeated searches and can become negative evidence.
 
+The log also holds the **Parkplatz**: side finds that do not serve the
+current question, one line each with source. They are picked up as their
+own question later, not followed on the spot.
+
 Session summary for the knowledge base (when the user asks to document):
-question(s) worked on → sources consulted → findings with status → conflicts
-open → hypotheses rejected and why → next steps → files added.
+state line → question(s) worked on → sources consulted → findings with
+status → conflicts open → hypotheses rejected and why → parked finds →
+requests waiting → the one next step → files added. The next session opens
+from it (`ausgabeform.md` §3).
 
 ## 6. Publishing
 

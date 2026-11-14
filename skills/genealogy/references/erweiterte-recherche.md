@@ -67,7 +67,8 @@ merchant service, study or religious life abroad.
 - **Search around the person** (cluster/FAN): siblings, in-laws, godparents,
   witnesses, neighbours, fellow emigrants from the village, comrades of the
   same unit. Rare surnames in the cluster are easier to find than a common
-  target name.
+  target name. Collect them in the Personen-Netz (`assets/vorlagen.md` §14)
+  and run the connection scan in `faecher-modus.md` §6.
 - **Search by something other than the name**: address, farm, occupation +
   place, ship + date, unit, parish + year.
 - **Operators**: exact phrase, exclusion, site restriction, date range,
@@ -123,3 +124,6 @@ comrades or fellow prisoners, keepers of family papers.
 8. Cluster searched (godparents, witnesses, neighbours)?
 9. Indirect evidence assembled and written up as a hypothesis?
 10. DNA: any cluster pointing at this couple? (`dna-myheritage.md`)
+11. All of the above done and logged, still stuck: Fächer-Modus
+    (`faecher-modus.md`) — new directions under different vantage points,
+    each turned into a testable prediction.

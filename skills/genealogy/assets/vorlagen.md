@@ -26,8 +26,11 @@ Person: <Name, ID>   Stand: <JJJJ-MM-TT>
 ## Verworfene Hypothesen
 - <Hypothese> — widerlegt durch <Quelle>, weil <…>
 
+## Parkplatz (Nebenfunde, nicht zu dieser Frage)
+- <Fund> — <Quelle> — eigene Frage wert: <ja | nein>
+
 ## Nächste Schritte
-1. <Quelle, Archiv, was genau prüfen>
+1. <Quelle, Archiv, was genau prüfen>   ← der eine nächste Schritt
 ```
 
 ```markdown
@@ -51,8 +54,11 @@ Person: <name, ID>   As of: <YYYY-MM-DD>
 ## Rejected hypotheses
 - <hypothesis> — disproven by <source> because <…>
 
+## Parked (side finds, off this question)
+- <find> — <source> — worth its own question: <yes | no>
+
 ## Next steps
-1. <source, repository, what exactly to check>
+1. <source, repository, what exactly to check>   ← the one next step
 ```
 
 ## 2. Quellenblatt / Source record sheet
@@ -88,6 +94,10 @@ Gelesen von / read by: <Person | maschinell, ungeprüft / machine, unchecked>
 ```markdown
 # Match-Prüfung <JJJJ-MM-TT> – <Name, ID>
 
+**URTEIL / VERDICT:** belegt | wahrscheinlich | möglich | ungeklärt | widerlegt
+**Aktion in MyHeritage:** bestätigen | offen lassen | ablehnen
+**Grund / deciding reason:** <ein Satz: das entscheidende Merkmal oder der Konflikt, mit Quelle>
+
 Eigenes Profil / own profile: <Name, *Datum Ort, ID>
 Gegenprofil / matched profile: <Name, Seite, Baum, Verwalter, URL/ID>
 Hinweistyp / hint type: Smart Match | Record Match | Instant Discovery | Theory | anderer
@@ -116,11 +126,10 @@ Abhängigkeit / dependency: <n Bäume → m unabhängige Ursprünge>
 Gegenprobe Namensvetter / namesake search: <Umfang, Ergebnis | nicht durchgeführt>
 Geprüfte Originalquelle / record examined: <Zitat | keine>
 
-**URTEIL / VERDICT:** belegt | wahrscheinlich | möglich | ungeklärt | widerlegt
 **Begründung / reasoning:** <…>
-**Aktion in MyHeritage:** bestätigen | offen lassen | ablehnen
 **Übernehmen / take over:** <Feldliste mit jeweiliger Originalquelle | nichts>
-**Nächste Quellen / next sources:** <…>
+**Nächste Quellen / next sources:** <nach Rang, höchstens fünf>
+**Nächster Schritt / next step:** <genau einer>
 ```
 
 ### Abgelehnter Match / Rejected match (Kurzform)
@@ -329,12 +338,148 @@ clusters: | Cluster | Quelle (Lauf, Datum, Schwellen) | Mitglieder | Ahnenpaar |
 
 ```markdown
 # Genealogie-Sitzung <JJJJ-MM-TT>
+Stand: <Frage> · <Person mit Jahr/Ort> · Schritt n/m
 Forschungsfragen: <…>
 Geprüfte Quellen: <Zitate; inkl. negativer Ergebnisse mit Suchumfang>
 Ergebnisse: <Befund — Status>
 Match-Entscheidungen: <Profil — Urteil — Aktion>
 Offene Widersprüche: <…>
 Verworfen: <Hypothese — Grund>
-Nächste Schritte: <priorisiert>
+Geparkt: <Nebenfunde>
+Wartet: <Anfrage — Stelle — gesendet am>
+Nächster Schritt: <genau einer, sofort beginnbar>
+Danach: <priorisiert>
 Neue Dateien: <Dateinamen>
+```
+
+The `Stand`, `Wartet` and `Nächster Schritt` lines are what the next session
+opens with (`references/ausgabeform.md` §3).
+
+## 13. Fächer-Lauf / Divergent run
+
+Record of one run of `references/faecher-modus.md`. Leads are not findings:
+nothing here carries a status above `[möglich]`.
+
+```markdown
+# Fächer-Lauf <JJJJ-MM-TT> – <Forschungsfrage in einem Satz>
+Anlass: <auf Zuruf | Sackgasse: was erschöpft ist>
+Lauf: <n Rahmen × m Ansätze> · <isoliert | Ersatzlauf ohne Isolation>
+Rahmen: <…>
+
+## Lagebild (für alle Zweige gleich)
+FRAGE:     <…>
+PERSON:    <Name · * · ∞ · † — nur belegt/wahrscheinlich, je mit Kurzquelle>
+UNBELEGT:  <was Baum, Überlieferung, fremde Bäume behaupten>
+GEPRÜFT:   <Suchen mit Umfang und Ergebnis>
+RAUM/ZEIT: <Pfarrei, Standesamt, Territorium, Konfession, Beruf, Stand>
+
+## Shortlist
+| # | Ansatz | T | M | N | Vorhersage (stimmt / stimmt nicht) | Erster Schritt |
+|---|--------|---|---|---|-------------------------------------|----------------|
+| ★ |        |   |   |   |                                     |                |
+
+## Suchaufträge
+### <Ansatz>
+Hypothese: <…>
+Vorhersage: <stimmt sie → Quelle zeigt X; stimmt sie nicht → Y; Lücken der Reihe geprüft: ja | nein>
+Quelle & Zugang: <Bestand, Stelle, Portal/Anfrage, Jahre, Namensvarianten>
+Tragende Annahme: <…>
+Erster Schritt: <…>
+Aufwand: <Zeit / Kosten | unbekannt>
+Folgeansätze: <…>
+
+## Fallen
+| Ansatz | Grund |
+|--------|-------|
+
+## Vollständiger Fächer
+### <Gruppe: zugrunde liegender Blickwinkel>
+- <Ansatz> [T_ M_ N_] (<Rahmen>)
+
+## Fernziele (T hoch, M niedrig)
+- <Ansatz> — <was sich ändern müsste>
+
+## Querfrage
+<…>
+
+## Nachtrag
+- <Ansatz> → gesucht am <Datum>, Protokoll <Verweis>, Ergebnis <…>
+```
+
+```markdown
+# Divergent run <YYYY-MM-DD> – <research question in one sentence>
+Occasion: <on request | dead end: what is exhausted>
+Run: <n frames × m leads> · <isolated | substitute run without isolation>
+Frames: <…>
+
+## Brief (identical for all branches)
+QUESTION:   <…>
+PERSON:     <name · * · ∞ · † — proven/probable only, each with short source>
+UNPROVEN:   <what tree, family lore, other trees claim>
+SEARCHED:   <searches with scope and result>
+PLACE/TIME: <parish, register office, territory, confession, occupation, status>
+
+## Shortlist
+| # | Lead | T | M | N | Prediction (holds / does not hold) | First step |
+|---|------|---|---|---|-------------------------------------|------------|
+| ★ |      |   |   |   |                                     |            |
+
+## Search orders
+### <lead>
+Hypothesis: <…>
+Prediction: <if true → source shows X; if false → Y; gaps in the series checked: yes | no>
+Source & access: <record group, holder, portal/request, years, name variants>
+Load-bearing assumption: <…>
+First step: <…>
+Effort: <time / cost | unknown>
+Follow-up leads: <…>
+
+## Traps
+| Lead | Reason |
+|------|--------|
+
+## Complete fan
+### <group: underlying angle>
+- <lead> [T_ M_ N_] (<frame>)
+
+## Long shots (T high, M low)
+- <lead> — <what would have to change>
+
+## Reopening question
+<…>
+
+## Addendum
+- <lead> → searched on <date>, log <reference>, result <…>
+```
+
+## 14. Personen-Netz / Person network (FAN table)
+
+One row per person per record. Fill it from every captured record of the
+family group, then run the connection scan (`references/faecher-modus.md`
+§6).
+
+```markdown
+# Personen-Netz – <Familiengruppe / Forschungsfrage>
+
+| Person (mit Jahr/Ort) | Quelle (Kurzzitat) | Datum | Rolle | Ort / Adresse / Hof | Alter, Beruf | unterschreibt / Handzeichen | Bezug zur Zielperson [Status] |
+|-----------------------|--------------------|-------|-------|---------------------|--------------|-----------------------------|-------------------------------|
+|                       |                    |       | Pate / Zeuge / Anzeigender / Nachbar / Vermieter / Arbeitgeber | | | | |
+
+## Auffälligkeiten
+- <Beobachtung> — Hinweis, kein Befund
+  Vorhersage: <stimmt die Verbindung → Quelle zeigt X; sonst Y>
+  Prüfung: <offen | Protokoll-Verweis, Ergebnis>
+```
+
+```markdown
+# Person network – <family group / research question>
+
+| Person (with year/place) | Source (short citation) | Date | Role | Place / address / farm | Age, occupation | signs / makes a mark | Relation to target [status] |
+|--------------------------|-------------------------|------|------|------------------------|-----------------|----------------------|-----------------------------|
+|                          |                         |      | godparent / witness / informant / neighbour / landlord / employer | | | | |
+
+## Observations
+- <observation> — a hint, not a finding
+  Prediction: <if the link holds → source shows X; otherwise Y>
+  Check: <open | log reference, result>
 ```

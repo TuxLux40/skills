@@ -45,6 +45,8 @@ Typical classifications:
 | Ahnenpass | Compilation of certified extracts | See pitfalls |
 | Online index (Ancestry, MyHeritage, FamilySearch) | Derivative | Finding aid; cite the image, not the index, once seen |
 | Online tree | Compilation | Lead only |
+| Maschinentranskript (OCR, HTR, Vision-Modell) | Derivative (machine reading) | Printed roman type: usually reliable. Handwriting and Fraktur: provisional until checked at the image; a vision model's errors look plausible |
+| KI-Zusammenfassung eines Dokumentenarchivs (e.g. smart-okf aggregate, synthesis) | Finding aid — derivative of a derivative | Cite the document, not the summary; see `dokumenten-wissensbasis.md` |
 | Grabstein, Totenzettel, Todesanzeige | Original object, secondary information for birth | Good for death, weak for birth data |
 | Adressbuch | Original compilation | Residence/occupation with a time lag of ~1 year |
 
@@ -128,6 +130,12 @@ Hedging language carries meaning — use it consistently: "ist" (belegt),
   checked against the image by the user. Kurrent digits and month names
   (7bris = September, 8bris = Oktober, 9bris = November, Xbris = Dezember) are
   frequent error sites.
+- A summary checked against its transcript inherits every misreading of that
+  transcript. Verification inside a pipeline is not verification at the
+  image.
+- Leads a model generates — Fächer-Modus, a synthesis's "patterns", any
+  connection it "sees" between records — are hypotheses. Each needs a
+  prediction and a check, and none carries a status above `[möglich]`.
 - Never produce a citation from memory of what a register "should" contain.
 - When asked "what do you know about family X in village Y", answer from
   provided material and searchable sources only; background knowledge about a

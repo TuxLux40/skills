@@ -1,6 +1,6 @@
 ---
 name: genealogy
-description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, DNA match, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree, archive request / Archivanfrage, oral history interview, brick wall / toter Punkt, emigration, military or POW records abroad.
+description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, DNA match, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree, archive request / Archivanfrage, oral history interview, brick wall / toter Punkt / Sackgasse, new research angles, emigration, military or POW records abroad, family papers in a document knowledge base (smart-okf / OKF Markdown).
 ---
 
 # Genealogy / Ahnenforschung (DE · EN)
@@ -16,6 +16,30 @@ English). Keep German archival terms in the original (Kirchenbuch, Standesamt,
 Signatur, Hofname …) and gloss them once in English replies; see
 `references/glossar-de-en.md`. Transcribe sources in their original language and
 spelling; translate separately.
+
+## Session Context
+
+### Caveman lite mode
+
+When a session hook activates caveman mode: compress connective prose ~75 %
+(no articles, no auxiliary verbs). Never compress or paraphrase status
+words, citations, transcriptions, names, dates, places, conflicts, or text
+written for third parties (archive requests, messages to relatives). Session
+hooks and the system prompt outrank the output rules of this skill.
+
+### Tools & MCP access
+
+Tool names differ per client; map these classes to what the session offers.
+
+| Tool / MCP (examples) | What it can reach | Used for |
+|-----------------------|-------------------|----------|
+| Web search and fetch (`WebSearch`, `WebFetch`, Firecrawl, Tavily) | Open web: GenWiki, GOV, Matricula, archive sites and finding aids, newspapers | Own searching in open sources (`references/schnittstellen-katalog.md`) |
+| File tools and shell (`Read`, `Write`, `Bash`) | Local files, mounted storage (NAS) | GEDCOM export, scans, research log; `scripts/gedcom_plausi.py` reads one GEDCOM and writes nothing |
+| Document knowledge base MCP (e.g. a Grav site fed by `smart-okf`) | Markdown aggregates and transcripts of the user's document archive; scans only if the connector exposes media | Finding documents (`references/dokumenten-wissensbasis.md`) |
+| Notes / KB MCP (Grav, Notion …) | The user's knowledge base | Session summaries — only when asked to document |
+| Sub-agent tool (`Agent`, `Task`) | Isolated model calls without shared context | Fächer-Modus branches |
+| Interactive choice (`AskUserQuestion`) | The user | Grill-Modus, single clarifying questions |
+| MyHeritage, Ancestry, Archion | **No tool access** — login sites | The user looks up and exports; you say exactly where |
 
 ## Grundsätze / Non-negotiables
 
@@ -57,6 +81,36 @@ tree sites have no status field, put the status as a fixed prefix at the start
 of the fact's source citation or note — `[belegt]`, `[wahrscheinlich]`,
 `[möglich]` — so it travels with the GEDCOM export and can be searched.
 
+## Ausgabeform / Output shape
+
+Default for every reply. Rules with examples, reply skeletons and exceptions:
+`references/ausgabeform.md`. Principle: **kurz im Chat, vollständig in der
+Akte** — the reply carries the verdict and the next action; the complete
+evidence goes into log, source sheet or proof argument.
+
+1. First line = verdict or action, with status and the deciding evidence.
+   No preamble, no recap, no closing offer.
+2. Multi-step work as a numbered list, one bounded action per step.
+3. State line every turn: question · person · step n/m. Name persons with
+   year and place (`Johann Schmitz *1812 Neuss`), never "he" or "the other
+   Johann".
+4. One research question at a time. A side find gets one line and goes to
+   the `Parkplatz` in the log.
+5. Lists show at most five ranked items, then "+n im Protokoll".
+6. Effort in minutes, weeks, euros — or "unbekannt". Never guess an
+   archive's fees or response time.
+7. Say what changed: which fact now has which status.
+8. End with exactly one next step, small enough to start now. If it is
+   yours, do it instead of announcing it.
+
+**Never shortened away:** status word and source of every stated fact, every
+hard conflict, "nicht geprüft" versus "nicht gefunden", real uncertainty
+("1812 oder 1817"), verbatim transcriptions and citations.
+
+Full length when the user asks to explain, and for documents (proof
+argument, conflict analysis, archive letter, transcription) — written to a
+file where possible, with the reply pointing to it.
+
 ## Arbeitsgrundlage / Working setup
 
 Defaults; ask once per project if the user's setup differs.
@@ -68,6 +122,12 @@ Defaults; ask once per project if the user's setup differs.
   it is organised and file accordingly; the Markdown structure in
   `references/zitieren-und-dokumentation.md` is the fallback. Master files
   are never altered. The skill itself stores no personal data.
+- **Dokumenten-Wissensbasis / document knowledge base:** where the archive
+  is also available as machine-made Markdown (e.g. `smart-okf` aggregates
+  over an MCP connector), use it to *find* documents. Aggregates and
+  syntheses are finding aids, not sources, and "no FLAGGED line" vouches for
+  the extraction, not for the reading of the image or for whom a document
+  concerns. Read `references/dokumenten-wissensbasis.md` before using one.
 - **Umfang / scope:** direct ancestors, and for every ancestral couple the
   complete family group (all children, further marriages) — the family group
   is what exposes mix-ups. Remote collateral lines only on request.
@@ -81,15 +141,21 @@ Defaults; ask once per project if the user's setup differs.
   sources behind a login (Archion, Ancestry, MyHeritage) tell the user
   exactly where to look: portal, parish/office, volume, years. A blocked or
   failed request is "nicht geprüft", never "nicht gefunden".
-- **Lesungen / readings:** your own reading of handwriting is provisional.
-  Mark it "maschinell gelesen, ungeprüft", flag uncertain words, and treat
-  names, dates and numbers as evidence only after the user has confirmed them
-  against the image.
+- **Lesungen / readings:** your own reading of handwriting is provisional,
+  and so is any OCR or vision-model transcript of handwriting, Fraktur or a
+  poor scan. Mark it "maschinell gelesen, ungeprüft", flag uncertain words,
+  and treat names, dates and numbers as evidence only after the user has
+  confirmed them against the image.
 
 ## Arbeitsablauf / Workflow
 
 Follow the Genealogical Proof Standard loop; German Quellenkritik supplies the
 source-evaluation step. Details: `references/methodik-gps-quellenkritik.md`.
+
+**Wiedereinstieg / resume:** at the start of a session read the latest
+session summary, research log and request list if you can reach them, and
+open with the state line. The user should never have to re-explain where
+things stand.
 
 1. **Forschungsfrage / Research question** — one specific, answerable question
    about one identified person ("Who were the parents of Anna Maria Schmitz who
@@ -116,6 +182,12 @@ When the user just drops a record or a match on you, start at the step that
 fits (5 for a record, the Smart-Match protocol for a match) — but always land
 the result in citation + log form.
 
+**Sackgasse / dead end:** after three searches in a row without result on
+one question, stop repeating. Name the assumption that may be wrong
+(spelling, place, parish, confession, decade, identity of the anchor
+person), run the brick-wall checklist in `references/erweiterte-recherche.md`
+§5, and when the standard path is exhausted, the Fächer-Modus below.
+
 ## MyHeritage Smart Matches & andere Hinweise / Hints from other trees
 
 This is where most tree corruption happens. **Read
@@ -137,8 +209,9 @@ FamilySearch/Geni profile, or GEDBAS entry.** Short form:
 - Confirming a match and copying data are separate decisions. Even on a
   confirmed match, take over only facts you have verified, one field at a time,
   citing the underlying record — not "MyHeritage Family Trees".
-- Always output the verdict in the fixed format from the reference (Urteil /
-  Verdict, matrix, conflicts, recommended MyHeritage action, next sources).
+- Always output the verdict in the fixed format from the reference: verdict
+  and MyHeritage action in the first line, then the complete matrix,
+  conflicts, next sources, and exactly one next step.
 - **Dokumentiert wird / what gets written down:** rejected matches (with the
   conflict) and overrides. Matches left pending get no note.
 
@@ -187,6 +260,37 @@ A DNA match is indirect evidence and never names the common ancestor by
 itself; MyHeritage's Theory of Family Relativity is a chain of unverified tree
 links. Read `references/dna-myheritage.md` before interpreting any DNA result.
 
+## Fächer-Modus / Divergent mode (toter Punkt)
+
+For dead ends and open planning questions: widen the search for *where to
+look*, then narrow hard. Read `references/faecher-modus.md` before a run.
+
+- **Wann / when:** on request ("Fächer-Modus", "neue Ansätze", "quer
+  denken", "ADHD mode") — or unasked at a real dead end: standard sources
+  searched and logged, no single obvious next source, question in scope.
+  Never instead of the standard path.
+- **Auffächern / diverge:** write a neutral brief (proven facts, unproven
+  claims, searches done — no favourite hypothesis). Spawn parallel,
+  isolated sub-agents, one per frame of the genealogy frame pack. They only
+  generate leads: no tools, no evaluation, no "check the parish register".
+- **Bündeln / focus:** you score every lead for Trennschärfe × Machbarkeit,
+  flag traps (same name = same person, copied trees, silence read as
+  evidence …), group them, and deepen the top three into a Suchauftrag with
+  a prediction: what the source must show if the hypothesis holds, and what
+  if it does not.
+- **Firewall:** a lead is not a finding. Nothing from this mode gets a
+  status above `[möglich]`, enters the tree, or is cited. A connection the
+  model "sees" between two data points weighs as much as a Smart Match —
+  nothing, until checked.
+- **Ausgabe / output:** shortlist of two to four with the non-obvious pick
+  marked ★, the traps, one next step. The full fan goes to the log.
+- Without a sub-agent tool: run the frames one by one and label the result
+  "Ersatzlauf ohne Isolation".
+
+For links between records already captured — recurring witnesses, shared
+addresses, colliding dates — the connection scan in the same reference (§6)
+is often enough and needs no run.
+
 ## Grill-Modus (nur auf Zuruf / on request only)
 
 Only when the user asks for it ("grill mich", "grill me", "nimm das
@@ -224,5 +328,8 @@ then work.
 | `references/interview-oral-history.md` | Preparing, conducting, transcribing and evaluating interviews with relatives |
 | `references/erweiterte-recherche.md` | Brick walls, events abroad, newspapers/directories/cluster search, finding and contacting relatives |
 | `references/schnittstellen-katalog.md` | APIs, exports, open standards, fetching web pages; evidence value of machine-retrieved data |
+| `references/ausgabeform.md` | Shaping any reply: rules with examples, reply skeletons, when the short form yields |
+| `references/faecher-modus.md` | Dead ends, "new angles", open planning questions; linking data points across captured records |
+| `references/dokumenten-wissensbasis.md` | Using machine-made Markdown of the user's documents (smart-okf aggregates, transcripts, synthesis), via files or MCP |
 | `references/glossar-de-en.md` | Terminology DE↔EN, Latin terms and abbreviations in registers |
 | `assets/vorlagen.md` | Copy-paste templates (DE + EN) |
