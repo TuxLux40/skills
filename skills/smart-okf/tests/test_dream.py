@@ -38,8 +38,8 @@ def _build_tree(tmp_path: Path) -> None:
     finances = tmp_path / "finances"
     providers.mkdir()
     finances.mkdir()
-    (providers / "contract.txt").write_text("Contract 123456789 with ACME Energy", encoding="utf-8")
-    (finances / "statement.txt").write_text("Payment to ACME Energy, ref 123456789", encoding="utf-8")
+    (providers / "contract.txt").write_text("Contract PQ90RS1234 with ACME Energy", encoding="utf-8")
+    (finances / "statement.txt").write_text("Payment to ACME Energy, ref PQ90RS1234", encoding="utf-8")
     ingest_folder(str(tmp_path), client=_IngestStub())  # type: ignore[arg-type]
 
 
@@ -62,7 +62,7 @@ def test_build_digest_is_compact_identity_not_full_body(tmp_path: Path) -> None:
     assert "### Aggregate: providers/providers.md" in digest
     assert "Orientation summary for this folder." in digest
     assert "_Source: contract.txt_" in digest
-    assert "Extracted: Contract 123456789" not in digest  # section bodies stay out
+    assert "Extracted: Contract PQ90RS1234" not in digest  # section bodies stay out
 
 
 def test_build_digest_includes_identifiers_from_frontmatter(tmp_path: Path) -> None:
@@ -79,8 +79,8 @@ def test_build_digest_includes_identifiers_from_frontmatter(tmp_path: Path) -> N
                 source=None,
                 sources=["meldung.pdf"],
                 identifiers={
-                    "versicherungsnummer": ["12345678X901"],
-                    "betriebsnummer": ["15027365", "11122233"],
+                    "versicherungsnummer": ["00000000X000"],
+                    "betriebsnummer": ["KL78MN9012", "CD34EF5678"],
                 },
             ),
             body="## Meldung\n\nOrientation only in digest; body stays out.\n\n_Source: meldung.pdf_",
@@ -91,8 +91,8 @@ def test_build_digest_includes_identifiers_from_frontmatter(tmp_path: Path) -> N
     digest = build_digest(aggregate, tmp_path)
 
     assert "Identifiers:" in digest
-    assert "versicherungsnummer: 12345678X901" in digest
-    assert "betriebsnummer: 15027365, 11122233" in digest
+    assert "versicherungsnummer: 00000000X000" in digest
+    assert "betriebsnummer: KL78MN9012, CD34EF5678" in digest
     assert "Orientation only in digest" not in digest  # body still excluded
 
 
@@ -169,7 +169,7 @@ def test_dream_reruns_when_an_aggregate_changed(tmp_path: Path) -> None:
     _build_tree(tmp_path)
     dream(str(tmp_path), client=_DreamStub())  # type: ignore[arg-type]
 
-    (tmp_path / "providers" / "new_letter.txt").write_text("New demand, ref 123456789", encoding="utf-8")
+    (tmp_path / "providers" / "new_letter.txt").write_text("New demand, ref PQ90RS1234", encoding="utf-8")
     ingest_folder(str(tmp_path), client=_IngestStub())  # type: ignore[arg-type]
 
     rerun = _DreamStub()
@@ -225,7 +225,7 @@ class _TwoPassStub:
     def dream_matter(self, group_text: str, *, max_tokens: int | None = None) -> str:
         self.matter_calls.append(group_text)
         return (
-            "### Matter\n\nDense matter write-up citing exact contract 999888777.\n\n"
+            "### Matter\n\nDense matter write-up citing exact contract AB12CD3456.\n\n"
             "### Conflicts\n\nTwo suppliers both claim exclusive delivery for the same period.\n\n"
             "### Actions\n\n- Verify the billing period against the network operator."
         )
@@ -238,8 +238,8 @@ def _build_tree_with_shared_filename_token(tmp_path: Path) -> None:
     finances.mkdir()
     # Real-world naming convention: the shared reference number lives in the filename,
     # which build_digest's "Sources:" line picks up even without reading section bodies.
-    (providers / "invoice_999888777.txt").write_text("Invoice content", encoding="utf-8")
-    (finances / "payment_999888777.txt").write_text("Payment content", encoding="utf-8")
+    (providers / "invoice_AB12CD3456.txt").write_text("Invoice content", encoding="utf-8")
+    (finances / "payment_AB12CD3456.txt").write_text("Payment content", encoding="utf-8")
     ingest_folder(str(tmp_path), client=_IngestStub())  # type: ignore[arg-type]
 
 
@@ -251,7 +251,7 @@ def test_deep_dive_replaces_matters_and_conflicts_but_keeps_baseline_patterns(tm
 
     assert result.errors == []
     output = synthesis_path(tmp_path).read_text(encoding="utf-8")
-    assert "Dense matter write-up citing exact contract 999888777" in output
+    assert "Dense matter write-up citing exact contract AB12CD3456" in output
     assert "Baseline vague matter mention" not in output  # replaced, not appended
     assert "Two suppliers both claim exclusive delivery" in output  # deep-dive conflict surfaced
     assert "Recurring provider correspondence" in output  # baseline Patterns kept
@@ -313,8 +313,8 @@ def test_dream_writes_a_dedicated_matter_file_for_a_candidate_group(tmp_path: Pa
     assert len(matter_files) == 1
     content = matter_files[0].read_text(encoding="utf-8")
     assert "type: Matter" in content
-    assert "999888777" in content
-    assert "Dense matter write-up citing exact contract 999888777" in content
+    assert "AB12CD3456" in content
+    assert "Dense matter write-up citing exact contract AB12CD3456" in content
     assert "providers/providers.md" in content  # involved-aggregates link
 
 
@@ -335,7 +335,7 @@ def test_dream_reuses_matter_file_and_skips_deep_dive_when_group_unchanged(tmp_p
     assert result.unchanged is False  # the new health/ aggregate did change the tree overall
     assert rerun_client.matter_calls == []  # matter group's own aggregates unchanged
     output = synthesis_path(tmp_path).read_text(encoding="utf-8")
-    assert "Dense matter write-up citing exact contract 999888777" in output
+    assert "Dense matter write-up citing exact contract AB12CD3456" in output
 
 
 def test_apply_deep_dives_skips_splicing_when_baseline_unparseable(tmp_path: Path) -> None:

@@ -2,7 +2,7 @@
 
 Groups aggregates that share a probable reference number (contract, customer, case,
 meter, or account ID — anything 5+ consecutive digits, or alphanumerics like
-`12345678X901`) before any deep-dive LLM call touches them. This keeps the expensive
+`00000000X000`) before any deep-dive LLM call touches them. This keeps the expensive
 pass (`app/services/dream.py`'s per-matter deep dive, which reads full aggregate bodies)
 bounded to genuinely related aggregates instead of scaling with tree size: number of
 deep-dive calls = number of candidate groups, not number of aggregates.
@@ -34,7 +34,7 @@ def min_token_digits_for_principle(ordering_principle: str) -> int:
 
 
 def _is_alphanum_reference(token: str) -> bool:
-    """True for mixed refs like `12345678X901` / `AB12CD3456` (≥2 digits, ≥1 letter, len≥6)."""
+    """True for mixed refs like `00000000X000` / `AB12CD3456` (≥2 digits, ≥1 letter, len≥6)."""
     if len(token) < 6:
         return False
     digits = sum(character.isdigit() for character in token)
@@ -48,7 +48,7 @@ def extract_numeric_tokens(text: str, *, min_digits: int = DEFAULT_MIN_TOKEN_DIG
     Includes:
     - pure digit runs of at least `min_digits` (default 5), excluding bare years `19xx`/`20xx`
       so a shared calendar year never merges two unrelated folders;
-    - alphanumerics of length ≥6 with ≥2 digits and ≥1 letter (`12345678X901`,
+    - alphanumerics of length ≥6 with ≥2 digits and ≥1 letter (`00000000X000`,
       `1XYZ0000000001`, `AB12CD3456`).
 
     Prefer feeding digests that already carry an `Identifiers:` line (from

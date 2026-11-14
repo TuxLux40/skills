@@ -234,7 +234,7 @@ def _identifier_finding(report: ValidationReport) -> ValidationFinding:
 
 def test_missing_transcript_identifier_fails(tmp_path: Path) -> None:
     source = "social/meldung.pdf"
-    _write_transcript(tmp_path, source, "Versicherungsnummer: 12345678X901\nPersonalnummer: 87654321\n")
+    _write_transcript(tmp_path, source, "Versicherungsnummer: 00000000X000\nPersonalnummer: XY98ZT7654\n")
     document = _document(
         sources=[source],
         body=(
@@ -246,16 +246,16 @@ def test_missing_transcript_identifier_fails(tmp_path: Path) -> None:
 
     finding = _identifier_finding(report)
     assert not finding.passed
-    assert "12345678X901" in finding.evidence
+    assert "00000000X000" in finding.evidence
 
 
 def test_present_transcript_identifier_passes(tmp_path: Path) -> None:
     source = "social/meldung.pdf"
-    _write_transcript(tmp_path, source, "Versicherungsnummer: 12345678X901\n")
+    _write_transcript(tmp_path, source, "Versicherungsnummer: 00000000X000\n")
     document = _document(
         sources=[source],
         body=(
-            "## Meldung\n\n**Kerndaten**\n- Versicherungsnummer: 12345678X901\n\n"
+            "## Meldung\n\n**Kerndaten**\n- Versicherungsnummer: 00000000X000\n\n"
             "Genuine content with the identifier retained.\n\n_Source: meldung.pdf_"
         ),
     )
@@ -270,11 +270,11 @@ def test_present_transcript_identifier_passes(tmp_path: Path) -> None:
 def test_identifier_normalization_ignores_spaces_and_dots(tmp_path: Path) -> None:
     source = "social/meldung.pdf"
     # Transcript has spaced form; aggregate body has compact form — both must match.
-    _write_transcript(tmp_path, source, "Versicherungsnummer: 12345678 X 901\n")
+    _write_transcript(tmp_path, source, "Versicherungsnummer: 00000000 X 000\n")
     document = _document(
         sources=[source],
         body=(
-            "## Meldung\n\n**Kerndaten**\n- Versicherungsnummer: 12345678X901\n\n"
+            "## Meldung\n\n**Kerndaten**\n- Versicherungsnummer: 00000000X000\n\n"
             "Genuine content past the density floor.\n\n_Source: meldung.pdf_"
         ),
     )

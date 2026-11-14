@@ -249,7 +249,7 @@ def test_merge_chunk_documents_unions_identifiers_sorted_deduped() -> None:
             type="Fact",
             description=None,
             source=None,
-            identifiers={"personalnummer": ["87654321"], "betriebsnummer": ["11122233"]},
+            identifiers={"personalnummer": ["XY98ZT7654"], "betriebsnummer": ["CD34EF5678"]},
         ),
         body="part one",
     )
@@ -259,8 +259,8 @@ def test_merge_chunk_documents_unions_identifiers_sorted_deduped() -> None:
             description=None,
             source=None,
             identifiers={
-                "betriebsnummer": ["15027365", "11122233"],  # one duplicate, one new
-                "versicherungsnummer": ["12345678X901"],
+                "betriebsnummer": ["KL78MN9012", "CD34EF5678"],  # one duplicate, one new
+                "versicherungsnummer": ["00000000X000"],
             },
         ),
         body="part two",
@@ -269,9 +269,9 @@ def test_merge_chunk_documents_unions_identifiers_sorted_deduped() -> None:
     merged = merge_chunk_documents([first, second])
 
     assert merged.frontmatter.identifiers == {
-        "betriebsnummer": ["15027365", "11122233"],
-        "personalnummer": ["87654321"],
-        "versicherungsnummer": ["12345678X901"],
+        "betriebsnummer": ["CD34EF5678", "KL78MN9012"],
+        "personalnummer": ["XY98ZT7654"],
+        "versicherungsnummer": ["00000000X000"],
     }
 
 
@@ -280,12 +280,12 @@ def test_aggregate_frontmatter_unions_identifiers_from_documents(tmp_path: Path)
         def __init__(self) -> None:
             self._by_text = {
                 "doc A content": (
-                    "---\ntype: Fact\nidentifiers:\n  personalnummer:\n    - '87654321'\n"
-                    "  betriebsnummer:\n    - '11122233'\n---\n\nFacts from A"
+                    "---\ntype: Fact\nidentifiers:\n  personalnummer:\n    - 'XY98ZT7654'\n"
+                    "  betriebsnummer:\n    - 'CD34EF5678'\n---\n\nFacts from A"
                 ),
                 "doc B content": (
-                    "---\ntype: Fact\nidentifiers:\n  personalnummer:\n    - '11112222'\n"
-                    "  betriebsnummer:\n    - '15027365'\n---\n\nFacts from B"
+                    "---\ntype: Fact\nidentifiers:\n  personalnummer:\n    - 'WX34YZ5678'\n"
+                    "  betriebsnummer:\n    - 'KL78MN9012'\n---\n\nFacts from B"
                 ),
             }
 
@@ -309,8 +309,8 @@ def test_aggregate_frontmatter_unions_identifiers_from_documents(tmp_path: Path)
 
     aggregate = OKFDocument.from_markdown((folder / "social.md").read_text(encoding="utf-8"))
     assert aggregate.frontmatter.identifiers == {
-        "betriebsnummer": ["15027365", "11122233"],
-        "personalnummer": ["87654321", "11112222"],
+        "betriebsnummer": ["CD34EF5678", "KL78MN9012"],
+        "personalnummer": ["WX34YZ5678", "XY98ZT7654"],
     }
 
 

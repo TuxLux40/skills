@@ -121,7 +121,7 @@ _IDENTIFIER_LABELS = (
 
 _VALUE_FIRST_TOKEN = r"[A-Za-z0-9](?:[A-Za-z0-9./-]*[A-Za-z0-9])?"
 """The identifier's first token: alnum, optionally with internal `.`/`/`/`-`
-(covers `12`, `1000000001`, `12345678X901`)."""
+(covers `12`, `1000000001`, `00000000X000`)."""
 
 _VALUE_CONT_TOKEN = r"(?:\b[A-Za-z]\b|[A-Za-z0-9./-]*\d[A-Za-z0-9./-]*)"
 """A token that can *continue* a split identifier value: either a single stray letter
@@ -142,7 +142,7 @@ _LABEL_PATTERN = re.compile(
     re.IGNORECASE | re.MULTILINE,
 )
 """Captures up to 4 space-separated value tokens after a label — enough for split forms
-like `12345678 X 901` or `12 O 345/23` — without swallowing trailing prose. A naive
+like `00000000 X 000` or `12 O 345/23` — without swallowing trailing prose. A naive
 `\\S[^\\n]*` here would capture 'Kundennummer: 1000000001 (Example Bank GmbH)'
 as one value, which then never matches the aggregate body verbatim (false FLAGGED)."""
 
@@ -156,7 +156,7 @@ _MAX_MISSING_EVIDENCE = 8
 
 
 def _normalize_identifier(value: str) -> str:
-    """Strip spaces and dots so `12345678 X 901` matches `12345678X901`."""
+    """Strip spaces and dots so `00000000 X 000` matches `00000000X000`."""
     return re.sub(r"[\s.]", "", value)
 
 

@@ -22,7 +22,7 @@ def _write(path: Path, content: str = "x") -> Path:
 
 
 def test_matter_slug_prefers_shared_tokens() -> None:
-    assert matter_slug(["999888777"], []) == "matter-999888777"
+    assert matter_slug(["AB12CD3456"], []) == "matter-AB12CD3456"
     assert matter_slug(["111111", "222222"], []) == "matter-111111-222222"
 
 
@@ -41,12 +41,12 @@ def test_write_matter_file_round_trips_type_and_hashes(tmp_path: Path) -> None:
     path = write_matter_file(
         tmp_path,
         group,
-        ["999888777"],
-        "### Matter\n\nA fact-dense write-up citing reference 999888777 across both aggregates, "
+        ["AB12CD3456"],
+        "### Matter\n\nA fact-dense write-up citing reference AB12CD3456 across both aggregates, "
         "with enough real content per source to read as a genuine deep-dive, not a placeholder.",
     )
 
-    assert path == matter_path(tmp_path, ["999888777"], group)
+    assert path == matter_path(tmp_path, ["AB12CD3456"], group)
     content = path.read_text(encoding="utf-8")
     assert "type: Matter" in content
     assert "fact-dense write-up" in content
@@ -70,7 +70,7 @@ def test_write_matter_file_flags_when_validation_fails(tmp_path: Path, monkeypat
     )
     monkeypatch.setattr(validation_module, "validate_aggregate", lambda document, path, **_kwargs: fake_report)
 
-    path = write_matter_file(tmp_path, group, ["999888777"], "### Matter\n\ntext")
+    path = write_matter_file(tmp_path, group, ["AB12CD3456"], "### Matter\n\ntext")
 
     content = path.read_text(encoding="utf-8")
     assert "_Verification: FLAGGED — fake check: fake reason_" in content
@@ -79,7 +79,7 @@ def test_write_matter_file_flags_when_validation_fails(tmp_path: Path, monkeypat
 def test_matter_unchanged_true_when_hashes_match(tmp_path: Path) -> None:
     a = _write(tmp_path / "providers" / "providers.md")
     group = [a]
-    path = write_matter_file(tmp_path, group, ["999888777"], "### Matter\n\ntext")
+    path = write_matter_file(tmp_path, group, ["AB12CD3456"], "### Matter\n\ntext")
 
     assert matter_unchanged(path, group_source_hashes(group, tmp_path)) is True
 
@@ -87,7 +87,7 @@ def test_matter_unchanged_true_when_hashes_match(tmp_path: Path) -> None:
 def test_matter_unchanged_false_when_a_member_changed(tmp_path: Path) -> None:
     a = _write(tmp_path / "providers" / "providers.md")
     group = [a]
-    path = write_matter_file(tmp_path, group, ["999888777"], "### Matter\n\ntext")
+    path = write_matter_file(tmp_path, group, ["AB12CD3456"], "### Matter\n\ntext")
 
     a.write_text("changed content", encoding="utf-8")
 

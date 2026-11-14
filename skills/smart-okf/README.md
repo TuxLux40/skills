@@ -169,7 +169,7 @@ The trick that makes this useful later: we write **stable IDs** (contract number
 
 ```bash
 # Good — greppable IDs + which folders were touched
-git commit -m "Ingest 2026-07-18: ACME-Energy 123456789, TeleNet, InkassoCorp; providers+finances"
+git commit -m "Ingest 2026-07-18: ACME-Energy PQ90RS1234, TeleNet, InkassoCorp; providers+finances"
 
 # Weak — no join key, useless for correlation months later
 git commit -m "Ingest: 2026-07-18"

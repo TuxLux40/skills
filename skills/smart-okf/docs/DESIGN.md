@@ -109,7 +109,7 @@ splicing it into whatever `synthesis.md` happens to be current:
   `<root>/matters/<slug>.md` (`type: Matter`, new value added to `docs/OKF_SPEC.md`'s type
   table) with an "Involved aggregates" link list plus the deep-dive's own `### Matter` /
   `### Conflicts` / `### Actions` headings verbatim. `matter_slug()` names the file after the
-  group's shared reference number(s) (`matter-999888777`), falling back to a short hash of
+  group's shared reference number(s) (`matter-AB12CD3456`), falling back to a short hash of
   the member paths in the (expected-never) case a group carries no token at all.
 - **Hash-incremental per matter, not just per whole-tree synthesis.** The synthesis's own
   incremental gate is whole-tree: any changed aggregate anywhere reruns every deep dive.
@@ -340,7 +340,7 @@ claims against the code and produced 8 findings, all fixed the same day:
 
 1. **Privacy (blocking):** SKILL.md/README.md example commit messages contained a real
    contract number and real counterparties — replaced with fictional IDs (`ACME-Energy
-   123456789`, `TeleNet`, `InkassoCorp`). Rule reaffirmed: nothing case-real in published files.
+   PQ90RS1234`, `TeleNet`, `InkassoCorp`). Rule reaffirmed: nothing case-real in published files.
 2. **Robustness:** `_ingest_directory` now catches `Exception` per file (was only
    `DocumentIngestError`/`LLMClientError`) — a malformed PDF (raw `PdfminerException`,
    observed live), unreadable image (`OSError` from the vision path), or corrupt docx no
@@ -406,7 +406,7 @@ the split:
 2. **Free grouping** (`app/services/matter_grouping.py`, no LLM call): union-find over
    5+ digit numeric tokens found in digest text (filenames, tags, titles, summaries —
    whichever already carry an ID; real-world source filenames like
-   `..._999888777_...pdf` put the account number right in the digest for free). Aggregates
+   `..._AB12CD3456_...pdf` put the account number right in the digest for free). Aggregates
    sharing a token become a candidate group. Singletons are dropped — nothing to correlate,
    and the cheap scan already covers them for Patterns.
 3. **Deep dive** (`prompts/dream_matter.md`, `LLMClient.dream_matter()`): only candidate
@@ -612,7 +612,7 @@ table), containing an "Involved aggregates" link list plus the deep dive's own
 Matter/Conflicts/Actions write-up verbatim. `app/services/matter_grouping.group_tokens()`
 recovers the specific reference number(s) that formed a given candidate group (a group can
 form via a token chain — A-B share token1, B-C share token2 — so both tokens still identify
-it) to build a stable, human-legible slug (`matter-999888777`).
+it) to build a stable, human-legible slug (`matter-AB12CD3456`).
 
 **Per-matter hash-incrementality, not just whole-tree.** `dream()`'s `_apply_deep_dives()`
 now checks each group's own source hashes against its existing matter file before calling
