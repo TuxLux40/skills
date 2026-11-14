@@ -71,8 +71,10 @@ Rules:
   and their order, not punctuation: be consistent. (The German edition DIN
   ISO 690:2013-10 is withdrawn; ISO 690:2021 is current.) Always add what
   the work names as its own source — that is where the evidence is.
-- A family document found through a document knowledge base is cited in the
-  form given in `dokumenten-wissensbasis.md` §4.
+- **Family papers in private hands**: the document as usual (issuer, type,
+  date, persons), then who holds it, the file name of the scan and how you
+  saw it — original, image, or a transcript or summary only. If the reading
+  is a machine's, say so.
 
 ## 2. Fact-level sourcing in tree software
 
@@ -131,7 +133,7 @@ The log also holds the **Parkplatz**: side finds that do not serve the
 current question, one line each with source. They are picked up as their
 own question later, not followed on the spot.
 
-Session summary for the knowledge base (when the user asks to document):
+Session summary (when the user asks to document):
 state line → question(s) worked on → sources consulted → findings with
 status → conflicts open → hypotheses rejected and why → parked finds →
 requests waiting → the one next step → files added. The next session opens

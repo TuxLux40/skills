@@ -31,7 +31,6 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/schnittstellen-katalog.md` | APIs, exports and open standards, with evidence value |
 | `references/ausgabeform.md` | Output shape: verdict first, one next step, and what brevity never removes |
 | `references/faecher-modus.md` | Divergent mode for dead ends: isolated branches, genealogy frame pack, leads as testable predictions |
-| `references/dokumenten-wissensbasis.md` | Using smart-okf / OKF Markdown of family papers: evidence value, citing, coverage |
 | `references/glossar-de-en.md` | DE↔EN glossary, register Latin, abbreviations |
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |
@@ -43,7 +42,6 @@ python3 scripts/gedcom_plausi.py tree.ged --lang de        # or --lang en, --jso
 
 ## Works with
 
-- [`smart-okf`](../smart-okf) — turns the document archive into Markdown; this skill defines what those files may carry as genealogical evidence.
 - [`dokumenten-organisation`](../dokumenten-organisation) — the general method for filing plan, naming, retrieval and appraisal; `references/ablage-und-erschliessung.md` applies it to a genealogy project and uses its file-name pattern and inventory script.
 
 ## Credits

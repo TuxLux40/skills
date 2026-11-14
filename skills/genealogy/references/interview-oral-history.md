@@ -61,8 +61,7 @@ Keep together, same base name (naming: `ablage-und-erschliessung.md` §4):
 ```
 
 The recording and the transcript are sources; the evaluation is your own
-writing. Where an ingest pipeline indexes the storage, that difference
-decides what it may read (`dokumenten-wissensbasis.md` §7).
+writing.
 
 ## 5. Evaluation
 

@@ -317,31 +317,25 @@
     },
     {
       "id": 10,
-      "prompt": "In meiner Dokumenten-Wissensbasis (smart-okf) steht im Aggregat `Familie_Kamp/Urkunden/Urkunden.md` unter 'Heiratsurkunde 1891': 'Bräutigam Wilhelm Kamp, geboren 12.03.1864 in Kettwig, Sohn des Ackerers Heinrich Kamp'. Quelle laut sources: `heirat_1891.jpg`, keine FLAGGED-Zeile. Dann kann ich das Geburtsdatum ja als belegt in den Baum eintragen, oder?",
-      "expected_output": "German reply: no, not yet. The aggregate is a finding aid; a missing FLAGGED line only says the extraction matches the transcript, not that the image was read correctly. The source file is a photo of a register entry or certificate, so names and dates are a machine reading until the user has confirmed them at the image; until then at most möglich and not in the tree. Asks for one concrete check at the image as the next step. Says the citation must name the document (path from sources, hash, layer used), not the aggregate. Notes that a birth date in a marriage record is secondary information and points to the birth or baptism record.",
+      "prompt": "Ich habe ein Foto der Heiratsurkunde von 1891 (Vordruck, handschriftlich ausgefüllt) von einem KI-Tool auslesen und zusammenfassen lassen. Ergebnis: 'Bräutigam Wilhelm Kamp, geboren 12.03.1864 in Kettwig, Sohn des Ackerers Heinrich Kamp'. Dann kann ich das Geburtsdatum ja als belegt in den Baum eintragen, oder?",
+      "expected_output": "German reply: no, not yet. A summary by a tool is a finding aid, not the source; the entry is handwritten, so name and date are a machine reading until the user has confirmed them at the image; until then at most möglich and not in the tree. Asks for one concrete check at the image as the next step. Says the citation must name the document itself and how it was seen, not the summary. Notes that a birth date in a marriage record is secondary information and points to the birth or baptism record.",
       "files": [],
       "assertions": [
         {
           "name": "not_into_tree_as_belegt",
-          "text": "Response does not agree to enter the birth date as 'belegt' on the strength of the aggregate",
-          "passed": false,
-          "evidence": ""
-        },
-        {
-          "name": "explains_guarantee_limit",
-          "text": "Response explains that the absence of a FLAGGED line vouches for extraction versus transcript only, not for the reading of the image",
+          "text": "Response does not agree to enter the birth date as 'belegt' on the strength of the tool's summary",
           "passed": false,
           "evidence": ""
         },
         {
           "name": "machine_reading_needs_image_check",
-          "text": "Response treats name and date as a machine reading that the user has to confirm against the image (heirat_1891.jpg) before it counts as evidence",
+          "text": "Response treats name and date as a machine reading of handwriting that the user has to confirm against the image before it counts as evidence",
           "passed": false,
           "evidence": ""
         },
         {
-          "name": "cites_document_not_aggregate",
-          "text": "Response says the citation has to name the document itself (with file path and/or hash and the layer looked at), not the aggregate Markdown",
+          "name": "summary_is_not_the_source",
+          "text": "Response says a machine-made summary or extract is a finding aid and that the citation has to name the document itself and how it was seen",
           "passed": false,
           "evidence": ""
         },

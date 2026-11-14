@@ -199,10 +199,7 @@ Often enough without a full run, and needs no sub-agents.
    - stated ages that drift from record to record;
    - someone missing where they should appear (not among the heirs; never a
      godparent in a family that always chose siblings);
-   - DNA-cluster surnames or places that reappear in the table;
-   - where a document knowledge base is connected: the `Patterns`,
-     `Matters` and `Conflicts` of its synthesis as machine-made candidates
-     (`dokumenten-wissensbasis.md` §5).
+   - DNA-cluster surnames or places that reappear in the table.
 3. Every hit is a hint. Write it as a prediction (§4.5), then check it.
 
 ## 7. Rahmen / Frames (genealogy pack)

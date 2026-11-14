@@ -3,9 +3,7 @@
 Where files go, what they are called, and how they are found again. The
 general method — filing plan, naming, retrieval, appraisal — is the sibling
 skill `dokumenten-organisation`; this file applies it to a genealogy
-project. Division of labour: `dokumenten-organisation` arranges files,
-`smart-okf` reads them into a knowledge base, this skill says what they
-prove.
+project.
 
 **The user's existing structure and naming take precedence.** Everything
 below is the fallback, and the standard for what is newly added.
@@ -71,8 +69,8 @@ genealogie/
 - **Sources and your own writing never share a folder.** `10_quellen/` and
   `50_korrespondenz/eingang/` hold what others produced; logs, notes,
   hypotheses and outgoing letters hold what you or the user concluded.
-  This is what lets an ingest pipeline index the sources without swallowing
-  your conclusions (`dokumenten-wissensbasis.md` §7).
+  Whatever later indexes, searches or summarises the sources can then not
+  mistake a conclusion for a document.
 - One line per top-level folder in a README at the root — what belongs
   here, what does not — keeps the structure from eroding.
 
@@ -170,10 +168,8 @@ a record is hidden from everyone it names.
   | lesung | only where it applies | `maschinell-ungeprüft` |
 
   The list of allowed terms lives in `05_register/`; a new term is a
-  decision. Where a knowledge base indexes tags, they are the way into it:
-  a title search finds little in per-folder summaries. Tags written by an
-  ingest model are free text — map them to this list before relying on
-  them (`dokumenten-wissensbasis.md` §7).
+  decision. Tags suggested by a tool are free text — map them to this list
+  before relying on them.
 - **Findbuch der Familienunterlagen.** One row per unit — album, box,
   bundle, Familienstammbuch, bible, letters — *including what relatives
   hold*: title · date range (Laufzeit) · extent · keeper and how it came to
@@ -185,8 +181,8 @@ a record is hidden from everyone it names.
 ## 7. Fotos und Bilddateien / Photos and image files
 
 - **Master files are never altered — metadata included.** Writing IPTC or
-  XMP into a file changes its checksum: citations by hash break, and an
-  ingest pipeline takes the file for a new document. Embed metadata in the
+  XMP into a file changes its checksum, and whatever tracks files by
+  checksum takes it for a new document. Embed metadata in the
   working copy; for the master use a sidecar (`.xmp`, or the note in
   `assets/vorlagen.md` §17).
 - Worth recording (IPTC/XMP field names): Description — who, what, where,

@@ -334,7 +334,7 @@ segments: | match_id | Chromosom | Start | Ende | cM | SNPs | Ahnenpaar | Seite 
 clusters: | Cluster | Quelle (Lauf, Datum, Schwellen) | Mitglieder | Ahnenpaar | Status | Grundlage |
 ```
 
-## 12. Sitzungszusammenfassung für die Wissensbasis / Session summary for the KB
+## 12. Sitzungszusammenfassung / Session summary
 
 ```markdown
 # Genealogie-Sitzung <JJJJ-MM-TT>

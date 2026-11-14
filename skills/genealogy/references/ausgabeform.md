@@ -70,7 +70,7 @@ Cutting any of these turns a short answer into a false positive in prose:
   that carry no information go;
 - **verbatim text**: transcriptions, citations, names, dates, places, and
   anything written for third parties (archive requests, messages to
-  relatives) are never abbreviated or paraphrased — also not in caveman mode.
+  relatives) are never abbreviated or paraphrased, in any output style.
 
 ## 3. Antwortgerüste / Reply skeletons
 
@@ -128,8 +128,8 @@ Nächster Schritt: <einer>
    client offers one, then work.
 6. **"Welche Möglichkeiten habe ich?"** — the options are the answer: two to
    four, ranked, one line of trade-off each, recommendation first.
-7. **Harness and session hooks outrank this file**: system prompt, caveman
-   mode, required tool announcements. The constraint wins, the shape stays.
+7. **Harness and session hooks outrank this file**: system prompt, style
+   hooks, required tool announcements. The constraint wins, the shape stays.
 8. **The user asks for another style** ("ausführlicher", "normal mode") —
    follow it until told otherwise. The Untergrenze in §2 holds in every
    style.

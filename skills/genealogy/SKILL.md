@@ -1,6 +1,6 @@
 ---
 name: genealogy
-description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, DNA match, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree, archive request / Archivanfrage, oral history interview, brick wall / toter Punkt / Sackgasse, new research angles, emigration, military or POW records abroad, family papers in a document knowledge base (smart-okf / OKF Markdown).
+description: Use for genealogy / family-history research, especially in Germany (Ahnenforschung, Familienforschung, Genealogie). Bilingual DE/EN. Evidence-based method (Genealogical Proof Standard + Quellenkritik), clean source citations, research log, conflict resolution, and strict verification of MyHeritage Smart Matches / Record Matches / hints from other trees to avoid false positives. Triggers — Kirchenbuch, Standesamt, Personenstandsregister, Stammbaum, Ahnentafel, Vorfahren, GEDCOM, Smart Match, MyHeritage, DNA match, Ancestry hint, Archion, Matricula, GenWiki, "ist das dieselbe Person?", "is this the same person?", parish register, civil registration, family tree, archive request / Archivanfrage, oral history interview, brick wall / toter Punkt / Sackgasse, new research angles, emigration, military or POW records abroad.
 ---
 
 # Genealogy / Ahnenforschung (DE · EN)
@@ -19,14 +19,6 @@ spelling; translate separately.
 
 ## Session Context
 
-### Caveman lite mode
-
-When a session hook activates caveman mode: compress connective prose ~75 %
-(no articles, no auxiliary verbs). Never compress or paraphrase status
-words, citations, transcriptions, names, dates, places, conflicts, or text
-written for third parties (archive requests, messages to relatives). Session
-hooks and the system prompt outrank the output rules of this skill.
-
 ### Tools & MCP access
 
 Tool names differ per client; map these classes to what the session offers.
@@ -35,8 +27,6 @@ Tool names differ per client; map these classes to what the session offers.
 |-----------------------|-------------------|----------|
 | Web search and fetch (`WebSearch`, `WebFetch`, Firecrawl, Tavily) | Open web: GenWiki, GOV, Matricula, archive sites and finding aids, newspapers | Own searching in open sources (`references/schnittstellen-katalog.md`) |
 | File tools and shell (`Read`, `Write`, `Bash`) | Local files, mounted storage (NAS) | GEDCOM export, scans, research log; `scripts/gedcom_plausi.py` reads one GEDCOM and writes nothing |
-| Document knowledge base MCP (e.g. a Grav site fed by `smart-okf`) | Markdown aggregates and transcripts of the user's document archive; scans only if the connector exposes media | Finding documents (`references/dokumenten-wissensbasis.md`) |
-| Notes / KB MCP (Grav, Notion …) | The user's knowledge base | Session summaries — only when asked to document |
 | Sub-agent tool (`Agent`, `Task`) | Isolated model calls without shared context | Fächer-Modus branches |
 | Interactive choice (`AskUserQuestion`) | The user | Grill-Modus, single clarifying questions |
 | MyHeritage, Ancestry, Archion | **No tool access** — login sites | The user looks up and exports; you say exactly where |
@@ -125,12 +115,6 @@ Defaults; ask once per project if the user's setup differs.
   `references/ablage-und-erschliessung.md`. Master files are never altered,
   their metadata included; family papers keep their original order and
   their keeper's name. The skill itself stores no personal data.
-- **Dokumenten-Wissensbasis / document knowledge base:** where the archive
-  is also available as machine-made Markdown (e.g. `smart-okf` aggregates
-  over an MCP connector), use it to *find* documents. Aggregates and
-  syntheses are finding aids, not sources, and "no FLAGGED line" vouches for
-  the extraction, not for the reading of the image or for whom a document
-  concerns. Read `references/dokumenten-wissensbasis.md` before using one.
 - **Umfang / scope:** direct ancestors, and for every ancestral couple the
   complete family group (all children, further marriages) — the family group
   is what exposes mix-ups. Remote collateral lines only on request.
@@ -249,9 +233,9 @@ Templates in DE and EN: `assets/vorlagen.md`. Citation rules:
 - **Bewertung:** source / information / evidence classification and informant.
 
 When the user asks to document or a session ends with new findings, write the
-session into the user's knowledge base in the log format (question, sources
-searched incl. negative results, findings with status, open questions, next
-steps) so the next session can resume without re-deriving anything.
+session summary where the user keeps their notes, in the log format (question,
+sources searched incl. negative results, findings with status, open questions,
+next step) so the next session can resume without re-deriving anything.
 
 ## GEDCOM-Plausibilitätsprüfung
 
@@ -338,6 +322,5 @@ then work.
 | `references/schnittstellen-katalog.md` | APIs, exports, open standards, fetching web pages; evidence value of machine-retrieved data |
 | `references/ausgabeform.md` | Shaping any reply: rules with examples, reply skeletons, when the short form yields |
 | `references/faecher-modus.md` | Dead ends, "new angles", open planning questions; linking data points across captured records |
-| `references/dokumenten-wissensbasis.md` | Using machine-made Markdown of the user's documents (smart-okf aggregates, transcripts, synthesis), via files or MCP |
 | `references/glossar-de-en.md` | Terminology DE↔EN, Latin terms and abbreviations in registers |
 | `assets/vorlagen.md` | Copy-paste templates (DE + EN) |
