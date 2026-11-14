@@ -483,3 +483,108 @@ family group, then run the connection scan (`references/faecher-modus.md`
   Prediction: <if the link holds → source shows X; otherwise Y>
   Check: <open | log reference, result>
 ```
+
+## 15. Personen- und Ortsregister / Person and place register
+
+One preferred form per person and place, every variant mapped to it
+(`references/ablage-und-erschliessung.md` §5). The same form goes into file
+names, tags, notes and replies.
+
+```markdown
+# Personenregister – Stand <JJJJ-MM-TT>
+
+| ID | Ansetzungsform | Varianten (mit Quelle) | Kekulé | Externe IDs | Identität [Status] | nicht identisch mit |
+|----|----------------|------------------------|--------|-------------|--------------------|---------------------|
+| P0001 | NACHNAME, Vorname(n) (*JJJJ Ort) | <Schreibweise — Quelle>; <…> | | MyHeritage: <…> | | P0… |
+
+# Ortsregister – Stand <JJJJ-MM-TT>
+
+| Ansetzungsform | GOV-ID | Historische Namen, Schreibweisen | Pfarrei(en) mit Zeitraum | Standesamt / Verwaltung mit Zeitraum | Verwechslungsgefahr |
+|----------------|--------|-----------------------------------|--------------------------|--------------------------------------|---------------------|
+|                |        |                                   |                          |                                      |                     |
+
+# Schlagwortliste (zugelassene Begriffe)
+quelle: Geburt, Taufe, Heirat, Tod, Begraebnis, Urkunde, Brief, Foto, Militär, Zeitung, Interview, <…>
+Verweisungen: <Eheurkunde → Heirat>, <Sterbeurkunde → Tod>, <…>
+```
+
+```markdown
+# Person register – as of <YYYY-MM-DD>
+
+| ID | Preferred form | Variants (with source) | Kekulé | External IDs | Identity [status] | not identical with |
+|----|----------------|------------------------|--------|--------------|-------------------|--------------------|
+| P0001 | SURNAME, given name(s) (*YYYY place) | <spelling — source>; <…> | | MyHeritage: <…> | | P0… |
+
+# Place register – as of <YYYY-MM-DD>
+
+| Preferred form | GOV-ID | Historical names, spellings | Parish(es) with period | Register office / administration with period | Easily confused with |
+|----------------|--------|-----------------------------|------------------------|----------------------------------------------|----------------------|
+|                |        |                             |                        |                                              |                      |
+
+# Tag list (allowed terms)
+quelle: Geburt, Taufe, Heirat, Tod, Begraebnis, Urkunde, Brief, Foto, Militär, Zeitung, Interview, <…>
+See-references: <Eheurkunde → Heirat>, <Sterbeurkunde → Tod>, <…>
+```
+
+## 16. Findbuch Familienunterlagen / Finding aid for family papers
+
+One row per unit, including what relatives hold
+(`references/ablage-und-erschliessung.md` §6).
+
+```markdown
+# Findbuch Familienunterlagen – Stand <JJJJ-MM-TT>
+
+| Nr. | Einheit (Titel) | Laufzeit | Umfang | Verwahrer, Überlieferungsweg | Zustand | Digitalisiert (ja / teilweise / nein, Ablageort) | Zugang über | Personen (IDs) | Hinweise |
+|-----|-----------------|----------|--------|------------------------------|---------|--------------------------------------------------|-------------|----------------|----------|
+| F01 | <Fotoalbum, Kasten, Bündel, Familienstammbuch, Bibel> | <JJJJ–JJJJ> | <60 Fotos, 12 Blatt> | <wer, von wem erhalten> | | | <wen fragen> | | |
+```
+
+```markdown
+# Finding aid for family papers – as of <YYYY-MM-DD>
+
+| No. | Unit (title) | Date range | Extent | Keeper, line of custody | Condition | Digitised (yes / partly / no, location) | Access via | Persons (IDs) | Notes |
+|-----|--------------|------------|--------|-------------------------|-----------|------------------------------------------|------------|---------------|-------|
+| F01 | <photo album, box, bundle, family register, bible> | <YYYY–YYYY> | <60 photos, 12 leaves> | <who, received from whom> | | | <whom to ask> | | |
+```
+
+## 17. Begleitnotiz zu einer Datei / Sidecar note for a file
+
+Lies beside the master under the same base name. The master itself stays
+untouched, its metadata included (`references/ablage-und-erschliessung.md`
+§7).
+
+```markdown
+# Begleitnotiz – <Dateiname des Masters>
+
+Originaldateiname: <wie von Scanner, Gerät oder Portal vergeben>
+Prüfsumme (SHA-256): <…>
+Zitat: <vollständiges Zitat der Quelle>
+Herkunft: <Archiv, Signatur | Verwahrer der Familienunterlage, Findbuch-Nr.>
+Fundort und Nachbarschaft: <Album S. 7 zwischen … und …; Bündel; Umschlag>
+Seiten: <Vorderseite: Datei · Rückseite: Datei | Rückseite leer>
+Datum des Originals: <JJJJ-MM-TT | Schätzung mit Grundlage>
+Digitalisiert: <Datum, Gerät, von wem>
+Abgebildet / genannt: <ID, Ansetzungsform — sagt wer, wann, wie sicher — [Status]>
+Urheber: <Fotograf, Atelier | unbekannt>
+Nutzungsbedingungen bei Erhalt: <nur private Forschung | Veröffentlichung mit Genehmigung | frei | unbekannt>
+Schlagwörter: <aus der Schlagwortliste>
+Bearbeitete Fassungen: <Dateinamen>
+```
+
+```markdown
+# Sidecar note – <file name of the master>
+
+Original file name: <as assigned by scanner, device or portal>
+Checksum (SHA-256): <…>
+Citation: <full citation of the source>
+Provenance: <repository, call number | keeper of the family papers, finding-aid no.>
+Found where, next to what: <album p. 7 between … and …; bundle; envelope>
+Sides: <front: file · back: file | back blank>
+Date of the original: <YYYY-MM-DD | estimate with its basis>
+Digitised: <date, device, by whom>
+Pictured / named: <ID, preferred form — says who, when, how sure — [status]>
+Creator: <photographer, studio | unknown>
+Terms of use at receipt: <private research only | publication with permission | free | unknown>
+Tags: <from the tag list>
+Derived versions: <file names>
+```

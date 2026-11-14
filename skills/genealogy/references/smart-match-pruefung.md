@@ -258,3 +258,38 @@ Merging two profiles is the same identity question. Run the matrix, and before
 merging export a GEDCOM backup and note which sources belonged to which
 profile. A merge is hard to undo; if the verdict is below *belegt*, link the
 profiles with a note instead.
+
+## 6. Rückbau / Taking a wrong link out of the tree
+
+Earlier confirmations, Quick Saves and imports may already sit in the tree.
+`scripts/gedcom_plausi.py` lists the candidates: facts whose only source is
+another tree, and chronological impossibilities. A candidate is a reason to
+check, not a reason to delete. Removal follows the rule for any weeding —
+evaluate, document, keep it reversible.
+
+1. **Export first.** Pull a dated GEDCOM export before touching anything.
+   It is the record of what was there, not an undo: a re-import makes a new
+   tree and loses detail.
+2. **One link at a time**, nearest generation first, each through the
+   procedure in section 2. Never remove a branch because its top looks
+   wrong: find the lowest link that does not hold. Everything above hangs
+   on that link.
+3. **The verdict decides the action:**
+
+   | Verdict on the link | Action |
+   |---------------------|--------|
+   | belegt · wahrscheinlich | Keep. Add the missing citation and the status prefix. |
+   | möglich · ungeklärt | Does not belong in the tree. Detach the link and keep the branch as a hypothesis — or, if the user decides to keep it, mark it like an override: status prefix and `Nachprüfen:`. |
+   | widerlegt | Detach the link. What happens to the detached persons is the user's decision. |
+
+4. **Detach before delete.** Removing a connection keeps the profiles and
+   their sources; deleting persons destroys them. In MyHeritage: person
+   card → More → Remove connection, then "From parents" or "From partner";
+   a child is detached from its own card, not from the parent's. Delete
+   only what the user decides to delete, and never in bulk.
+5. **Log it** like a rejected match: which link, the verdict, the conflict
+   or the missing evidence, the date, and the export file that still holds
+   the branch. Keep the namesake's data with the hypotheses — the next
+   Smart Match will offer the same branch again.
+6. Afterwards run the plausibility check on a fresh export and compare the
+   two reports.

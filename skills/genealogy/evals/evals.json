@@ -358,6 +358,100 @@
           "evidence": ""
         }
       ]
+    },
+    {
+      "id": 11,
+      "prompt": "Meine Tante hat mir das Fotoalbum meiner Urgroßmutter geliehen, etwa 60 Fotos, einige mit Beschriftung auf der Rückseite. Ich will es einscannen und auf mein NAS legen. Wie gehe ich vor, damit das für die Ahnenforschung sauber ist?",
+      "expected_output": "German reply as a short numbered procedure. Records the provenance first (who holds the album, how it reached her). Keeps the original order: scan page by page in sequence and keep the scanner's numbering. Scans front and back. Leaves the masters untouched, metadata included, and puts descriptions in a sidecar or working copy. Treats who is pictured as a statement by someone: ask the aunt and record who said it, when and how sure. Keeps the album together as one unit under its keeper's name, linked from person notes, with an entry in the finding aid. Names files by the pattern with an estimated date. Ends with exactly one next step.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "provenance_recorded",
+          "text": "Response has the user record who holds the album now and how it came to her (line of custody) before anything else",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "original_order_kept",
+          "text": "Response keeps the original order of the album (scan in page sequence, keep the numbering, do not re-sort into person folders)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "front_and_back",
+          "text": "Response says to scan the backs (inscriptions, studio stamps) as well as the fronts",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "master_untouched",
+          "text": "Response keeps the scan masters unaltered and puts descriptions or metadata into a sidecar note or a working copy, not into the master file",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "identification_has_informant",
+          "text": "Response treats the identification of pictured persons as a statement with an informant (ask the aunt; record who said it, when, how sure), not as fact",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "unit_stays_together",
+          "text": "Response files the album as one unit under its keeper or provenance and links it from person notes instead of splitting it up by person",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "In meinem Baum hängt seit zwei Jahren ein ganzer Ast über Johann Schmitz (*1812 Neuss): Eltern, Großeltern und rund 40 weitere Personen, die ich damals per Smart Match übernommen habe. Inzwischen glaube ich, dass schon die Eltern nicht stimmen. Soll ich den Ast einfach löschen?",
+      "expected_output": "German reply: not by bulk deletion. First a dated GEDCOM export, and the note that it is a record, not an undo. Then check the lowest link (Johann Schmitz *1812 Neuss to the claimed parents) with the match protocol, because everything above hangs on it. Depending on the verdict keep, mark, or detach. Detach the connection (MyHeritage: Remove connection) rather than delete the persons; what happens to the detached profiles is the user's decision. Log what was removed and why, keep the branch as a hypothesis because the same Smart Match will come back. Ends with exactly one next step.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "no_bulk_delete",
+          "text": "Response advises against simply deleting the whole branch",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "export_first",
+          "text": "Response has the user pull a dated GEDCOM export before changing anything",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "lowest_link_first",
+          "text": "Response says to check the link between Johann Schmitz *1812 Neuss and the claimed parents first, since the rest of the branch depends on it",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "detach_before_delete",
+          "text": "Response prefers removing the connection over deleting the persons and leaves the fate of the detached profiles to the user",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "logged_and_kept_as_hypothesis",
+          "text": "Response has the removal logged (what, why, when) and the branch kept as a documented hypothesis or rejected match",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
     }
   ]
 }

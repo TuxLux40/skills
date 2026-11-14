@@ -118,10 +118,13 @@ Defaults; ask once per project if the user's setup differs.
 - **Führender Baum / master tree:** the user's online tree (MyHeritage) is
   authoritative. Before each round of match decisions the user pulls a
   **dated GEDCOM export** as backup and for the plausibility check.
-- **Belege / documents:** the user's own storage (e.g. a NAS). Ask once how
-  it is organised and file accordingly; the Markdown structure in
-  `references/zitieren-und-dokumentation.md` is the fallback. Master files
-  are never altered. The skill itself stores no personal data.
+- **Belege / documents:** the user's own storage (e.g. a NAS). If you can
+  reach it, take a read-only inventory, state your reading of its structure
+  and have it confirmed once; otherwise ask once. File accordingly.
+  Fallback structure, file names, person and place register and tags:
+  `references/ablage-und-erschliessung.md`. Master files are never altered,
+  their metadata included; family papers keep their original order and
+  their keeper's name. The skill itself stores no personal data.
 - **Dokumenten-Wissensbasis / document knowledge base:** where the archive
   is also available as machine-made Markdown (e.g. `smart-okf` aggregates
   over an MCP connector), use it to *find* documents. Aggregates and
@@ -214,6 +217,9 @@ FamilySearch/Geni profile, or GEDBAS entry.** Short form:
   conflicts, next sources, and exactly one next step.
 - **Dokumentiert wird / what gets written down:** rejected matches (with the
   conflict) and overrides. Matches left pending get no note.
+- **Rückbau / cleaning up:** wrong links already in the tree come out one
+  at a time — export first, find the lowest link that does not hold, detach
+  before delete, log it (reference §6).
 
 ### Überstimmen / Override
 
@@ -229,8 +235,9 @@ it. Then: name the missing conditions once, do not argue further, and
 
 ## Dokumentation / Documentation
 
-Templates in DE and EN: `assets/vorlagen.md`. Citation rules and file naming:
-`references/zitieren-und-dokumentation.md`. Minimum for every captured record:
+Templates in DE and EN: `assets/vorlagen.md`. Citation rules:
+`references/zitieren-und-dokumentation.md`. Filing, file names, registers:
+`references/ablage-und-erschliessung.md`. Minimum for every captured record:
 
 - **Zitat / Citation:** repository, fonds/Bestand, Signatur, volume, page/folio,
   entry number, record date; plus where and when *you* viewed it (portal, URL
@@ -319,7 +326,8 @@ then work.
 | `references/methodik-gps-quellenkritik.md` | Evaluating a source, weighing conflicting evidence, writing a proof |
 | `references/quellen-deutschland.md` | Planning where to search: record types, archives, portals, access rules |
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confessions, scripts — the German pitfalls |
-| `references/zitieren-und-dokumentation.md` | Citation formats, file naming, folder/KB structure, research log |
+| `references/zitieren-und-dokumentation.md` | Citation formats incl. published works, fact-level sourcing in the tree, research log, publishing |
+| `references/ablage-und-erschliessung.md` | Filing or naming files, scanning family papers and photos, person and place register, tags, Findbuch, what to keep |
 | `references/region-nrw-rheinland.md` | Research in the Rhineland, Ruhr area, Essen, Mülheim an der Ruhr, NRW |
 | `references/land-niederlande.md` | Dutch lines, Lower Rhine border families |
 | `references/land-ungarn.md` | Lines from the Kingdom of Hungary, Danube Swabians |

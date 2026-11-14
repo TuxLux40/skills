@@ -47,6 +47,11 @@ Kompilation; angegebene Quelle: keine.
 Oral / family source:
 Mündliche Auskunft von <Name>, Enkelin der Betroffenen, Gespräch am
 2026-08-03 in <Ort>, Notizen im Besitz d. Verf. Sekundärinformation.
+
+Published work (compilation — a lead that names a source to follow):
+MUSTER, Erika, 1998. Ortsfamilienbuch Beispieldorf 1650–1900. Musterstadt:
+Verein für Familienkunde Musterstadt, S. 214, Familie Nr. 1023.
+Kompilation; dort angegebene Quelle: KB Beispieldorf, Taufen 1788.
 ```
 
 Rules:
@@ -59,6 +64,15 @@ Rules:
   and go, Signaturen persist.
 - Bilingual output: keep repository names and titles in the original language;
   translate only the connective text.
+- **Published works** — Ortsfamilienbuch, local history, article, web page
+  — follow ISO 690: author, year, title, edition, place, publisher, then
+  page and family or entry number; online sources add `[online]`,
+  `[Zugriff am: …]` and `Verfügbar unter: …`. The standard fixes elements
+  and their order, not punctuation: be consistent. (The German edition DIN
+  ISO 690:2013-10 is withdrawn; ISO 690:2021 is current.) Always add what
+  the work names as its own source — that is where the evidence is.
+- A family document found through a document knowledge base is cited in the
+  form given in `dokumenten-wissensbasis.md` §4.
 
 ## 2. Fact-level sourcing in tree software
 
@@ -78,80 +92,25 @@ Rules:
   `Nachprüfen: <record that would settle it>`.
 - **Online tree as master:** the default setup is the MyHeritage tree as the
   authoritative copy plus a **dated GEDCOM export** before every round of
-  match decisions (`90_export/JJJJ-MM-TT_<baum>.ged`). The export is the
+  match decisions (`90_export/JJJJ-MM-TT--<Baum>.ged`). The export is the
   backup and the input for `scripts/gedcom_plausi.py`. GEDCOM transfer loses
   data (custom tags, media links, some citation detail) — do not treat a
   re-import as lossless.
 
-## 3. Files and folders
+## 3. Files, names, registers
 
-**The user's existing storage structure (e.g. on a NAS) takes precedence.**
-At the first filing task ask once how the storage is organised (root path,
-top-level folders, existing naming habits), note the answer in the project's
-research log, and file accordingly. The structure below is the fallback when
-none exists. Independent of the structure, these rules hold:
+Where files go, how they are named, the person and place registers, tags,
+photos and what is kept: `ablage-und-erschliessung.md`. Two rules from
+there bear on every citation:
 
-- **Master files are never altered**: the scan, download or recording as
-  received. Edited versions (crop, contrast, transcript) sit beside the
-  master with a suffix (`_bearb`, `_ausschnitt`, `_transkript`).
-- **Provenance stays visible**: repository and Signatur in the file name or
-  in a sidecar note (`<datei>.md`) holding citation, access date, original
-  URL and a checksum.
-- **Relative links** from person and log notes to files, so the tree of
-  folders can move between machines.
-- **One place per file**; link, do not duplicate.
-- Media types: scans as TIFF/PNG or the JPEG as delivered; documents PDF/A;
-  audio WAV/FLAC as master; DNA exports as downloaded plus a dated copy.
-- A NAS is not a backup: keep a second copy elsewhere and test restoring.
-- **If an ingest pipeline indexes the storage** (e.g. `smart-okf`): check
-  which formats it reads and keep a readable derivative beside masters it
-  skips (TIFF). Keep your own notes — logs, source sheets, proof arguments —
-  out of the set it treats as documents, or the next ingest hands your
-  conclusions back as document facts. Details and the citation form for
-  documents found through such a knowledge base:
-  `dokumenten-wissensbasis.md`.
-- Building a filing structure from scratch: the sibling skill
-  `dokumenten-organisation` covers classification and naming.
+- **Master files are never altered** — the scan, download or recording as
+  received, its metadata included. Edited versions sit beside the master
+  with a suffix.
+- **Provenance stays visible**: repository and Signatur in the file name,
+  and a sidecar note holding citation, access date, original URL, checksum
+  and the terms of use the file came under.
 
-Name files so they sort and identify themselves without the folder:
-
-```
-<JJJJ-MM-TT>_<Ereignis>_<NACHNAME>-<Vorname>_<Ort>_<Archivkürzel>-<Signatur>_<S|Bl|Nr>.<ext>
-1788-03-14_Taufe_MUSTER-Johann-Heinrich_Beispieldorf_BAM-KB4_S112-Nr23.jpg
-1891-05-16_Heirat_MUSTER-BEISPIEL_Musterstadt_StAM-HR1891_Nr204.pdf
-```
-
-- ISO dates; unknown parts as `0000`/`00`; no umlaut loss needed on modern
-  filesystems, but be consistent.
-- Keep the **unaltered download/scan** (master); put crops and enhanced
-  versions beside it with a suffix. Record checksums if the collection is
-  meant to last. Prefer TIFF/PNG or original JPEG for masters, PDF/A for
-  documents.
-- Suggested structure:
-
-```
-genealogie/
-  00_forschungsprotokoll/     research log, one file per session or question
-  10_quellen/                 by repository → Bestand → unit (provenance!)
-  20_personen/                one note per person, ID in the filename
-  30_familien-orte/           place and family-group notes
-  40_hypothesen/              unproven links, rejected matches, overrides
-  50_korrespondenz/           archive requests and replies
-  90_export/                  dated GEDCOM backups
-```
-
-Sources are filed by **provenance** (where they come from), not by the person
-they mention — one register page names many people; link from person notes.
-
-## 4. Person identifiers
-
-Give every person a stable ID independent of any website. Kekulé/Ahnentafel
-numbers (proband 1, father 2n, mother 2n+1) work for direct ancestors; use a
-neutral running ID (`P0001`) for everyone and store Kekulé as an attribute,
-because Kekulé numbers shift when the proband changes and do not cover
-siblings. Record the MyHeritage/FamilySearch IDs as external references.
-
-## 5. Research log (Forschungsprotokoll)
+## 4. Research log (Forschungsprotokoll)
 
 One entry per search, written at the time:
 
@@ -178,9 +137,11 @@ status → conflicts open → hypotheses rejected and why → parked finds →
 requests waiting → the one next step → files added. The next session opens
 from it (`ausgabeform.md` §3).
 
-## 6. Publishing
+## 5. Publishing
 
 - Mark hypotheses as such in text and charts (dashed lines, "vermutlich").
 - State the cut-off date of the research and how AI tools were used.
+- Images of records and photos: publish only what the terms noted at
+  capture allow (`ablage-und-erschliessung.md` §7).
 - Deposit a copy (GEDCOM + sources + log) where it survives you: family,
   regional society, CompGen projects.

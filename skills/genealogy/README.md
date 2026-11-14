@@ -19,7 +19,8 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `references/methodik-gps-quellenkritik.md` | GPS, evidence analysis, source criticism, conflict resolution |
 | `references/quellen-deutschland.md` | Record types, archives, portals, access rules |
 | `references/regionale-besonderheiten.md` | Names, calendars, territories, confession, script |
-| `references/zitieren-und-dokumentation.md` | Citation format, file naming, folder structure, research log |
+| `references/zitieren-und-dokumentation.md` | Citation format, fact-level sourcing, research log, publishing |
+| `references/ablage-und-erschliessung.md` | Filing and cataloguing: provenance, file names, person and place register, controlled tags, Findbuch, photos |
 | `references/region-nrw-rheinland.md` | Rhineland, Ruhr area, Essen, Mülheim an der Ruhr |
 | `references/land-niederlande.md` | Netherlands — short reference |
 | `references/land-ungarn.md` | Hungary — short reference |
@@ -43,7 +44,7 @@ python3 scripts/gedcom_plausi.py tree.ged --lang de        # or --lang en, --jso
 ## Works with
 
 - [`smart-okf`](../smart-okf) — turns the document archive into Markdown; this skill defines what those files may carry as genealogical evidence.
-- [`dokumenten-organisation`](../dokumenten-organisation) — naming and filing of the documents themselves.
+- [`dokumenten-organisation`](../dokumenten-organisation) — the general method for filing plan, naming, retrieval and appraisal; `references/ablage-und-erschliessung.md` applies it to a genealogy project and uses its file-name pattern and inventory script.
 
 ## Credits
 

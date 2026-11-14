@@ -112,23 +112,69 @@ treat every such link as a possible namesake until checked.
   the provenance chain. A misreading goes into the research log or source
   sheet and is reported to the user, so it can be corrected at the file and
   re-ingested.
-- **Research notes are not sources.** Logs, source sheets, proof arguments
-  and session summaries stay where the ingest does not pick them up as
-  documents: a separate notes tree, or Markdown files (smart-okf ignores
-  `.md` input for exactly this reason). Never save text you wrote as `.txt`,
-  `.pdf` or `.docx` inside an ingested folder — the next ingest would hand
-  your own conclusion back as a document fact. That is circular evidence.
+- **Research notes are not sources.** Logs, source sheets, proof arguments,
+  session summaries and your own letters stay outside what the ingest
+  reads (§7). Never save text you wrote as `.txt`, `.pdf` or `.docx` inside
+  an ingested folder — the next ingest would hand your own conclusion back
+  as a document fact. That is circular evidence.
 - **Sources made during the project are documents**: interview recordings
   and their transcripts, gravestone photos, archive replies. File them with
   who, when and how, so they can be ingested like the rest.
-- Keeping masters in a format the pipeline skips (TIFF): put a readable
-  derivative (PNG, JPEG or PDF) beside the master. Naming and filing follow
-  the user's structure; the sibling skill `dokumenten-organisation` covers
-  the method.
 - Write to a knowledge base only when the user asks to document, and where
   they said.
 
-## 7. Zugang über MCP / Connector notes
+## 7. Einrichtung für einen Genealogie-Bestand / Setting up a genealogy root
+
+For `smart-okf`, as read from its code in this repository — check again
+after updates. Settings live in `<root>/.smart-okf/config.yaml`. Folder
+names as in `ablage-und-erschliessung.md` §3.
+
+- **Keep your own writing out.** `.md` is skipped anyway; a log exported as
+  PDF, DOCX or TXT is not. Exclude the folders that hold conclusions:
+
+  ```yaml
+  exclude_patterns:
+    - "*00_forschungsprotokoll/*"
+    - "*05_register/*"
+    - "*20_personen/*"
+    - "*30_familien-orte/*"
+    - "*40_hypothesen/*"
+    - "*50_korrespondenz/ausgang/*"
+    - "*90_export/*"
+  ```
+
+  Your own request letters state assumptions as context ("mein Vorfahr
+  wurde vermutlich in … geboren"); ingested, they come back as facts from a
+  document. Replies from archives (`eingang/`) are sources and stay in.
+- **`ordering_principle: provenance`** (the default). `pertinence` lowers
+  the threshold for a shared reference number to four digits, and only
+  years 19xx and 20xx are filtered out — a year such as 1788 or 1891 would
+  then tie unrelated documents into one matter.
+- **`vision_model` set.** Without it, standalone images go through
+  tesseract, which does not read Kurrent or Sütterlin. With it, expect
+  fluent misreadings (§2): the setting changes how a transcript fails, not
+  whether it needs checking. It applies to PNG and JPEG only; a scanned PDF
+  takes the PDF path whatever is on its pages.
+- **PDF masters and in-place OCR.** With `use_marker: false` (CLI
+  `--no-marker`), a scanned PDF without a text layer is OCRed *in place*:
+  the file is replaced by a version with an embedded text layer, and its
+  checksum changes. For masters that must stay as received, leave
+  `use_marker` on, or ingest a working copy and keep the master outside the
+  ingested tree. Record the master's checksum before the first ingest.
+- **File types.** A master in a format the pipeline skips (TIFF) needs a
+  readable derivative (PNG, JPEG, PDF) beside it, or it does not exist for
+  the knowledge base.
+- **Interview transcripts.** A transcript saved as `.md` is skipped. Save
+  it as `.txt` once it has been checked against the audio — then it is
+  ingested as the source it is. The unchecked draft and your evaluation of
+  the interview stay `.md`.
+- **Tags.** The extraction model invents its tags freely and writes them to
+  the frontmatter key `tags`; the site may index another key (Grav:
+  `taxonomy.tag`). Until tags are mapped to the controlled list
+  (`ablage-und-erschliessung.md` §6) and to the key that is indexed, a tag
+  search is not complete — log a miss as "nicht geprüft".
+
+## 8. Zugang über MCP / Connector notes
 
 - Check once what the connector account may do: read or write, pages only
   or media too.

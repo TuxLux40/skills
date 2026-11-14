@@ -51,14 +51,18 @@ No tool is prescribed. Requirements, whatever is used:
 
 ## 4. Filing
 
-Keep together, same base name (see `zitieren-und-dokumentation.md`):
+Keep together, same base name (naming: `ablage-und-erschliessung.md` §4):
 
 ```
-<JJJJ-MM-TT>_Interview_<NACHNAME-Vorname>_<Ort>.<wav|flac|mp3>   master audio, never edited
-…_transkript.md        transcript with time stamps and status
-…_auswertung.md        extracted statements (below)
-…_einwilligung.md      what was agreed about use
+<JJJJ-MM-TT>--Interview_<NACHNAME-Vorname>_<Ort>.<wav|flac|mp3>   master audio, never edited
+…__transkript.md       transcript with time stamps and status
+…__auswertung.md       extracted statements (below)
+…__einwilligung.md     what was agreed about use
 ```
+
+The recording and the transcript are sources; the evaluation is your own
+writing. Where an ingest pipeline indexes the storage, that difference
+decides what it may read (`dokumenten-wissensbasis.md` §7).
 
 ## 5. Evaluation
 
