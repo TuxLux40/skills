@@ -95,7 +95,7 @@ rg -i "policy number" /path/to/your/documents   # instant, reads the summaries
 **4. Connect the dots** across folders (optional, run occasionally) — the agent can trigger this, or run it yourself:
 
 ```bash
-uv run python scripts/dream.py /path/to/your/documents   # writes synthesis.md + matters/
+uv run python scripts/synthesize.py /path/to/your/documents   # writes synthesis.md + matters/
 ```
 
 <details>
@@ -134,14 +134,14 @@ flowchart LR
     doc["📄 New document"] --> extract["1 · EXTRACT<br>read the text<br>(OCR if scanned)"]
     extract --> derive["2 · DERIVE<br>pull out the facts:<br>names, dates, IDs, amounts"]
     derive --> verify["✅ VERIFY<br>check every fact is<br>really in the source —<br>flag if not"] & aggregate["3 · AGGREGATE<br>one summary per folder<br>+ index linking<br>sub-folders"]
-    aggregate --> dream["4 · DREAM<br>connect the same matter<br>across different folders"]
+    aggregate --> synthesize["4 · SYNTHESIZE<br>connect the same matter<br>across different folders"]
 
      doc:::s1
      extract:::s1
      derive:::s2
      verify:::sv
      aggregate:::s3
-     dream:::s4
+     synthesize:::s4
     classDef s1 fill:#0969da,stroke:#0a3069,color:#fff
     classDef s2 fill:#1a7f37,stroke:#0f5323,color:#fff
     classDef s3 fill:#9a6700,stroke:#5c3d00,color:#fff
@@ -155,7 +155,7 @@ flowchart LR
 | **2 · Derive**    | Distil the durable facts — contract numbers, dates, contacts, amounts etc.                                                       | Facts written into the folder summary                                  |
 | **2.1 Verify**     | A model double-checks the extraction against the original; anything invented is**kept but flagged**, never silently trusted | Trustworthy facts (`_Verification: FLAGGED` marks the doubtful ones) |
 | **3 · Aggregate** | One summary per folder, and a roll-up index so parent folders link down to children                                               | A browsable hierarchy                                                  |
-| **4 · Dream**     | Notice when the*same* matter (a dispute, a claim) spans several folders and pull it into one file                               | `synthesis.md` + `matters/`                                        |
+| **4 · Synthesize**     | Notice when the*same* matter (a dispute, a claim) spans several folders and pull it into one file                               | `synthesis.md` + `matters/`                                        |
 
 This mirrors real **archival science** — provenance (respect the folders as they are), pertinence (group by subject across folders), and the finding-aid principle (an index points down, it never duplicates). The full reasoning is in [`docs/ARCHIVAL_PRINCIPLES.md`](docs/ARCHIVAL_PRINCIPLES.md).
 
@@ -178,7 +178,7 @@ git commit -m "Ingest: 2026-07-18"
 This pays off in two places:
 
 - **Retrieval** (ladder rung 3) — once summaries and transcripts don't have the answer, `git log --grep`/`git log -S` finds exact IDs across the whole history, and `git log --stat` / `git diff HEAD~1` shows what changed in the last ingest.
-- **Dreaming** — the automatic matter-grouping pass (`app/services/matter_grouping.py`) groups purely by shared numeric tokens found *in the aggregate text itself*; the code never calls git. But the commit-message convention exists *because* that automatic match can miss a matter (same case, different wording, no shared 5+ digit token) — a batch upload landing in one commit still correlates co-arrival, and the ID you wrote into a commit message resurfaces months later via `git log --grep`, letting you (or the agent) tie the matter back together by hand even when the automatic pass never linked it.
+- **Synthesizing** — the automatic matter-grouping pass (`app/services/matter_grouping.py`) groups purely by shared numeric tokens found *in the aggregate text itself*; the code never calls git. But the commit-message convention exists *because* that automatic match can miss a matter (same case, different wording, no shared 5+ digit token) — a batch upload landing in one commit still correlates co-arrival, and the ID you wrote into a commit message resurfaces months later via `git log --grep`, letting you (or the agent) tie the matter back together by hand even when the automatic pass never linked it.
 
 See [`SKILL.md` — Change tracking](SKILL.md#change-tracking) for the full commit-message convention.
 
@@ -303,8 +303,8 @@ flowchart TB
         Human["You"]
     end
     subgraph skill["smart-okf (this repo)"]
-        CLI["scripts: ingest · dream · validate · dashboard"]
-        Services["app/services<br/>ingest · gating · verify · dream · navigation"]
+        CLI["scripts: ingest · synthesize · validate · dashboard"]
+        Services["app/services<br/>ingest · gating · verify · synthesize · navigation"]
         Prompts["prompts/*.md"]
     end
     subgraph host["Ingest host"]
@@ -379,7 +379,7 @@ Settings load in order: built-in defaults → `<document_root>/.smart-okf/config
 | ------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `llm_host` / `llm_model`                      | `localhost:11434` · `qwen2.5:3b` | The extractor endpoint and model                                                                                                             |
 | `vision_model`                                  | off                                   | Optional model for handwriting + images                                                                                                      |
-| `dream_model` / `dream_host`                  | falls back to extractor               | Model for cross-folder synthesis — use the smartest you have                                                                                |
+| `synthesize_model` / `synthesize_host`                  | falls back to extractor               | Model for cross-folder synthesis — use the smartest you have                                                                                |
 | `verify_model` / `verify_host`                | falls back to extractor               | Model for the mandatory fact-check                                                                                                           |
 | `ordering_principle`                            | `provenance`                        | `provenance` (respect folders) or `pertinence` (lean into cross-folder matters) — see [archival principles](docs/ARCHIVAL_PRINCIPLES.md) |
 | `exclude_patterns`                              | none                                  | Globs for files never worth ingesting (manuals, terms)                                                                                       |
@@ -403,9 +403,9 @@ uv run pytest -q                                     # 159 tests
 app/
 ├── config.py              # settings (YAML + env)
 ├── models/okf.py          # the OKF document model
-└── services/              # ingest · gating · fact_verification · dream ·
+└── services/              # ingest · gating · fact_verification · synthesize ·
                            #   navigation · matter_grouping · transcription · …
-scripts/                   # ingest_folder · dream · validate_okf · dashboard
+scripts/                   # ingest_folder · synthesize · validate_okf · dashboard
 prompts/*.md               # the LLM system prompts
 SKILL.md                   # onboarding · ingest · the retrieval ladder
 docs/                      # OKF_SPEC · ARCHIVAL_PRINCIPLES · DESIGN · EVAL_PASSES_AND_GATING

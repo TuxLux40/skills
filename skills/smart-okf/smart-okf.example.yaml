@@ -13,11 +13,11 @@ llm_model: gemma-4-e4b-it-qat
 # Optional: vision-capable model on the same host for standalone images (handwriting + scene).
 # vision_model: qwen3-vl-2b-instruct
 
-# Dreamer: model for the cross-folder synthesis pass (scripts/dream.py). Reasoning, not
+# Synthesizer: model for the cross-folder synthesis pass (scripts/synthesize.py). Reasoning, not
 # extraction — use the smartest model you have. Defaults to llm_model/llm_host when unset.
-# A remote dream_host needs allow_remote_llm: true (digests are distilled but personal).
-# dream_model: qwen3-30b-a3b
-# dream_host: http://192.168.1.50:8080
+# A remote synthesize_host needs allow_remote_llm: true (digests are distilled but personal).
+# synthesize_model: qwen3-30b-a3b
+# synthesize_host: http://192.168.1.50:8080
 
 # Verifier: model for the mandatory post-extraction fact check (always runs). Defaults to
 # llm_model/llm_host. Point at a different/bigger model if the extractor is weak enough that
@@ -31,21 +31,21 @@ llm_model: gemma-4-e4b-it-qat
 
 # Archival ordering principle: 'provenance' (default, respect folders — conservative matter
 # forming) or 'pertinence' (lean into cross-folder subject synthesis). See
-# docs/ARCHIVAL_PRINCIPLES.md. Only affects how eagerly the dream pass links matters.
+# docs/ARCHIVAL_PRINCIPLES.md. Only affects how eagerly the synthesis pass links matters.
 # ordering_principle: provenance
 
 # Gating (deterministic, no LLM). Glob patterns match the root-relative path or bare filename.
 # exclude_patterns:      # never ingested at all (manuals, terms, marketing)
 #   - "*handbuch*"
 #   - "*/AGB/*"
-# low_priority_patterns: # ingested, but kept out of the deep dream pass
+# low_priority_patterns: # ingested, but kept out of the deep synthesis pass
 #   - "archive/*"
 # priority_patterns:     # forced into deep analysis (overrides low-priority + built-in trivial words)
 #   - "*aktenzeichen*"
 # local_only_patterns:   # sensitive files only a local model may read: skipped while the extractor
 #   - "health/*"         # is remote, ingested normally once it is local. Existing aggregates stay.
 
-# Set true when llm_host / dream_host / verify_host point at something that looks local but forwards to a
+# Set true when llm_host / synthesize_host / verify_host point at something that looks local but forwards to a
 # cloud service (a loopback proxy in front of a hosted API). Without it, local_only_patterns cannot tell.
 # llm_hosts_are_remote: true
 

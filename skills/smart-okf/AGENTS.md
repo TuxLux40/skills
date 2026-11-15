@@ -7,7 +7,7 @@ OKF knowledge base for personal document trees.
 **Core purpose:** **Aggregates = library of atomic facts. Synthesis = librarian** (same story
 across docs/folders, conflicts, next steps). **Honcho-as-architecture out; Honcho-as-inspiration
 for smarter MD passes in.** Retrieval ladder (MD → transcripts → git) is mandatory. Ingest
-automates extract; the dream pass (`scripts/dream.py` → `synthesis.md`) is the shipped R2b librarian.
+automates extract; the synthesis pass (`scripts/synthesize.py` → `synthesis.md`) is the shipped R2b librarian.
 
 ## Architecture
 

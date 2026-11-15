@@ -25,11 +25,11 @@ from app.constants import (
 )
 from app.exceptions import LLMClientError
 from app.services.prompts import (
-    load_dream_matter_prompt,
-    load_dream_synthesis_prompt,
     load_extraction_prompt,
     load_fact_verification_prompt,
     load_folder_summary_prompt,
+    load_synthesis_matter_prompt,
+    load_synthesis_overview_prompt,
     load_vision_extraction_prompt,
 )
 
@@ -76,7 +76,7 @@ class LLMClient:
     def _localized(self, system_prompt: str) -> str:
         """Append a language directive to `system_prompt` when `content_language` is set.
 
-        Only used by callers that generate free prose (extraction, summaries, dream). Never
+        Only used by callers that generate free prose (extraction, summaries, synthesis). Never
         applied to `verify_facts` (its output is a fixed OK/FLAGGED verdict, not prose) — see
         `content_language`'s docstring in `app/config.py` for what this does and doesn't cover.
         """
@@ -84,7 +84,7 @@ class LLMClient:
             return system_prompt
         return (
             f"{system_prompt}\n\nWrite your own generated framing text — titles, descriptions, "
-            f"tags, orientation summaries, dream synthesis prose — in {self.content_language}, "
+            f"tags, orientation summaries, synthesis prose — in {self.content_language}, "
             f"regardless of the source document's language. This does not apply to facts you "
             f"extract from a source document: keep those faithful to the source's own wording "
             f"and language, never translate them."
@@ -230,22 +230,22 @@ class LLMClient:
         system_prompt = self._localized(load_folder_summary_prompt())
         return self.chat(system_prompt, merged_sections)
 
-    def dream_synthesis(self, digest: str, *, max_tokens: int | None = None) -> str:
-        """Cross-folder "dream" pass: synthesize matters/conflicts/patterns/actions from aggregate digests.
+    def synthesize_overview(self, digest: str, *, max_tokens: int | None = None) -> str:
+        """Cross-folder "synthesis" pass: synthesize matters/conflicts/patterns/actions from aggregate digests.
 
         Synthesis output is longer-form than per-document extraction, so callers may raise
         `max_tokens` above the extraction default.
         """
-        system_prompt = self._localized(load_dream_synthesis_prompt())
+        system_prompt = self._localized(load_synthesis_overview_prompt())
         return self.chat(system_prompt, digest, max_tokens=max_tokens)
 
-    def dream_matter(self, group_text: str, *, max_tokens: int | None = None) -> str:
+    def synthesize_matter(self, group_text: str, *, max_tokens: int | None = None) -> str:
         """Deep-dive one candidate cross-folder matter using full aggregate text (not digests).
 
         Only called for candidate groups a cheap non-LLM pre-filter already found sharing a
         reference number (`app/services/matter_grouping.py`) — bounded cost, not O(aggregates).
         """
-        system_prompt = self._localized(load_dream_matter_prompt())
+        system_prompt = self._localized(load_synthesis_matter_prompt())
         return self.chat(system_prompt, group_text, max_tokens=max_tokens)
 
     def verify_facts(self, source_text: str, extracted_markdown: str, *, max_tokens: int | None = None) -> str:
@@ -281,14 +281,14 @@ class LLMClient:
         `openai/gpt-oss-20b` after a UI model swap) — every extraction that run used
         whatever was loaded, silently, with no error anywhere. A 1B model hallucinated
         dates and domain terms in otherwise-plausible-looking aggregates. Call once per
-        configured client before a real ingest/dream run, not per-file.
+        configured client before a real ingest/synthesis run, not per-file.
         """
         available = self.available_models()
         if self.model not in available:
             raise LLMClientError(
                 f"Configured model {self.model!r} is not loaded at {self.host} "
                 f"(server currently reports: {', '.join(available) if available else 'no models'}). "
-                "Load the configured model in your LLM server, fix llm_model/dream_model/verify_model "
+                "Load the configured model in your LLM server, fix llm_model/synthesize_model/verify_model "
                 "in config, or pass --allow-model-mismatch to proceed anyway (not recommended — "
                 "extraction quality is not guaranteed with an unverified model)."
             )

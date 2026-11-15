@@ -28,12 +28,12 @@ origin is itself information and is not dissolved into a thematic re-sort. In sm
   at each level about *that* level, and keeps re-ingest incremental (a changed child
   doesn't force its parent to be re-extracted).
 
-### 2. Principle of pertinence — the dream / matters layer
+### 2. Principle of pertinence — the synthesize / matters layer
 
 The complementary principle: records are grouped by subject/matter regardless of
 where they physically sit. A dispute with an energy provider touches `providers/`,
 `finances/`, `insurance/`, and `lawyers/` — provenance keeps those apart, pertinence pulls
-the thread together. In smart-okf this is the `dream` pass: it correlates aggregates across
+the thread together. In smart-okf this is the `synthesize` pass: it correlates aggregates across
 folders by shared identifiers (contract/customer/case numbers) into *matters*
 (`type: Matter`) and a whole-tree `synthesis.md`, without touching the folders themselves.
 
@@ -61,7 +61,7 @@ retaining and at what depth. smart-okf's gating (`app/services/gating.py`) is th
   marketing) can be dropped from ingest entirely via patterns.
 - **Deprioritize (eager)**: anything matching a built-in low-value keyword (AGB,
   Bedienungsanleitung, …) or a user low-priority pattern is still ingested but kept out of
-  the expensive cross-folder `dream` pass — unless explicitly marked priority. The default
+  the expensive cross-folder `synthesize` pass — unless explicitly marked priority. The default
   stance leans toward *not* spending deep-analysis budget on boilerplate.
 - **Password-protected files** are skipped and logged rather than half-read or crashing.
 

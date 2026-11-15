@@ -189,7 +189,7 @@ def test_content_language_unset_leaves_system_prompt_unchanged(tmp_path: Path, m
     assert "generated framing text" not in messages[0]["content"]  # type: ignore[index]
 
 
-def test_content_language_set_appends_directive_to_extraction_and_dream_prompts(
+def test_content_language_set_appends_directive_to_extraction_and_synthesis_prompts(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     client = LLMClient(host="http://127.0.0.1:1", content_language="de")
@@ -204,8 +204,8 @@ def test_content_language_set_appends_directive_to_extraction_and_dream_prompts(
 
     client.extract_structured("raw text")
     client.summarize_sections("merged sections")
-    client.dream_synthesis("digest")
-    client.dream_matter("group text")
+    client.synthesize_overview("digest")
+    client.synthesize_matter("group text")
 
     for system_prompt in captured:
         assert "in de" in system_prompt

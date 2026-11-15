@@ -149,7 +149,7 @@ Per §7: flat, date-grouped history, newest first, ISO 8601 `YYYY-MM-DD` heading
 * **Creation**: Established the [Dataplex Playbook](/playbooks/dataplex.md).
 ```
 
-Not yet generated — a natural fit for the Dream pass (PR 9) recording what it changed.
+Not yet generated — a natural fit for the Synthesis pass (PR 9) recording what it changed.
 
 ## Conformance (§9)
 
@@ -170,22 +170,22 @@ types gracefully:
 | `Event` | Something that happened, with a date |
 | `Person` | An entity/person profile |
 | `FolderSummary` | Aggregate of every ingested document in one folder — what ingest produces by default |
-| `FolderIndex` | Roll-up index for a folder that has subfolders with aggregates but no documents of its own — links down to child aggregates (finding-aid principle), carries no `sources`, excluded from the dream pass |
+| `FolderIndex` | Roll-up index for a folder that has subfolders with aggregates but no documents of its own — links down to child aggregates (finding-aid principle), carries no `sources`, excluded from the synthesis pass |
 | `DocumentSummary` | Extraction summary for exactly one document (manual authoring; ingest no longer produces these directly) |
 | `Index` | A directory listing (`index.md`) |
-| `Insight` | Derived/inductive conclusion (Dream pass, optional/later) |
-| `Pattern` | Cross-document pattern or abstraction (Dream pass, optional/later) |
-| `Synthesis` | Root-level whole-tree dream output (`synthesis.md`) — matters, conflicts, patterns, open actions |
+| `Insight` | Derived/inductive conclusion (Synthesis pass, optional/later) |
+| `Pattern` | Cross-document pattern or abstraction (Synthesis pass, optional/later) |
+| `Synthesis` | Root-level whole-tree synthesis output (`synthesis.md`) — matters, conflicts, patterns, open actions |
 | `Matter` | Root-level per-matter concept file (`matters/<slug>.md`, R2) — one persistent, hash-incremental file per cross-folder matter group sharing a reference number |
 
 Add project-specific types as needed; do not enforce an enum.
 
-## Workflow (Honcho-inspired: store → derive → dream → query)
+## Workflow (Honcho-inspired: store → derive → synthesize → query)
 
 1. **Store** — a scheduled ingest run (cron/systemd timer, not a watcher) writes each folder's
    aggregate `.md` with provenance (`app/services/ingest.py`).
 2. **Derive** — on ingest, extract explicit facts + immediate deductions (optional/later).
-3. **Dream** — periodic pass over the KB for patterns, conflicts, links, abstractions; a natural
+3. **Synthesize** — periodic pass over the KB for patterns, conflicts, links, abstractions; a natural
    writer of `log.md` entries (optional/later).
 4. **Query** — humans browse folders directly; agents use ripgrep or folder-aggregate links; API/MCP
    are optional/later, not committed scope.

@@ -17,14 +17,14 @@ historical changelog entries.
 | 2 | `derive` | facts | inline in the aggregate section by default; per-file file only when toggled |
 | 3 | `aggregate` | aggregate | `<folder>.md` (`type: FolderSummary`) |
 | 3b | `roll-up` (mode of aggregate) | index | parent `<folder>.md` links child aggregates |
-| 4 | `dream` | matter + synthesis | `matters/<slug>.md`, `synthesis.md` |
+| 4 | `synthesize` | matter + synthesis | `matters/<slug>.md`, `synthesis.md` |
 
 **Assertions**
 - A1. Every config key / CLI flag / prompt filename introduced or renamed uses one of
-  `extract` / `derive` / `aggregate` / `roll-up` / `dream`.
+  `extract` / `derive` / `aggregate` / `roll-up` / `synthesize`.
 - A2. `roll-up` is a mode of `aggregate`, not a separate pass (no standalone `roll-up`
   script or service module).
-- A3. `dream` remains global across the whole tree (already cross-folder); it is not
+- A3. `synthesize` remains global across the whole tree (already cross-folder); it is not
   affected by the `aggregate` recursion/roll-up setting.
 
 ## 2. Level 2 `derive` — always on, writing into the aggregate; per-file artifact opt-in
@@ -68,8 +68,8 @@ beneath. Children stay canonical; incrementality is preserved.
   list plus a short synthesized overview (finding-aid principle: register, not duplication).
 - C3. Roll-up MUST NOT trigger re-extraction of unchanged children (hash incrementality
   holds); only the parent index is (re)written when a child aggregate changes.
-- C4. Roll-up (hierarchy index) and `dream` (cross-folder subject synthesis) are distinct
-  layers — roll-up follows the folder hierarchy (provenance), `dream` cuts across it
+- C4. Roll-up (hierarchy index) and `synthesize` (cross-folder subject synthesis) are distinct
+  layers — roll-up follows the folder hierarchy (provenance), `synthesize` cuts across it
   (pertinence); neither implies the other.
 
 ## 4. Self-updating root README for human navigation
@@ -103,7 +103,7 @@ either language. Password-protected files must be skipped safely.
 - E2. Files matching an exclusion rule are not ingested at all (no extraction call), and
   the reason is logged as skipped.
 - E3. Files that are neither explicitly excluded nor explicitly prioritized are eagerly
-  **deprioritized** — automatically kept out of the expensive `dream`/deep-analysis pass by
+  **deprioritized** — automatically kept out of the expensive `synthesize`/deep-analysis pass by
   default (still extractable/aggregatable, just not deeply synthesized), rather than
   silently treated as important. "Eager" = the default leans toward deprioritization when
   priority is unknown.
@@ -126,7 +126,7 @@ Mapping (already implicit in the design, now made explicit):
 - **Principle of provenance** (order by origin/context) → the `aggregate` + `roll-up` layer:
   documents keep the folder structure they arrived in; the hierarchy is described, not
   reordered. smart-okf never moves the user's files.
-- **Principle of pertinence** (order by subject) → the `dream` / `matters` layer: cross-folder
+- **Principle of pertinence** (order by subject) → the `synthesize` / `matters` layer: cross-folder
   synthesis groups by subject matter regardless of where files physically live.
 - **Finding-aid principle** (register points down, does not duplicate) → root README (§4) and
   roll-up (§3).
@@ -152,11 +152,11 @@ customizable when a different user/agent invokes it.
 
 **Assertions**
 - F1. Core passes (`extract`, `derive`, `aggregate` incl. roll-up) always run and are not
-  toggleable off — they are the archival baseline. Optional layers (`dream`, and the
+  toggleable off — they are the archival baseline. Optional layers (`synthesize`, and the
   `derive_per_file` artifact) are individually toggleable. Every pass has its own
   model/host selectable and is independently runnable.
 - F2. Onboarding asks: document location(s); which model for which pass; whether to run
-  the optional `dream` layer now; and the governing archival principle (§G2) — then the
+  the optional `synthesize` layer now; and the governing archival principle (§G2) — then the
   run proceeds automatically to completion without further prompting.
 - F3. End state per the user's archival goal: every ingested (non-excluded) document ends
   up with a transcript, a summary/aggregate presence, and derived facts, retrievable by any

@@ -1,5 +1,7 @@
 # smart-okf: System Design Document (Phase 0–3)
 
+> **Terminology note (2026-11-15).** The pass called *dream* in the entries below is now called **synthesize** (module `app/services/synthesis.py`, script `scripts/synthesize.py`, config keys `synthesize_model`/`synthesize_host`; the old `dream_*` keys still load). The text-reading step is called **transcribe**; **extract** is only the model step. Old entries keep the names they were written with.
+
 | Field | Value |
 |-------|-------|
 | **Author** | TuxLux40 (homelab maintainer) + Claude |
@@ -98,9 +100,9 @@ wrapped clone — see README §"Remote access via git".
 #### PR R2: Cross-folder consolidation pass — **shipped 2026-07-23**
 
 **Shipped as part of the dream pass, not a separate ingest-time consolidation pass.** By the
-time this was built, `scripts/dream.py` (R2b) already computed everything the design sketch
+time this was built, `scripts/synthesize.py` (R2b) already computed everything the design sketch
 below needed: `app/services/matter_grouping.py`'s free, non-LLM grouping of aggregates
-sharing a 5+ digit reference number, and a deep-dive LLM call (`dream_matter()`) that reads a
+sharing a 5+ digit reference number, and a deep-dive LLM call (`synthesize_matter()`) that reads a
 candidate group's full aggregate text and produces a Matter/Conflicts/Actions write-up. R2's
 actual job was just to **persist that write-up as its own concept file** instead of only
 splicing it into whatever `synthesis.md` happens to be current:
@@ -115,7 +117,7 @@ splicing it into whatever `synthesis.md` happens to be current:
   incremental gate is whole-tree: any changed aggregate anywhere reruns every deep dive.
   Each matter file now stores its own group's source hashes in frontmatter
   (`app/services/matter_grouping.group_tokens()` + `matter_files.group_source_hashes()`), so
-  `dream()`'s `_apply_deep_dives()` skips the (expensive, full-aggregate-text) deep-dive call
+  `synthesize()`'s `_apply_deep_dives()` skips the (expensive, full-aggregate-text) deep-dive call
   for a group whose own aggregates are unchanged even when an unrelated aggregate elsewhere
   triggered the run — reusing the existing matter file's stored body instead.
 - No feature flag, on by default: the deep-dive call was already happening for candidate
@@ -267,14 +269,14 @@ and was dropped rather than built.
 Two libraries were researched as candidates and **not adopted**, evaluation kept here rather than
 implemented against:
 
-- **Honcho's derive/dream loop** (the pattern `prompts/reasoning_derive.md`/`reasoning_dream.md`
+- **Honcho's derive/dream loop** (the pattern `prompts/reasoning_derive.md`/`reasoning_synthesize.md`
   were speculatively written against) — confirmed via Honcho's own source/docs: derive is
   per-message/on-write via a queue-worker LLM pass producing `Document` rows in Postgres+pgvector;
   dream is idle-triggered (not clock-scheduled — a per-peer inactivity timer that new messages
   reset) and runs deduction/induction "specialist" passes plus surprisal-sampling over the
   accumulated documents; query is a third, independent on-demand path. The *shape* (write-time
   extraction vs. idle-time cross-cutting synthesis) is reusable inspiration for whatever eventually
-  wires up `reasoning_derive.md`/`reasoning_dream.md` (see R2 in the Roadmap section above); the
+  wires up `reasoning_derive.md`/`reasoning_synthesize.md` (see R2 in the Roadmap section above); the
   concrete implementation (Postgres, pgvector, queue workers) is not — none of that fits this
   project's cron/filesystem model, and porting it wholesale would be exactly the kind of
   infrastructure creep the langfuse rejection above already ruled out for the same reasons.
@@ -366,10 +368,10 @@ claims against the code and produced 8 findings, all fixed the same day:
    more tesseract transcripts contradicting vision-derived sections.
 
 **Dream pass (R2b v1) shipped** — the librarian, per the locked core purpose. Filesystem-native,
-Honcho-in-shape-only: `app/services/dream.py` + `scripts/dream.py` collect every
+Honcho-in-shape-only: `app/services/synthesis.py` + `scripts/synthesize.py` collect every
 `type: FolderSummary` aggregate, build a compact per-aggregate digest (identity, tags,
 orientation summary, section headings + `_Source:` lines — never full bodies), and make one
-LLM call (`prompts/dream_synthesis.md`) producing `<root>/synthesis.md` (`type: Synthesis`)
+LLM call (`prompts/synthesize_overview.md`) producing `<root>/synthesis.md` (`type: Synthesis`)
 with exactly four sections: Matters (cross-folder, join IDs verbatim), Conflicts, Patterns,
 Open actions — every claim citing aggregate paths. Hash-incremental exactly like ingest:
 synthesis frontmatter stores a SHA-256 per source aggregate; zero LLM calls when nothing
@@ -409,7 +411,7 @@ the split:
    `..._999888777_...pdf` put the account number right in the digest for free). Aggregates
    sharing a token become a candidate group. Singletons are dropped — nothing to correlate,
    and the cheap scan already covers them for Patterns.
-3. **Deep dive** (`prompts/dream_matter.md`, `LLMClient.dream_matter()`): only candidate
+3. **Deep dive** (`prompts/synthesize_matter.md`, `LLMClient.synthesize_matter()`): only candidate
    groups get a follow-up call that reads their **full** aggregate markdown (not digest) and
    produces three labeled sections (Matter/Conflicts/Actions) with exact identifiers and
    explicit logical-incompatibility reasoning ("two suppliers can't both exclusively supply
@@ -593,7 +595,7 @@ sets exit code 2 (same "partial success, not silently green" signal as `skipped`
 
 **Cost kept to the minimum the mandate allows.** One short call per document (not
 per chunk, not a whole-tree re-analysis), with its own `verify_model`/`verify_host`
-config fields (mirroring `dream_model`/`dream_host`) so a cheap, fast model can do
+config fields (mirroring `synthesize_model`/`synthesize_host`) so a cheap, fast model can do
 the checking even when a bigger model does the extracting — or the same model can
 verify itself (default: falls back to `llm_model`/`llm_host`) when only one model is
 available, which still catches obviously-broken shapes even though it can't catch a
@@ -614,9 +616,9 @@ recovers the specific reference number(s) that formed a given candidate group (a
 form via a token chain — A-B share token1, B-C share token2 — so both tokens still identify
 it) to build a stable, human-legible slug (`matter-999888777`).
 
-**Per-matter hash-incrementality, not just whole-tree.** `dream()`'s `_apply_deep_dives()`
+**Per-matter hash-incrementality, not just whole-tree.** `synthesize()`'s `_apply_deep_dives()`
 now checks each group's own source hashes against its existing matter file before calling
-`dream_matter()`; unchanged groups reuse their stored file (reparsed with the same
+`synthesize_matter()`; unchanged groups reuse their stored file (reparsed with the same
 `_parse_matter_sections()` used for a fresh deep dive) instead of re-running the LLM call —
 so an unrelated aggregate changing elsewhere no longer forces every matter to be re-derived.
 
@@ -640,7 +642,7 @@ references multiple KBs in one chat).
 
 **Shipped:** `app/config.py`'s `document_roots` field and its validator are gone.
 `load_config(root: Path)` replaces the old bare `SmartOkfConfig()` call in every script
-(`ingest_folder.py`, `dream.py`, `dashboard.py`) — it reads `<root>/.smart-okf/config.yaml`
+(`ingest_folder.py`, `synthesize.py`, `dashboard.py`) — it reads `<root>/.smart-okf/config.yaml`
 specifically, returning `None` if that file doesn't exist (checked explicitly, since every
 field now has a default and nothing raises `ValidationError` on a merely-missing file
 anymore). `SMART_OKF_CONFIG` still works as an explicit override to point at a file
@@ -705,7 +707,7 @@ Sensitive personal and homelab documents (genealogy, IT notes, legal scans) live
 | **Image ingest** | ❌ **Broken** | `.png`/`.jpg`/`.jpeg` in `SUPPORTED_DOCUMENT_SUFFIXES` but `transcribe_file()` calls `read_text()` on non-PDF files — produces garbage, not `DocumentIngestError`. `easyocr` in deps but unused. |
 | Folder ingest (co-located `.md`) | ✅ Done | `app/services/ingest.py` |
 | Extraction prompts | ✅ Done | `prompts/extraction_system.md` |
-| Reasoning prompts (not wired) | ✅ Done | `prompts/reasoning_derive.md`, `reasoning_dream.md` |
+| Reasoning prompts (not wired) | ✅ Done | `prompts/reasoning_derive.md`, `reasoning_synthesize.md` |
 | CLI ingest script | ✅ Done | `scripts/ingest_folder.py` |
 | Streamlit skeleton | ⚠️ Placeholder | `app/ui/streamlit_app.py` — uses `DEFAULT_MODEL` env key, not `DEFAULT_LLM_MODEL` (line 21) |
 | Unit tests (3) | ✅ Done | `tests/test_okf.py` |
@@ -779,7 +781,7 @@ graph TB
         KB[app/services/kb_manager.py]
         ENR[app/services/enrichment.py]
         DRV[app/services/reasoning/derive.py]
-        DRM[app/services/reasoning/dream.py]
+        DRM[app/services/reasoning/synthesize.py]
         SRCH[app/services/search.py]
         JOB[app/services/jobs.py]
         DEPS[app/api/deps.py<br/>shared DI factory]
@@ -902,7 +904,7 @@ app/
     reasoning/
       __init__.py
       derive.py             # NEW — derive pass + output parser
-      dream.py              # NEW — dream pass + operation applier
+      synthesize.py              # NEW — dream pass + operation applier
       scope.py              # NEW — changed-since, folder scope
       output.py             # NEW — ReasoningOutputContract parser
   api/
@@ -1325,7 +1327,7 @@ def swap_review_queue(container: ServiceContainer, queue: ReviewQueuePort) -> No
 | PR | Composition change |
 |----|-------------------|
 | PR 6b | Create `container.py`; `ingest_orchestrator` receives `ServiceContainer` |
-| PR 8/9 | `derive.py` / `dream.py` receive `ServiceContainer` (includes `review_queue`) |
+| PR 8/9 | `derive.py` / `synthesize.py` receive `ServiceContainer` (includes `review_queue`) |
 | PR 11 | `SQLiteReviewQueue` implemented; `build_container()` returns SQLite impl instead of `NoOpReviewQueue`; `swap_review_queue` called in factory |
 | PR 12 | `app/api/deps.py` exposes `get_container() -> ServiceContainer` (singleton per process) |
 | PR 15 | `app/mcp/tools.py` calls `get_container()` — same instance as API |
@@ -2075,7 +2077,7 @@ Phase 3 "done" = PR 15 merged with 5 MCP tools. PR 16 rerank optional; PR 17–1
 
 - `DEVELOPMENT_PLAN.md`, `README.md`, `pyproject.toml`
 - `app/models/okf.py`, `app/services/ingest.py`, `app/services/transcription.py`
-- `prompts/extraction_system.md`, `reasoning_derive.md`, `reasoning_dream.md`
+- `prompts/extraction_system.md`, `reasoning_derive.md`, `reasoning_synthesize.md`
 - Google OKF spec v0.1; Honcho loop concept (adapted)
 
 ---
@@ -2251,8 +2253,8 @@ Revised ordering per review. Dependencies corrected.
 **Dependencies:** PR 8
 
 **Files:**
-- `app/services/reasoning/dream.py`
-- `prompts/reasoning_dream.md` (append JSON envelope suffix)
+- `app/services/reasoning/synthesize.py`
+- `prompts/reasoning_synthesize.md` (append JSON envelope suffix)
 - `app/models/review.py`
 - `tests/test_reasoning_dream.py` (incl. path traversal + `create_document` enrichment gate tests)
 

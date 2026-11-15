@@ -60,25 +60,25 @@ def test_host_is_allowlisted_accepts_rfc1918() -> None:
     assert host_is_allowlisted("10.0.0.5", []) is True
 
 
-def test_dream_model_and_host_default_to_none_fallback_to_extractor() -> None:
+def test_synthesis_model_and_host_default_to_none_fallback_to_extractor() -> None:
     config = _config()
-    assert config.dream_model is None
-    assert config.dream_host is None
+    assert config.synthesize_model is None
+    assert config.synthesize_host is None
 
 
-def test_dream_host_remote_refused_without_allow_remote_llm() -> None:
-    with pytest.raises(ValidationError, match="dream_host"):
-        _config(dream_host="https://api.openai.com/v1")
+def test_synthesis_host_remote_refused_without_allow_remote_llm() -> None:
+    with pytest.raises(ValidationError, match="synthesize_host"):
+        _config(synthesize_host="https://api.openai.com/v1")
 
 
-def test_dream_host_remote_allowed_with_allow_remote_llm() -> None:
-    config = _config(dream_host="https://api.openai.com/v1", allow_remote_llm=True)
-    assert config.dream_host == "https://api.openai.com/v1"
+def test_synthesis_host_remote_allowed_with_allow_remote_llm() -> None:
+    config = _config(synthesize_host="https://api.openai.com/v1", allow_remote_llm=True)
+    assert config.synthesize_host == "https://api.openai.com/v1"
 
 
-def test_dream_host_local_allowed_by_default() -> None:
-    config = _config(dream_host="http://192.168.1.10:8080")
-    assert config.dream_host == "http://192.168.1.10:8080"
+def test_synthesis_host_local_allowed_by_default() -> None:
+    config = _config(synthesize_host="http://192.168.1.10:8080")
+    assert config.synthesize_host == "http://192.168.1.10:8080"
 
 
 def test_ordering_principle_defaults_to_provenance() -> None:
@@ -199,10 +199,10 @@ def test_plain_loopback_host_is_local() -> None:
     assert _config(llm_host="http://127.0.0.1:11434").uses_remote_llm() is False
 
 
-def test_dream_host_remote_makes_the_whole_setup_remote() -> None:
+def test_synthesis_host_remote_makes_the_whole_setup_remote() -> None:
     config = _config(
         llm_host="http://127.0.0.1:11434",
-        dream_host="https://api.example.com/v1",
+        synthesize_host="https://api.example.com/v1",
         allow_remote_llm=True,
     )
     assert config.uses_remote_llm() is True
@@ -211,3 +211,22 @@ def test_dream_host_remote_makes_the_whole_setup_remote() -> None:
 def test_local_only_patterns_load_from_yaml_and_default_empty(tmp_path: Path) -> None:
     assert _config().local_only_patterns == []
     assert _config(local_only_patterns=["health/*"]).local_only_patterns == ["health/*"]
+
+
+def test_legacy_dream_keys_still_load_as_synthesize_keys() -> None:
+    config = _config(dream_model="big-model", dream_host="http://127.0.0.1:1234")
+    assert config.synthesize_model == "big-model"
+    assert config.synthesize_host == "http://127.0.0.1:1234"
+
+
+def test_new_synthesize_key_wins_over_the_legacy_one() -> None:
+    assert _config(synthesize_model="new", dream_model="old").synthesize_model == "new"
+
+
+def test_config_file_with_legacy_dream_keys_is_not_dropped(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("SMART_OKF_CONFIG", raising=False)
+    (tmp_path / ".smart-okf").mkdir()
+    (tmp_path / ".smart-okf" / "config.yaml").write_text("dream_model: old-name\nllm_model: base\n", encoding="utf-8")
+    config = load_config(tmp_path)
+    assert config is not None
+    assert config.synthesize_model == "old-name"

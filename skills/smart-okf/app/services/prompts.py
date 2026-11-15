@@ -1,18 +1,18 @@
 """Prompt file loading helpers."""
 
 from app.constants import (
-    DEFAULT_DREAM_MATTER_PROMPT,
-    DEFAULT_DREAM_SYNTHESIS_PROMPT,
     DEFAULT_EXTRACTION_PROMPT,
     DEFAULT_FACT_VERIFICATION_PROMPT,
     DEFAULT_FOLDER_SUMMARY_PROMPT,
+    DEFAULT_SYNTHESIS_MATTER_PROMPT,
+    DEFAULT_SYNTHESIS_OVERVIEW_PROMPT,
     DEFAULT_VISION_EXTRACTION_PROMPT,
-    DREAM_MATTER_PROMPT_FILE,
-    DREAM_SYNTHESIS_PROMPT_FILE,
     EXTRACTION_PROMPT_FILE,
     FACT_VERIFICATION_PROMPT_FILE,
     FOLDER_SUMMARY_PROMPT_FILE,
     PROMPTS_DIR,
+    SYNTHESIS_MATTER_PROMPT_FILE,
+    SYNTHESIS_OVERVIEW_PROMPT_FILE,
     VISION_EXTRACTION_PROMPT_FILE,
 )
 
@@ -40,14 +40,14 @@ def load_vision_extraction_prompt() -> str:
     return load_prompt(VISION_EXTRACTION_PROMPT_FILE, fallback=DEFAULT_VISION_EXTRACTION_PROMPT)
 
 
-def load_dream_synthesis_prompt() -> str:
-    """Load the system prompt used by the dream pass to synthesize across folder aggregates."""
-    return load_prompt(DREAM_SYNTHESIS_PROMPT_FILE, fallback=DEFAULT_DREAM_SYNTHESIS_PROMPT)
+def load_synthesis_overview_prompt() -> str:
+    """Load the system prompt used by the synthesis pass to synthesize across folder aggregates."""
+    return load_prompt(SYNTHESIS_OVERVIEW_PROMPT_FILE, fallback=DEFAULT_SYNTHESIS_OVERVIEW_PROMPT)
 
 
-def load_dream_matter_prompt() -> str:
+def load_synthesis_matter_prompt() -> str:
     """Load the system prompt used to deep-dive one candidate cross-folder matter."""
-    return load_prompt(DREAM_MATTER_PROMPT_FILE, fallback=DEFAULT_DREAM_MATTER_PROMPT)
+    return load_prompt(SYNTHESIS_MATTER_PROMPT_FILE, fallback=DEFAULT_SYNTHESIS_MATTER_PROMPT)
 
 
 def load_fact_verification_prompt() -> str:

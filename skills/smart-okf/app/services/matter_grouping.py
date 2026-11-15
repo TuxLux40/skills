@@ -3,7 +3,7 @@
 Groups aggregates that share a probable reference number (contract, customer, case,
 meter, or account ID — anything 5+ consecutive digits, or alphanumerics like
 `12345678X901`) before any deep-dive LLM call touches them. This keeps the expensive
-pass (`app/services/dream.py`'s per-matter deep dive, which reads full aggregate bodies)
+pass (`app/services/synthesis.py`'s per-matter deep dive, which reads full aggregate bodies)
 bounded to genuinely related aggregates instead of scaling with tree size: number of
 deep-dive calls = number of candidate groups, not number of aggregates.
 """
@@ -113,7 +113,7 @@ def group_tokens(group: list[Path], digests: dict[Path, str]) -> list[str]:
     so this recounts token occurrences confined to `group`'s own members rather than reusing
     `group_by_shared_tokens`'s global union-find state. Used to build a stable, human-legible
     slug for the matter's persisted file (`app/services/matter_files.py`) — stable across
-    dream reruns as long as the same aggregates keep sharing the same token.
+    synthesis reruns as long as the same aggregates keep sharing the same token.
     """
     counts: dict[str, int] = {}
     for path in group:

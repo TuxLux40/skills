@@ -103,23 +103,23 @@ do not re-read every original PDF for facts that were already distilled.
    `vision_model` in `.smart-okf/config.yaml` if yes. Vision + structured extraction = two LLM calls
    per image.
 
-4. **Ask which model should dream** (`dream_model` / `dream_host`). The dream pass
-   (see **Dreaming** below) is cross-folder *reasoning* — conflicts, patterns, matter
+4. **Ask which model should synthesize** (`synthesize_model` / `synthesize_host`). The
+   synthesis pass (see **Synthesizing** below) is cross-folder *reasoning* — conflicts, patterns, matter
    linking — and benefits from the smartest model available more than any other stage;
    the extractor's small fast model is often not the right choice here. Offer three
    options and explain the tradeoff:
 
-   - **Same as extractor** (default — leave `dream_model` unset): fine to start, weakest
+   - **Same as extractor** (default — leave `synthesize_model` unset): fine to start, weakest
      reasoning.
    - **Bigger local model**: same or another local host (a second machine's llama.cpp,
      a GPU box on the LAN). Best quality without data leaving the network. If their
      backend lists larger models (30B+, `thinking`/`reasoner` variants), suggest one.
-   - **Hosted model** (`dream_host` pointing at a cloud API + `allow_remote_llm: true`):
+   - **Hosted model** (`synthesize_host` pointing at a cloud API + `allow_remote_llm: true`):
      strongest reasoning. Be explicit about what leaves the machine: not the raw
      documents, but the aggregate *digests* — distilled personal facts, names, reference
      numbers. Only with informed consent, never as a silent default.
 
-   Dreaming runs rarely (after ingest batches), so a slow-but-smart model costs little.
+   Synthesizing runs rarely (after ingest batches), so a slow-but-smart model costs little.
 
 5. **Ask where this document root lives** and confirm the folder exists and looks like
    personal documents, not a code repo or media library. One config = one root = one
@@ -170,7 +170,7 @@ do not re-read every original PDF for facts that were already distilled.
 
 9. **Write `<document_root>/.smart-okf/config.yaml`** from what you learned (see
    [smart-okf.example.yaml](smart-okf.example.yaml): `llm_host`, `llm_model`, optional
-   `vision_model` / `dream_model` / `dream_host` / `verify_model` / `verify_host` /
+   `vision_model` / `synthesize_model` / `synthesize_host` / `verify_model` / `verify_host` /
    `use_marker` / `ordering_principle` / `exclude_patterns` / `low_priority_patterns` /
    `priority_patterns` / `derive_per_file` / `generate_readme`). Plain YAML — create the
    `.smart-okf/` folder and write the file directly — there is no separate onboarding
@@ -198,7 +198,7 @@ vector DB: it is **whole-tree ripgrep + read + git**, with an explicit fallback 
 | 3 | **Git history** | “What’s new,” same-batch uploads, ID-tagged commits months later |
 | 4 | **JSONL** (`.okf-llm-log.jsonl`) | Ingest debugging only — **not** knowledge retrieval |
 
-Steps 0 and 0.5 exist only after a dream pass has run (see **Dreaming** below); if
+Steps 0 and 0.5 exist only after a synthesis pass has run (see **Synthesizing** below); if
 `synthesis.md` is missing or older than recent ingests, offer to run it.
 
 **Transcripts are not optional polish.** Ingest always writes them so agents never need to re-OCR for exact strings. If step 1 does not fully answer the question, you **must** run step 2.
@@ -269,7 +269,7 @@ If no aggregate exists for a relevant folder yet, offer to ingest first.
 ## Change tracking
 
 Documents root is a git repo (set up in Onboarding step 6 if it wasn't already one). **After
-every pass that touches files — ingest (extract+derive+aggregate) and dream — commit before
+every pass that touches files — ingest (extract+derive+aggregate) and synthesize — commit before
 moving on.** This is not a suggestion: git is the only place "what's new since the last run"
 and "find this ID months later" (retrieval ladder step 3) actually live. A pass that ran but
 was never committed is invisible to both.
@@ -294,7 +294,7 @@ IDs: <label>=<value>, <label>=<value>, ...
 
 | Commit field | OKF frontmatter analog | Content |
 |---|---|---|
-| `<type>:` prefix | `type:` | `ingest`, `dream`, `fix`, `cleanup`, `feat`, `chore` |
+| `<type>:` prefix | `type:` | `ingest`, `synthesize`, `fix`, `cleanup`, `feat`, `chore` |
 | `<title>` | `title:` | one line, imperative, what changed |
 | description paragraph | `description:` | why — what triggered this pass/fix, not a restatement of the diff |
 | `Folders:` trailer | `sources:` | every top-level folder touched, relative to the document root |
@@ -335,7 +335,7 @@ git -C /path/to/documents log --grep='123456789' -i
 ```
 
 Root-level per-matter files (**R2**, `<root>/matters/<slug>.md`) are written automatically by
-the dream pass for any candidate group sharing a reference number — see **Dreaming** below.
+the synthesis pass for any candidate group sharing a reference number — see **Synthesizing** below.
 Batch commits + shared IDs still matter for cases the free grouping pre-filter misses.
 
 **Remote / web agents:** push to a **private** remote (Gitea, GitLab, …); they read `.md` +
@@ -355,7 +355,9 @@ plus "and browse it non-recursively" instructions.
 Terms used below: **transcribe** = read the raw text out of a source file (pdfplumber, marker, OCR with
 OCRmyPDF or tesseract); the result is the **transcript**. **Extract** = the model pulls the facts and
 identifiers out of a transcript into OKF Markdown. **Ingest** = the whole run: transcribe, extract,
-verify, write the aggregate.
+verify, write the aggregate. **Synthesize** = a separate pass over all aggregates that groups the same
+matter across folders and writes `synthesis.md` and `matters/` (formerly called the dream pass; the config
+keys `dream_model` and `dream_host` still work).
 
 Requires an OpenAI-compatible LLM server (LM Studio, llama.cpp `llama-server`, Ollama, vLLM).
 Check reachability before starting: `curl -s $SMART_OKF_LLM_HOST/v1/models`.
@@ -431,13 +433,13 @@ uv run python scripts/ingest_folder.py /path/to/documents
 - `index.md` and `log.md` are reserved OKF filenames; a folder literally named `index` or `log`
   is skipped rather than overwriting them.
 
-## Dreaming (cross-folder synthesis)
+## Synthesizing (cross-folder synthesis)
 
 The librarian pass. After ingest has built/refreshed aggregates, run:
 
 ```bash
 cd /path/to/smart-okf
-uv run python scripts/dream.py /path/to/documents
+uv run python scripts/synthesize.py /path/to/documents
 ```
 
 - Writes one `<root>/synthesis.md` (`type: Synthesis`) with exactly four sections:
@@ -460,11 +462,11 @@ uv run python scripts/dream.py /path/to/documents
   frontmatter (whole-tree gate) *and* in each matter file's own frontmatter (per-matter gate)
   — a matter whose own aggregates are unchanged reuses its existing file and skips the
   deep-dive call even when an unrelated aggregate elsewhere triggered the run. `--force`
-  re-dreams the whole tree anyway.
-- **Dreamer model is its own choice** (`dream_model`/`dream_host` in config,
-  `SMART_OKF_DREAM_MODEL`/`SMART_OKF_DREAM_HOST`, or `--model`/`--host`): falls back to the
+  re-synthesizes the whole tree anyway.
+- **Synthesizer model is its own choice** (`synthesize_model`/`synthesize_host` in config,
+  `SMART_OKF_SYNTHESIZE_MODEL`/`SMART_OKF_SYNTHESIZE_HOST`, or `--model`/`--host`): falls back to the
   extractor model when unset, but reasoning quality scales with model size here more than
-  anywhere else — see Onboarding step 4. Remote `dream_host` needs `allow_remote_llm`.
+  anywhere else — see Onboarding step 4. Remote `synthesize_host` needs `allow_remote_llm`.
   Large KBs are synthesized in batches, then consolidated — transparent, no flag.
 - Run it after ingest runs (same cron, one line later) or on demand when the user asks a
   cross-folder question and `synthesis.md` is stale/missing. Commit it with the ingest commit.
@@ -472,7 +474,7 @@ uv run python scripts/dream.py /path/to/documents
   facts in the cited aggregate (and its transcripts) before answering from it.
 
 ```cron
-0 3 * * 0  cd /path/to/smart-okf && uv run python scripts/ingest_folder.py /path/to/documents && uv run python scripts/dream.py /path/to/documents && uv run python scripts/validate_okf.py /path/to/documents
+0 3 * * 0  cd /path/to/smart-okf && uv run python scripts/ingest_folder.py /path/to/documents && uv run python scripts/synthesize.py /path/to/documents && uv run python scripts/validate_okf.py /path/to/documents
 ```
 
 `validate_okf.py` exits nonzero when anything is flagged, same "cron goes red instead of

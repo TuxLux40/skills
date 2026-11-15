@@ -1,7 +1,7 @@
 # smart-okf Development Plan
 
 ## Vision
-A self-contained, local web app + backend that turns your sensitive document folders into a rich, co-located OKF knowledge base. Your local LLM handles OCR post-processing, structured fact extraction, and ongoing reasoning. MD files live next to originals for instant human browsing. Agents (OpenWebUI, Hermes, etc.) access via folders, API, or MCP. Honcho-inspired loop (store/ingest → derive/reason → dream/synthesize → query) runs locally with your models only.
+A self-contained, local web app + backend that turns your sensitive document folders into a rich, co-located OKF knowledge base. Your local LLM handles OCR post-processing, structured fact extraction, and ongoing reasoning. MD files live next to originals for instant human browsing. Agents (OpenWebUI, Hermes, etc.) access via folders, API, or MCP. Honcho-inspired loop (store/ingest → derive/reason → synthesize/synthesize → query) runs locally with your models only.
 
 **Key Constraints**
 - Everything local and private (no external APIs unless you explicitly add).
@@ -26,7 +26,7 @@ A self-contained, local web app + backend that turns your sensitive document fol
 - [ ] Basic prompts in `/prompts/`:
   - `extraction_system.md`: Turn OCR/raw text into structured OKF facts + frontmatter.
   - `reasoning_derive.md`: Explicit statements + deductive conclusions from new/changed content.
-  - `reasoning_dream.md`: Periodic synthesis (patterns, conflicts, relationships, higher abstractions, action suggestions). Emulate Honcho Deriver + Dreamer.
+  - `reasoning_synthesize.md`: Periodic synthesis (patterns, conflicts, relationships, higher abstractions, action suggestions). Emulate Honcho Deriver + Synthesizer.
 - [ ] Simple CLI or script for one-shot ingest on a test folder (co-located MD creation).
 - [ ] Documentation: Example folder structure, sample MD output, config examples.
 
@@ -43,7 +43,7 @@ A self-contained, local web app + backend that turns your sensitive document fol
 **Honcho Loop Adaptation (Local LLM)**:
 - **Store**: Ingest creates "event" (new/changed file + extracted MD).
 - **Derive** (on ingest or batch): LLM extracts explicit facts + deductive conclusions → writes/updates MDs.
-- **Dream** (scheduled or on-demand): Periodic pass over recent MDs/indices → inductive patterns, conflict detection (e.g., duplicate facts with diffs), relationship inference (new links), abstractions/summaries, action items. Persist as new Insight/Pattern MDs or updates to indices/log.md.
+- **Synthesize** (scheduled or on-demand): Periodic pass over recent MDs/indices → inductive patterns, conflict detection (e.g., duplicate facts with diffs), relationship inference (new links), abstractions/summaries, action items. Persist as new Insight/Pattern MDs or updates to indices/log.md.
 - **Query**: Simple search (ripgrep + LLM rerank) or full API. Later MCP tools.
 - No Honcho dependency — pure local LLM calls + file-based state.
 
@@ -56,7 +56,7 @@ A self-contained, local web app + backend that turns your sensitive document fol
   - Inline MD preview + simple editor (with OKF validation).
   - Ingest controls: Select paths, run OCR+extract, watch mode toggle.
   - LLM dashboard: Select/configure endpoint + model (small dedicated for pipeline, or your main models). Test prompts.
-  - Reasoning controls: Trigger derive/dream passes (scoped to recent/changed), view logs/outputs.
+  - Reasoning controls: Trigger derive/synthesize passes (scoped to recent/changed), view logs/outputs.
   - Review queue: Low-confidence extractions, detected conflicts → human approve/edit.
   - Settings: Hierarchy templates, tag schemas, co-location style, backup hooks.
 - Backend API (FastAPI if not pure Streamlit) for programmatic access.
@@ -65,7 +65,7 @@ A self-contained, local web app + backend that turns your sensitive document fol
 **Deliverable**: Usable local web app that makes the whole system feel like a polished internal tool.
 
 ### Phase 3: Agent Integration & Polish (2-4 weeks)
-- MCP server/tools (librarian): `search`, `read`, `propose_write`/`patch` (with enrichment gate), `reason` (trigger dream), `maintain` (lint). Register in your MCPJungle.
+- MCP server/tools (librarian): `search`, `read`, `propose_write`/`patch` (with enrichment gate), `reason` (trigger synthesize), `maintain` (lint). Register in your MCPJungle.
 - OpenWebUI integration:
   - Primary: Point OpenWebUI Knowledge Base / RAG at document root or MD folders (MDs are high-signal).
   - Advanced: Expose web app API or MCP tools as custom retriever/tool in OpenWebUI chats.
@@ -96,7 +96,7 @@ graph TD
     C --> D[LLM Extraction Service<br/>Your Local Model]
     D --> E[KB Manager<br/>Co-located OKF MDs + index.md]
     E --> F[Enrichment Gate + Linking]
-    F --> G[Honcho-Inspired Reasoning Loop<br/>Derive on ingest + Dream periodic]
+    F --> G[Honcho-Inspired Reasoning Loop<br/>Derive on ingest + Synthesize periodic]
     G --> E
     B --> H[Web UI<br/>Browser / Preview / Ingest / Review / LLM Config]
     B --> I[MCP Tools<br/>search/read/patch/reason]
@@ -110,13 +110,13 @@ graph TD
 1. New/changed doc in watched folder.
 2. OCR → LLM extracts structured facts → writes co-located `.md` (or `_kb/`).
 3. Enrichment: Search existing KB first.
-4. Reasoning: Derive immediate insights; Dream later for patterns/conflicts/links/actions.
+4. Reasoning: Derive immediate insights; Synthesize later for patterns/conflicts/links/actions.
 5. Humans browse folders directly.
 6. Agents query via folders (RAG), API, or MCP.
 
 ## Risks & Mitigations
 - **OCR/Extraction Quality**: LLM refinement step + confidence scores + review queue. Start with high-quality tools (marker + vision LLM).
-- **Junk Drawer / Drift**: Strict enrichment gate + linting + Honcho-style consolidation in Dream phase.
+- **Junk Drawer / Drift**: Strict enrichment gate + linting + Honcho-style consolidation in Synthesize phase.
 - **Performance on modest hardware**: Small dedicated LLM for pipeline; batching; scope reasoning to recent changes.
 - **Cognitive Load (ADHD-friendly)**: Reliable automation, clear logs, one-click triggers, review queue instead of silent failures.
 - **Maintenance**: Automated lint/maintain tools; git for MDs.

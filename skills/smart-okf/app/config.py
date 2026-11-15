@@ -15,7 +15,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 import yaml
-from pydantic import Field, ValidationError, ValidationInfo, field_validator
+from pydantic import Field, ValidationError, ValidationInfo, field_validator, model_validator
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -183,16 +183,16 @@ class SmartOkfConfig(BaseSettings):
     scene description), served by the same `llm_host`. None (default) falls back to
     tesseract-only OCR — no vision capability, no dependency added. See README.md."""
 
-    dream_model: str | None = None
-    """Model for the dream synthesis pass (`scripts/dream.py`). None (default) uses
-    `llm_model`. Dreaming is cross-folder *reasoning*, not extraction — it benefits from
+    synthesize_model: str | None = None
+    """Model for the synthesis pass (`scripts/synthesize.py`). None (default) uses
+    `llm_model`. Synthesizing is cross-folder *reasoning*, not extraction — it benefits from
     the smartest model available more than any other stage, so users with stronger
-    hardware (or willingness to use a hosted model, see `dream_host`) point this at a
+    hardware (or willingness to use a hosted model, see `synthesize_host`) point this at a
     bigger model than the extractor."""
 
-    dream_host: str | None = None
-    """Server for the dream model. None (default) uses `llm_host`. Subject to the same
-    remote-host gate as `llm_host` (`allow_remote_llm` + allowlist): dream input is
+    synthesize_host: str | None = None
+    """Server for the synthesis model. None (default) uses `llm_host`. Subject to the same
+    remote-host gate as `llm_host` (`allow_remote_llm` + allowlist): synthesis input is
     digests of personal aggregates — distilled, but still personal data."""
 
     verify_model: str | None = None
@@ -213,7 +213,7 @@ class SmartOkfConfig(BaseSettings):
     terms, marketing). See `app/services/gating.py`."""
 
     low_priority_patterns: list[str] = Field(default_factory=list)
-    """Glob patterns for files ingested normally but kept out of the deep `dream` pass."""
+    """Glob patterns for files ingested normally but kept out of the deep `synthesize` pass."""
 
     priority_patterns: list[str] = Field(default_factory=list)
     """Glob patterns forcing deep analysis — overrides low-priority patterns and the
@@ -238,7 +238,7 @@ class SmartOkfConfig(BaseSettings):
 
     content_language: str | None = None
     """Force the language of LLM-*generated* prose — orientation summaries, aggregate
-    `description`, `tags`, dream synthesis/matter output, image descriptions. None (default):
+    `description`, `tags`, synthesis/matter output, image descriptions. None (default):
     the model infers language from each folder's dominant source-document language (already
     the prompts' behavior). Set e.g. `de` to pin generated content to one language regardless
     of source mix — useful for an archive that's overwhelmingly one language but has scattered
@@ -248,10 +248,23 @@ class SmartOkfConfig(BaseSettings):
     (`FolderSummary`, `Synthesis`, ...) — those are code-matched constants, always English,
     per `docs/OKF_SPEC.md`."""
 
+    @model_validator(mode="before")
+    @classmethod
+    def accept_legacy_dream_keys(cls, data: Any) -> Any:
+        """Keep configs written before the synthesizer rename working (`dream_model`, `dream_host`)."""
+        if not isinstance(data, dict):
+            return data
+        migrated = dict(data)
+        for old, new in (("dream_model", "synthesize_model"), ("dream_host", "synthesize_host")):
+            if old in migrated:
+                legacy = migrated.pop(old)
+                migrated.setdefault(new, legacy)
+        return migrated
+
     def uses_remote_llm(self) -> bool:
-        """Whether extraction, dreaming or verification would send text to a remote model."""
+        """Whether extraction, synthesizing or verification would send text to a remote model."""
         return llm_is_remote(
-            [self.llm_host, self.dream_host, self.verify_host],
+            [self.llm_host, self.synthesize_host, self.verify_host],
             declared_remote=self.llm_hosts_are_remote,
             allowlist=self.llm_host_allowlist,
         )
@@ -264,7 +277,7 @@ class SmartOkfConfig(BaseSettings):
             raise ValueError(f"ordering_principle must be 'provenance' or 'pertinence', got {v!r}")
         return v
 
-    @field_validator("llm_host", "dream_host", "verify_host")
+    @field_validator("llm_host", "synthesize_host", "verify_host")
     @classmethod
     def validate_llm_host(cls, v: str | None, info: ValidationInfo) -> str | None:
         """Reject non-allowlisted remote hosts unless `allow_remote_llm` is set."""

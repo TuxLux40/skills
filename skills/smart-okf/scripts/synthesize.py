@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-"""Cross-folder "dream" synthesis pass — run after (or independently of) ingest.
+"""Cross-folder "synthesis" synthesis pass — run after (or independently of) ingest.
 
 Reads every folder aggregate under the root and writes one `<root>/synthesis.md`
 (`type: Synthesis`): matters spanning folders, conflicts, patterns, open actions.
-Incremental: zero LLM calls when no aggregate changed since the last dream.
+Incremental: zero LLM calls when no aggregate changed since the last synthesis.
 
 Usage:
-    uv run python scripts/dream.py /path/to/documents
-    uv run python scripts/dream.py /path/to/documents --force       # re-dream even if nothing changed
+    uv run python scripts/synthesize.py /path/to/documents
+    uv run python scripts/synthesize.py /path/to/documents --force       # re-synthesize even if nothing changed
 """
 
 import argparse
@@ -18,28 +18,28 @@ from pathlib import Path
 from app.config import load_config, resolve_document_root
 from app.constants import LLM_LOG_FILENAME
 from app.exceptions import LLMClientError
-from app.services.dream import dream
 from app.services.gating import GatingRules
 from app.services.llm_client import LLMClient
+from app.services.synthesis import synthesize
 
 
 def main() -> None:
-    """CLI entry point for the dream pass."""
+    """CLI entry point for the synthesis pass."""
     parser = argparse.ArgumentParser(description="Synthesize matters/conflicts/patterns/actions across aggregates.")
-    parser.add_argument("folder", help="Document root to dream over.")
+    parser.add_argument("folder", help="Document root to synthesize over.")
     parser.add_argument(
         "--host",
         default=None,
-        help="OpenAI-compatible server URL for the dreamer (default: dream_host from config/env, "
+        help="OpenAI-compatible server URL for the synthesizer (default: synthesize_host from config/env, "
         "falling back to the extractor's llm_host)",
     )
     parser.add_argument(
         "--model",
         default=None,
-        help="Dreamer model name (default: dream_model from config/env, falling back to llm_model). "
-        "Dreaming is reasoning, not extraction — use the smartest model you have access to.",
+        help="Synthesizer model name (default: synthesize_model from config/env, falling back to llm_model). "
+        "Synthesizing is reasoning, not extraction — use the smartest model you have access to.",
     )
-    parser.add_argument("--force", action="store_true", help="Re-dream even when no aggregate changed")
+    parser.add_argument("--force", action="store_true", help="Re-synthesize even when no aggregate changed")
     parser.add_argument("--quiet", action="store_true", help="Suppress progress output")
     parser.add_argument(
         "--allow-model-mismatch",
@@ -53,17 +53,19 @@ def main() -> None:
     config = load_config(root)
     folders = [str(root)]
 
-    # Dreamer resolution: CLI flag > dream_* (config/env) > extractor settings (config, then
+    # Synthesizer resolution: CLI flag > synthesize_* (config/env) > extractor settings (config, then
     # LLMClient's own SMART_OKF_LLM_* env fallback via model/host=None).
     host: str | None = (
         args.host
-        or os.getenv("SMART_OKF_DREAM_HOST")
-        or ((config.dream_host or config.llm_host) if config is not None else None)
+        or os.getenv("SMART_OKF_SYNTHESIZE_HOST")
+        or os.getenv("SMART_OKF_DREAM_HOST")  # legacy name
+        or ((config.synthesize_host or config.llm_host) if config is not None else None)
     )
     model: str | None = (
         args.model
-        or os.getenv("SMART_OKF_DREAM_MODEL")
-        or ((config.dream_model or config.llm_model) if config is not None else None)
+        or os.getenv("SMART_OKF_SYNTHESIZE_MODEL")
+        or os.getenv("SMART_OKF_DREAM_MODEL")  # legacy name
+        or ((config.synthesize_model or config.llm_model) if config is not None else None)
     )
 
     rules = GatingRules(
@@ -85,7 +87,7 @@ def main() -> None:
             else:
                 print(f"error: {mismatch_error}", file=sys.stderr)
                 sys.exit(1)
-        result = dream(
+        result = synthesize(
             folder,
             client=client,
             force=args.force,

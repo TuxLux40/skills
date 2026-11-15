@@ -102,7 +102,7 @@ def main() -> None:
     # defaults apply (same values as SmartOkfConfig's field defaults).
     llm_max_tokens = config.llm_max_tokens if config is not None else None
     llm_temperature = config.llm_temperature if config is not None else None
-    # Verify resolution mirrors dream's model/host fallback: CLI flag > verify_* (config/env)
+    # Verify resolution mirrors synthesis's model/host fallback: CLI flag > verify_* (config/env)
     # > extractor's own resolved host/model. Verification always runs (see extract_document);
     # this only picks which model does the checking.
     verify_host: str | None = args.verify_host or (config.verify_host if config is not None else None) or host

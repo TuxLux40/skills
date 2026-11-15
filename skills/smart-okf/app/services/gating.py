@@ -5,7 +5,7 @@ Two independent decisions, deterministic and free (no LLM call — pattern/keywo
 - **exclude** (`is_excluded`): the file is not ingested at all. For documents that carry
   no durable personal facts worth extracting — manuals, terms of service, marketing.
 - **deprioritize** (`is_deprioritized`): the file/folder is ingested normally (transcript +
-  derive + aggregate) but kept out of the expensive cross-folder `dream` pass. The default
+  derive + aggregate) but kept out of the expensive cross-folder `synthesize` pass. The default
   stance is *eager*: anything matching a built-in trivial-name keyword or a user
   low-priority pattern is deprioritized unless the user explicitly marked it priority — so
   budget goes to documents that actually describe the user's affairs, not boilerplate that
@@ -105,7 +105,7 @@ DEFAULT_TRIVIAL_KEYWORDS: frozenset[str] = frozenset(
     }
 )
 """Filename/path substrings that mark a document as boilerplate — deprioritized eagerly
-(kept out of `dream`) even when the user listed no patterns. Covers German, English,
+(kept out of `synthesize`) even when the user listed no patterns. Covers German, English,
 French, Spanish, Italian, and Dutch, since documents may arrive in any of those. Deliberately
 conservative: these words rarely appear in documents carrying personal facts (contracts,
 letters, statements), so a match is a strong low-value signal — generic short words that
@@ -116,14 +116,14 @@ to deprioritize."""
 
 @dataclass
 class GatingRules:
-    """Resolved gating configuration for one ingest/dream run."""
+    """Resolved gating configuration for one ingest/synthesis run."""
 
     exclude_patterns: list[str] = field(default_factory=list)
     """Glob patterns (matched against the root-relative POSIX path and the bare filename).
     A match means the file is never ingested."""
 
     low_priority_patterns: list[str] = field(default_factory=list)
-    """Glob patterns that deprioritize a file/folder (ingested, but excluded from dream)."""
+    """Glob patterns that deprioritize a file/folder (ingested, but excluded from synthesis)."""
 
     priority_patterns: list[str] = field(default_factory=list)
     """Glob patterns that force priority — always deep-analyzed, overriding both the
@@ -156,11 +156,11 @@ def is_blocked_for_remote(relative_path: str, rules: GatingRules) -> bool:
 
 
 def is_deprioritized(relative_path: str, rules: GatingRules) -> bool:
-    """Whether a file/folder is ingested but kept out of the deep `dream` pass.
+    """Whether a file/folder is ingested but kept out of the deep `synthesize` pass.
 
     Priority patterns win over everything. Otherwise a low-priority pattern OR a built-in
     trivial-name keyword (eager default) deprioritizes it. A path with no signal at all is
-    NOT deprioritized — normal documents still reach dream.
+    NOT deprioritized — normal documents still reach synthesis.
     """
     if _matches_any(relative_path, rules.priority_patterns):
         return False

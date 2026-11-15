@@ -1,18 +1,18 @@
 """Per-matter concept files (R2): one dedicated, hash-incremental `.md` per cross-folder
 matter group, alongside the whole-tree `synthesis.md` (R2b).
 
-`app/services/dream.py`'s deep dive already reads a candidate group's full aggregate text
+`app/services/synthesis.py`'s deep dive already reads a candidate group's full aggregate text
 and produces a Matter/Conflicts/Actions write-up; this module persists that write-up as its
 own concept file under `<root>/matters/`, `type: Matter`, instead of only splicing it into
 the synthesis. Two things follow from making it a real file:
 
-- **Findable independent of a fresh dream run.** `synthesis.md` is regenerated wholesale
+- **Findable independent of a fresh synthesis run.** `synthesis.md` is regenerated wholesale
   each time; a matter file is a stable, linkable concept an agent (or a git history search)
   can point at directly — "the ACME-Energy dispute" instead of "some paragraph in whichever
   synthesis.md happened to be current."
 - **Hash-incremental per matter, not just per synthesis.** The synthesis's own incremental
   gate is whole-tree: any changed aggregate anywhere reruns every deep dive. Persisting each
-  matter's source hashes lets `dream()` skip the (expensive, full-text) deep-dive call for
+  matter's source hashes lets `synthesize()` skip the (expensive, full-text) deep-dive call for
   groups whose own aggregates are unchanged, even when an unrelated aggregate elsewhere
   triggered the run.
 """
@@ -47,7 +47,7 @@ def matter_path(root: Path, tokens: list[str], group: list[Path]) -> Path:
 
 
 def group_source_hashes(group: list[Path], root: Path) -> dict[str, str]:
-    """SHA-256 per group member, keyed by its path relative to root — mirrors ingest/dream."""
+    """SHA-256 per group member, keyed by its path relative to root — mirrors ingest/synthesize."""
     return {str(path.relative_to(root)): hash_file(path) for path in group}
 
 
@@ -72,7 +72,7 @@ def write_matter_file(root: Path, group: list[Path], tokens: list[str], deep_div
 
     The body keeps the deep dive's own `### Matter` / `### Conflicts` / `### Actions`
     headings verbatim (prefixed by a plain aggregate-links list) so a later unchanged-run
-    can feed the stored body straight back through `dream._parse_matter_sections` without
+    can feed the stored body straight back through `synthesis._parse_matter_sections` without
     needing a second, file-specific parser.
     """
     path = matter_path(root, tokens, group)

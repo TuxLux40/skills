@@ -223,8 +223,8 @@ def build_config_summary(config: SmartOkfConfig | None) -> dict[str, str]:
     return {
         "llm_model (extractor)": config.llm_model,
         "llm_host (extractor)": config.llm_host,
-        "dream_model": config.dream_model or f"{config.llm_model} (falls back to llm_model)",
-        "dream_host": config.dream_host or f"{config.llm_host} (falls back to llm_host)",
+        "synthesize_model": config.synthesize_model or f"{config.llm_model} (falls back to llm_model)",
+        "synthesize_host": config.synthesize_host or f"{config.llm_host} (falls back to llm_host)",
         "vision_model": config.vision_model or "(not set — tesseract-only OCR for images)",
         "use_marker": str(config.use_marker),
         "allow_remote_llm": str(config.allow_remote_llm),
@@ -239,7 +239,7 @@ def collect_cron_lines() -> list[str]:
         return []
     if result.returncode != 0:
         return []
-    markers = ("ingest_folder.py", "dream.py", "validate_okf.py")
+    markers = ("ingest_folder.py", "synthesize.py", "validate_okf.py")
     return [line for line in result.stdout.splitlines() if any(marker in line for marker in markers)]
 
 
@@ -337,7 +337,7 @@ def _render_config_section(data: DashboardData) -> str:
     cron_html = (
         "<pre>" + html.escape("\n".join(data.cron_lines)) + "</pre>"
         if data.cron_lines
-        else "<p class='muted'>No crontab lines reference ingest_folder.py / dream.py / validate_okf.py.</p>"
+        else "<p class='muted'>No crontab lines reference ingest_folder.py / synthesize.py / validate_okf.py.</p>"
     )
     return f"""
     <section id="config">

@@ -9,7 +9,7 @@ DEFAULT_LLM_TEMPERATURE = 0.3
 DEFAULT_MAX_TOKENS = 4096
 """Raised from 2048: a dense document (e.g. a German social-insurance notice) now also needs
 room for a frontmatter `identifiers` map plus a body `**Kerndaten**` block per section, on top
-of the narrative extraction. Dream already uses 4096 (`DREAM_MAX_TOKENS`); extraction matches it."""
+of the narrative extraction. Synthesis already uses 4096 (`SYNTHESIS_MAX_TOKENS`); extraction matches it."""
 
 OKF_VERSION = "0.1"
 UNKNOWN_OKF_TYPE = "Unknown"
@@ -23,7 +23,7 @@ FOLDER_INDEX_OKF_TYPE = "FolderIndex"
 """Frontmatter `type` for a roll-up index: a parent folder that has subfolders with
 aggregates but no directly-contained documents of its own. Finding-aid principle — it links
 down to child aggregates without duplicating their content, so it carries no `sources`
-(unlike FolderSummary). Excluded from the `dream` pass (navigation, not content)."""
+(unlike FolderSummary). Excluded from the `synthesize` pass (navigation, not content)."""
 
 ROLLUP_HEADING = "## Subfolders"
 """Body section listing links to child-folder aggregates. Injected into a folder's
@@ -71,10 +71,10 @@ LLM_LOG_FILENAME = ".okf-llm-log.jsonl"
 """Hidden root-level JSONL log of every LLM call: model, duration, retries, success."""
 
 SYNTHESIS_OKF_TYPE = "Synthesis"
-"""Frontmatter `type` for the root-level cross-folder dream synthesis document."""
+"""Frontmatter `type` for the root-level cross-folder synthesis document."""
 
 SYNTHESIS_FILENAME = "synthesis.md"
-"""Root-level output of the dream pass: matters, conflicts, patterns, open actions."""
+"""Root-level output of the synthesis pass: matters, conflicts, patterns, open actions."""
 
 MATTER_OKF_TYPE = "Matter"
 """Frontmatter `type` for a dedicated per-matter concept file (R2): one persistent, hash-
@@ -85,15 +85,15 @@ MATTERS_DIR_NAME = "matters"
 """Root-level, non-hidden folder holding one `.md` per matter group — a real user-facing
 concept (unlike `.okf-transcripts/`), so it stays visible."""
 
-DREAM_SYNTHESIS_PROMPT_FILE = "dream_synthesis.md"
-DEFAULT_DREAM_SYNTHESIS_PROMPT = (
+SYNTHESIS_OVERVIEW_PROMPT_FILE = "synthesize_overview.md"
+DEFAULT_SYNTHESIS_OVERVIEW_PROMPT = (
     "You synthesize a digest of folder aggregates into one cross-folder report with exactly "
     "these markdown sections: '## Matters', '## Conflicts', '## Patterns', '## Open actions'. "
     "Cite aggregate paths for every claim; keep identifiers verbatim; body only, no frontmatter."
 )
 
-DREAM_MATTER_PROMPT_FILE = "dream_matter.md"
-DEFAULT_DREAM_MATTER_PROMPT = (
+SYNTHESIS_MATTER_PROMPT_FILE = "synthesize_matter.md"
+DEFAULT_SYNTHESIS_MATTER_PROMPT = (
     "You investigate one candidate cross-folder matter (aggregates sharing a reference "
     "number) using their full text. Output exactly three sections: '### Matter' (dense "
     "paragraph, every identifier verbatim), '### Conflicts' (contradictions, cite both "

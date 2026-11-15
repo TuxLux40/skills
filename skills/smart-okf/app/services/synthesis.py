@@ -1,4 +1,4 @@
-"""Cross-folder "dream" synthesis pass over the folder aggregates (the librarian).
+"""Cross-folder "synthesis" synthesis pass over the folder aggregates (the librarian).
 
 Honcho-inspired in *shape* only: extraction happens at write time (ingest), and this
 pass runs idle-time/cron-time over the accumulated aggregates to notice what no single
@@ -7,7 +7,7 @@ actions. No queue, no database: input is the aggregates on disk, output is one
 root-level `synthesis.md` (`type: Synthesis`).
 
 Incremental like ingest: the synthesis stores a SHA-256 per source aggregate in its
-frontmatter. When no aggregate changed since the last dream, the pass makes zero LLM
+frontmatter. When no aggregate changed since the last synthesis, the pass makes zero LLM
 calls.
 
 Two passes, bounded cost:
@@ -32,7 +32,7 @@ Each deep-dived group is also persisted as its own concept file under `<root>/ma
 rather than only a paragraph inside whatever `synthesis.md` happens to be current.
 Hash-incremental per matter: a group whose own aggregates are unchanged reuses its existing
 matter file instead of re-running the deep-dive call, even when an unrelated aggregate
-elsewhere triggered this dream run.
+elsewhere triggered this synthesis run.
 """
 
 import re
@@ -60,7 +60,7 @@ from app.services.matter_files import (
 )
 from app.services.matter_grouping import group_by_shared_tokens, group_tokens, min_token_digits_for_principle
 
-DREAM_MAX_TOKENS = 4096
+SYNTHESIS_MAX_TOKENS = 4096
 """Synthesis is longer-form than per-document extraction; give it more output room."""
 
 _SYNTHESIS_HEADERS = ("Matters", "Conflicts", "Patterns", "Open actions")
@@ -70,8 +70,8 @@ _NO_CONFLICTS_MARKERS = ("keine konflikte erkannt", "no conflicts detected")
 
 
 @dataclass
-class DreamResult:
-    """Summary of a dream pass."""
+class SynthesisResult:
+    """Summary of a synthesis pass."""
 
     root: Path
     synthesis_path: Path | None = None
@@ -139,7 +139,7 @@ def build_digest(aggregate_path: Path, root: Path) -> str:
     return "\n".join(lines)
 
 
-def dream(
+def synthesize(
     root_folder: str,
     client: LLMClient | None = None,
     *,
@@ -147,8 +147,8 @@ def dream(
     verbose: bool = False,
     rules: GatingRules | None = None,
     ordering_principle: str = "provenance",
-) -> DreamResult:
-    """Run one dream pass over root's aggregates, writing/refreshing `<root>/synthesis.md`.
+) -> SynthesisResult:
+    """Run one synthesis pass over root's aggregates, writing/refreshing `<root>/synthesis.md`.
 
     Skips the LLM entirely when no aggregate changed since the last synthesis (unless
     `force`). Oversized digests are synthesized in batches, then consolidated with one
@@ -159,7 +159,7 @@ def dream(
     `ordering_principle` tunes how loosely cross-folder matters form (`pertinence` = looser).
     """
     root = Path(root_folder).expanduser().resolve()
-    result = DreamResult(root=root)
+    result = SynthesisResult(root=root)
     if not root.is_dir():
         result.errors.append(f"{root} is not a directory")
         return result
@@ -187,12 +187,12 @@ def dream(
         result.unchanged = True
         result.synthesis_path = output_path
         if verbose:
-            print(f"Unchanged: no aggregate changed since last dream ({output_path})")
+            print(f"Unchanged: no aggregate changed since last synthesis ({output_path})")
         return result
 
     digest_map = {path: digest for path in aggregates if (digest := build_digest(path, root))}
     if verbose:
-        print(f"Dreaming over {len(digest_map)} aggregate(s)...")
+        print(f"Synthesizing over {len(digest_map)} aggregate(s)...")
 
     llm_client = client or LLMClient(log_path=root / LLM_LOG_FILENAME)
     try:
@@ -202,13 +202,13 @@ def dream(
             print(f"  {len(groups)} candidate matter group(s) found — deep-diving...")
         body = _apply_deep_dives(baseline_body, groups, digest_map, root, llm_client, verbose=verbose)
     except LLMClientError as error:
-        result.errors.append(f"dream synthesis failed: {error}")
+        result.errors.append(f"synthesis failed: {error}")
         return result
 
     frontmatter = OKFFrontmatter(
         type=SYNTHESIS_OKF_TYPE,
         title="Cross-folder synthesis",
-        description=f"Dream pass over {len(aggregates)} folder aggregate(s): matters, conflicts, patterns, actions",
+        description=f"Synthesis pass over {len(aggregates)} folder aggregate(s): matters, conflicts, patterns, actions",
         source=None,
         sources=sorted(current_hashes),
         source_hashes=current_hashes,
@@ -222,26 +222,26 @@ def dream(
 
 
 def _synthesize(digests: list[str], client: LLMClient) -> str:
-    """One dream call, or batched calls + a consolidation call when the digest is oversized."""
+    """One synthesis call, or batched calls + a consolidation call when the digest is oversized."""
     batches = _batch_digests(digests, CHUNK_CHAR_THRESHOLD)
     if len(batches) == 1:
-        return client.dream_synthesis(batches[0], max_tokens=DREAM_MAX_TOKENS)
+        return client.synthesize_overview(batches[0], max_tokens=SYNTHESIS_MAX_TOKENS)
 
     partials = [
-        client.dream_synthesis(
+        client.synthesize_overview(
             f"(Partial digest {i + 1}/{len(batches)} — synthesize what this subset shows.)\n\n{batch}",
-            max_tokens=DREAM_MAX_TOKENS,
+            max_tokens=SYNTHESIS_MAX_TOKENS,
         )
         for i, batch in enumerate(batches)
     ]
     consolidation_input = "\n\n---\n\n".join(
         f"(Partial synthesis {i + 1}/{len(partials)})\n\n{partial}" for i, partial in enumerate(partials)
     )
-    return client.dream_synthesis(
+    return client.synthesize_overview(
         "The following are partial syntheses of subsets of the knowledge base. Merge them into "
         "one consistent report with the same four sections, deduplicating matters that appear "
         f"in several partials.\n\n{consolidation_input}",
-        max_tokens=DREAM_MAX_TOKENS,
+        max_tokens=SYNTHESIS_MAX_TOKENS,
     )
 
 
@@ -340,23 +340,23 @@ def _deep_dive(group: list[Path], root: Path, client: LLMClient) -> str:
     parts = [f"=== {path.relative_to(root)} ===\n{path.read_text(encoding='utf-8')}" for path in group]
     batches = _batch_digests(parts, CHUNK_CHAR_THRESHOLD)
     if len(batches) == 1:
-        return client.dream_matter(batches[0], max_tokens=DREAM_MAX_TOKENS)
+        return client.synthesize_matter(batches[0], max_tokens=SYNTHESIS_MAX_TOKENS)
 
     partials = [
-        client.dream_matter(
+        client.synthesize_matter(
             f"(Partial evidence {i + 1}/{len(batches)} for this candidate matter.)\n\n{batch}",
-            max_tokens=DREAM_MAX_TOKENS,
+            max_tokens=SYNTHESIS_MAX_TOKENS,
         )
         for i, batch in enumerate(batches)
     ]
     consolidation_input = "\n\n---\n\n".join(
         f"(Partial write-up {i + 1}/{len(partials)})\n\n{partial}" for i, partial in enumerate(partials)
     )
-    return client.dream_matter(
+    return client.synthesize_matter(
         "The following are partial Matter/Conflicts/Actions write-ups for the SAME candidate "
         "matter, each from a different subset of its evidence. Merge them into one coherent "
         f"set of three sections, deduplicating repeated facts.\n\n{consolidation_input}",
-        max_tokens=DREAM_MAX_TOKENS,
+        max_tokens=SYNTHESIS_MAX_TOKENS,
     )
 
 
