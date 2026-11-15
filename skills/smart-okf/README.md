@@ -404,7 +404,7 @@ app/
 ├── config.py              # settings (YAML + env)
 ├── models/okf.py          # the OKF document model
 └── services/              # ingest · gating · fact_verification · dream ·
-                           #   navigation · matter_grouping · text_extraction · …
+                           #   navigation · matter_grouping · transcription · …
 scripts/                   # ingest_folder · dream · validate_okf · dashboard
 prompts/*.md               # the LLM system prompts
 SKILL.md                   # onboarding · ingest · the retrieval ladder

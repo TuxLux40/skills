@@ -21,11 +21,11 @@ from pathlib import Path
 from app.config import DEFAULT_LLM_HOST_ALLOWLIST, llm_is_remote, load_config, resolve_document_root
 from app.constants import DEFAULT_LLM_HOST, DEFAULT_LLM_MODEL, LLM_LOG_FILENAME
 from app.exceptions import LLMClientError
-from app.services.extraction_options import ExtractionOptions
 from app.services.gating import GatingRules
 from app.services.ingest import IngestFolderResult, ingest_folder
 from app.services.llm_client import LLMClient
-from app.services.text_extraction import marker_available
+from app.services.transcription import marker_available
+from app.services.transcription_options import TranscriptionOptions
 
 
 def main() -> None:
@@ -114,7 +114,7 @@ def main() -> None:
             "Install it (pipx install marker-pdf) or pass --no-marker for pdfplumber/OCRmyPDF only."
         )
         return
-    options = ExtractionOptions(use_marker=use_marker)
+    options = TranscriptionOptions(use_marker=use_marker)
     rules = GatingRules(
         exclude_patterns=list(config.exclude_patterns) if config is not None else [],
         low_priority_patterns=list(config.low_priority_patterns) if config is not None else [],

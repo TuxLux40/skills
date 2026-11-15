@@ -194,7 +194,7 @@ only loosely — independent otherwise.
 
 #### PR R6: Docling as a swappable extraction backend
 
-**Problem:** `app/services/text_extraction.py` hand-rolls per-format extraction (pdfplumber,
+**Problem:** `app/services/transcription.py` hand-rolls per-format extraction (pdfplumber,
 python-docx, stdlib email, openpyxl/csv). [Docling](https://github.com/docling-project/docling)
 (IBM/LF AI, MIT) unifies PDF/DOCX/XLSX/CSV/`.eml` behind one API and has genuine `.eml` support
 most general document tools lack — evaluated 2026-07-18, not adopted: its standard PDF pipeline
@@ -279,12 +279,12 @@ implemented against:
   project's cron/filesystem model, and porting it wholesale would be exactly the kind of
   infrastructure creep the langfuse rejection above already ruled out for the same reasons.
 - **Docling** (IBM/LF AI, MIT-licensed) was considered as a replacement for the hand-rolled
-  per-format logic in `app/services/text_extraction.py`. It does unify PDF/DOCX/XLSX/CSV/`.eml`
+  per-format logic in `app/services/transcription.py`. It does unify PDF/DOCX/XLSX/CSV/`.eml`
   extraction behind one API (`.eml` support is a genuine advantage most general document tools
   lack) and is permissively licensed, unlike marker — but its standard PDF pipeline still requires
   PyTorch (`docling-ibm-models`, confirmed via upstream issue #648), so it's no lighter than
   marker despite being importable; its native output is its own `DoclingDocument`
-  structure, not markdown, so the OKF-translation work `text_extraction.py`/`ingest.py` already do
+  structure, not markdown, so the OKF-translation work `transcription.py`/`ingest.py` already do
   wouldn't shrink; and it has no equivalent to OCRmyPDF's in-place PDF rewrite (it processes
   in-memory, produces no searchable-PDF artifact). Not worth the dependency weight for the current
   pdfplumber+OCRmyPDF+marker stack's actual pain points; worth a second look only if scanned-PDF
@@ -318,7 +318,7 @@ distinct, separately-scoped feature — not bundled into this one.
 
 **Mechanics:** `extract_document()` (`app/services/ingest.py`) branches on `file_path.suffix in
 IMAGE_DOCUMENT_SUFFIXES and client.vision_model is not None` — routes to `describe_image()`
-instead of `extract_text_from_file()`; the returned text (transcription + scene description) then
+instead of `transcribe_file()`; the returned text (transcription + scene description) then
 flows through the same chunk/structure/transcript pipeline as any other document, so nothing
 downstream needed to change. `vision_model` defaults to `None` (env: `SMART_OKF_VISION_MODEL`) —
 unset, behavior is byte-for-byte the old tesseract-only path; no regression for anyone who
@@ -349,8 +349,8 @@ claims against the code and produced 8 findings, all fixed the same day:
    root / 2 partial-with-skips) and `scripts/ingest_folder.py` uses it, so cron goes red
    instead of silently green when files fail. The CLI also preflights `marker_single` once
    at startup (clear single error) instead of N per-file skips.
-4. **Read-only backfill:** `ExtractionOptions.allow_ocr_rewrite` (False in
-   `LIGHT_EXTRACTION`) — transcript backfill can no longer OCR-rewrite a scanned PDF in
+4. **Read-only backfill:** `TranscriptionOptions.allow_ocr_rewrite` (False in
+   `LIGHT_TRANSCRIPTION`) — transcript backfill can no longer OCR-rewrite a scanned PDF in
    place during an "unchanged" pass; it raises and the backfill skips, instead of mutating
    originals and invalidating hashes.
 5. **Orphan aggregates:** deleting a folder's last supported file now deletes its stale
@@ -682,7 +682,7 @@ are actively being reorganized post-ingest.
 
 **smart-okf** is a local-first, privacy-preserving knowledge base that transforms sensitive document folders (PDFs, scans, plain text) into co-located OKF-structured Markdown companions. A Python backend orchestrates OCR, LLM extraction, enrichment, and a Honcho-inspired reasoning loop (store → derive → dream → query). Humans browse folders directly; agents access the same knowledge via ripgrep, REST API, and MCP tools registered in MCPJungle.
 
-Phase 0 scaffolding is largely complete: Pydantic OKF models (`app/models/okf.py`), shared ingest service (`app/services/ingest.py`), Ollama LLM client (`app/services/llm_client.py`), pdfplumber text extraction (`app/services/text_extraction.py`), extraction/reasoning prompts (`prompts/`), CLI ingest script (`scripts/ingest_folder.py`), and a Streamlit skeleton (`app/ui/streamlit_app.py`). Known gaps and doc drift are catalogued in [Current State](#current-state-as-of-2026-07-16).
+Phase 0 scaffolding is largely complete: Pydantic OKF models (`app/models/okf.py`), shared ingest service (`app/services/ingest.py`), Ollama LLM client (`app/services/llm_client.py`), pdfplumber text extraction (`app/services/transcription.py`), extraction/reasoning prompts (`prompts/`), CLI ingest script (`scripts/ingest_folder.py`), and a Streamlit skeleton (`app/ui/streamlit_app.py`). Known gaps and doc drift are catalogued in [Current State](#current-state-as-of-2026-07-16).
 
 The design preserves existing patterns: centralized constants (`app/constants.py`), typed exception hierarchy (`app/exceptions.py`), immutable `model_copy` updates in ingest (`apply_ingest_defaults`), and shared services consumed by CLI, UI, API, and MCP layers.
 
@@ -701,8 +701,8 @@ Sensitive personal and homelab documents (genealogy, IT notes, legal scans) live
 | OKF Pydantic models + round-trip markdown | ✅ Done | `app/models/okf.py` |
 | Constants, exceptions | ✅ Done | `app/constants.py`, `app/exceptions.py` |
 | LLM client (Ollama) | ✅ Done | `app/services/llm_client.py` |
-| Text extraction (PDF via pdfplumber) | ✅ Done | `app/services/text_extraction.py` |
-| **Image ingest** | ❌ **Broken** | `.png`/`.jpg`/`.jpeg` in `SUPPORTED_DOCUMENT_SUFFIXES` but `extract_text_from_file()` calls `read_text()` on non-PDF files — produces garbage, not `DocumentIngestError`. `easyocr` in deps but unused. |
+| Text extraction (PDF via pdfplumber) | ✅ Done | `app/services/transcription.py` |
+| **Image ingest** | ❌ **Broken** | `.png`/`.jpg`/`.jpeg` in `SUPPORTED_DOCUMENT_SUFFIXES` but `transcribe_file()` calls `read_text()` on non-PDF files — produces garbage, not `DocumentIngestError`. `easyocr` in deps but unused. |
 | Folder ingest (co-located `.md`) | ✅ Done | `app/services/ingest.py` |
 | Extraction prompts | ✅ Done | `prompts/extraction_system.md` |
 | Reasoning prompts (not wired) | ✅ Done | `prompts/reasoning_derive.md`, `reasoning_dream.md` |
@@ -774,7 +774,7 @@ graph TB
         CFG[app/config.py<br/>YAML + env]
         WCH[app/services/watcher.py<br/>watchdog]
         ING[app/services/ingest.py]
-        TXT[app/services/text_extraction.py]
+        TXT[app/services/transcription.py]
         LLM[app/services/llm_client.py]
         KB[app/services/kb_manager.py]
         ENR[app/services/enrichment.py]
@@ -886,7 +886,7 @@ app/
   services/
     ingest.py               # existing — orchestration entry; thin after PR 6b
     ingest_orchestrator.py  # NEW (PR 6b) — wires KB + enrichment + jobs + derive hook
-    text_extraction.py      # existing — add easyocr; fail-fast for images (PR 3a)
+    transcription.py      # existing — add easyocr; fail-fast for images (PR 3a)
     llm_client.py           # existing — add derive/dream helpers
     prompts.py              # existing — add load_derive_prompt, load_dream_prompt
     kb_manager.py           # NEW — read/write MDs, index.md, linking
@@ -938,7 +938,7 @@ sequenceDiagram
     participant J as jobs.py
     participant O as ingest_orchestrator.py
     participant I as ingest.py
-    participant T as text_extraction.py
+    participant T as transcription.py
     participant L as llm_client.py
     participant E as enrichment.py
     participant K as kb_manager.py
@@ -948,7 +948,7 @@ sequenceDiagram
     W->>J: enqueue_ingest(path) [dedup guard]
     J->>O: run_ingest_pipeline(path)
     O->>I: ingest_document_file(path)
-    I->>T: extract_text_from_file(path)
+    I->>T: transcribe_file(path)
     alt PDF with text layer
         T-->>I: pdfplumber text
     else Image / scanned PDF
@@ -2074,7 +2074,7 @@ Phase 3 "done" = PR 15 merged with 5 MCP tools. PR 16 rerank optional; PR 17–1
 ## References
 
 - `DEVELOPMENT_PLAN.md`, `README.md`, `pyproject.toml`
-- `app/models/okf.py`, `app/services/ingest.py`, `app/services/text_extraction.py`
+- `app/models/okf.py`, `app/services/ingest.py`, `app/services/transcription.py`
 - `prompts/extraction_system.md`, `reasoning_derive.md`, `reasoning_dream.md`
 - Google OKF spec v0.1; Honcho loop concept (adapted)
 
@@ -2154,7 +2154,7 @@ Revised ordering per review. Dependencies corrected.
 **Dependencies:** PR 1
 
 **Files:**
-- `app/services/text_extraction.py`, `app/constants.py`
+- `app/services/transcription.py`, `app/constants.py`
 - `tests/test_text_extraction.py`
 
 **Description:** Until OCR lands, raise `DocumentIngestError("Image OCR not yet implemented")` for image suffixes instead of `read_text()` garbage. Prevents silent corruption.
@@ -2165,7 +2165,7 @@ Revised ordering per review. Dependencies corrected.
 **Dependencies:** PR 3a
 
 **Files:**
-- `app/services/text_extraction.py` (easyocr integration)
+- `app/services/transcription.py` (easyocr integration)
 - `tests/test_text_extraction.py` (binary image fixtures)
 - `tests/fixtures/images/sample.png`
 

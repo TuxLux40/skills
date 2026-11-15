@@ -352,6 +352,11 @@ plus "and browse it non-recursively" instructions.
 
 ## Ingest
 
+Terms used below: **transcribe** = read the raw text out of a source file (pdfplumber, marker, OCR with
+OCRmyPDF or tesseract); the result is the **transcript**. **Extract** = the model pulls the facts and
+identifiers out of a transcript into OKF Markdown. **Ingest** = the whole run: transcribe, extract,
+verify, write the aggregate.
+
 Requires an OpenAI-compatible LLM server (LM Studio, llama.cpp `llama-server`, Ollama, vLLM).
 Check reachability before starting: `curl -s $SMART_OKF_LLM_HOST/v1/models`.
 

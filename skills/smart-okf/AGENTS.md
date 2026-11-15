@@ -14,7 +14,7 @@ automates extract; the dream pass (`scripts/dream.py` → `synthesis.md`) is the
 ```
 Document folders (local storage)
         ↓ manual or cron-scheduled ingest (incremental via source_hashes)
-app/services/ingest.py  →  text_extraction (+ in-place OCRmyPDF)  →  llm_client  →  one OKF .md per folder
+app/services/ingest.py  →  transcription (+ in-place OCRmyPDF)  →  llm_client  →  one OKF .md per folder
         ↓
 Humans browse folders · agents query via the smart-okf skill + ripgrep
 ```
@@ -30,7 +30,7 @@ Humans browse folders · agents query via the smart-okf skill + ripgrep
 | `app/services/ports.py` | Protocols (`ReviewQueuePort`) |
 | `app/services/ingest.py` | Per-folder aggregate ingest (non-recursive, hash-incremental) |
 | `app/services/llm_client.py` | OpenAI-compatible chat + extraction (Ollama, llama.cpp, vLLM, …) |
-| `app/services/text_extraction.py` | PDF/docx/eml/csv/xlsx text + in-place OCRmyPDF for scanned PDFs |
+| `app/services/transcription.py` | PDF/docx/eml/csv/xlsx text + in-place OCRmyPDF for scanned PDFs |
 | `app/services/prompts.py` | Load prompt markdown |
 | `scripts/ingest_folder.py` | CLI wrapper (cron-friendly, --host/--model flags) |
 | `prompts/` | LLM system prompts |

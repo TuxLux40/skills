@@ -7,7 +7,7 @@ import pytest
 from docx import Document as DocxDocument
 
 from app.exceptions import DocumentIngestError, EncryptedDocumentError
-from app.services.text_extraction import extract_text_from_file, is_supported_document
+from app.services.transcription import is_supported_document, transcribe_file
 
 
 def test_is_supported_document_covers_new_suffixes() -> None:
@@ -21,14 +21,14 @@ def test_extract_text_from_unreadable_image_raises_clear_ocr_error(tmp_path: Pat
     image_path.write_bytes(b"\x89PNG fake bytes")
 
     with pytest.raises(DocumentIngestError, match="OCR"):
-        extract_text_from_file(image_path)
+        transcribe_file(image_path)
 
 
 def test_extract_text_from_csv_reads_plain_text(tmp_path: Path) -> None:
     csv_path = tmp_path / "records.csv"
     csv_path.write_text("name,value\nfoo,1\n", encoding="utf-8")
 
-    assert "name,value" in extract_text_from_file(csv_path)
+    assert "name,value" in transcribe_file(csv_path)
 
 
 def test_extract_text_from_docx_reads_paragraphs_and_tables(tmp_path: Path) -> None:
@@ -40,7 +40,7 @@ def test_extract_text_from_docx_reads_paragraphs_and_tables(tmp_path: Path) -> N
     table.rows[0].cells[1].text = "42"
     document.save(str(docx_path))
 
-    text = extract_text_from_file(docx_path)
+    text = transcribe_file(docx_path)
 
     assert "Dear User," in text
     assert "Invoice" in text
@@ -52,7 +52,7 @@ def test_encrypted_ooxml_is_detected_and_skipped(tmp_path: Path) -> None:
     encrypted = tmp_path / "protected.docx"
     encrypted.write_bytes(b"\xd0\xcf\x11\xe0" + b"\x00" * 512)
     with pytest.raises(EncryptedDocumentError, match="password-protected"):
-        extract_text_from_file(encrypted)
+        transcribe_file(encrypted)
 
 
 def test_encrypted_document_error_is_a_document_ingest_error(tmp_path: Path) -> None:
@@ -60,7 +60,7 @@ def test_encrypted_document_error_is_a_document_ingest_error(tmp_path: Path) -> 
     encrypted = tmp_path / "protected.xlsx"
     encrypted.write_bytes(b"\xd0\xcf\x11\xe0" + b"\x00" * 512)
     with pytest.raises(DocumentIngestError):
-        extract_text_from_file(encrypted)
+        transcribe_file(encrypted)
 
 
 def test_extract_text_from_xlsx_reads_cells(tmp_path: Path) -> None:
@@ -73,7 +73,7 @@ def test_extract_text_from_xlsx_reads_cells(tmp_path: Path) -> None:
     sheet.append(["Rent", 900])
     workbook.save(str(xlsx_path))
 
-    text = extract_text_from_file(xlsx_path)
+    text = transcribe_file(xlsx_path)
 
     assert "Sheet1" in text
     assert "Rent" in text
@@ -93,14 +93,14 @@ def test_extract_text_from_eml_reads_headers_and_body(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    text = extract_text_from_file(eml_path)
+    text = transcribe_file(eml_path)
 
     assert "Subject: Appointment reminder" in text
     assert "Your appointment is on Friday." in text
 
 
 def test_non_pdf_files_never_touch_marker(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """marker is only ever consulted for .pdf, regardless of ExtractionOptions default."""
+    """marker is only ever consulted for .pdf, regardless of TranscriptionOptions default."""
     import shutil
 
     def _fail_if_called(*args: object, **kwargs: object) -> None:
@@ -111,7 +111,7 @@ def test_non_pdf_files_never_touch_marker(tmp_path: Path, monkeypatch: pytest.Mo
     text_path = tmp_path / "notes.txt"
     text_path.write_text("plain text, no marker involved", encoding="utf-8")
 
-    assert extract_text_from_file(text_path) == "plain text, no marker involved"
+    assert transcribe_file(text_path) == "plain text, no marker involved"
 
 
 def test_use_marker_defaults_to_true_for_pdf(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -123,7 +123,7 @@ def test_use_marker_defaults_to_true_for_pdf(tmp_path: Path, monkeypatch: pytest
     pdf_path.write_bytes(b"%PDF-1.4\n%%EOF")
 
     with pytest.raises(DocumentIngestError, match="marker_single"):
-        extract_text_from_file(pdf_path)
+        transcribe_file(pdf_path)
 
 
 def test_use_marker_true_raises_clear_error_when_binary_missing(
@@ -131,14 +131,14 @@ def test_use_marker_true_raises_clear_error_when_binary_missing(
 ) -> None:
     import shutil
 
-    from app.services.extraction_options import ExtractionOptions
+    from app.services.transcription_options import TranscriptionOptions
 
     monkeypatch.setattr(shutil, "which", lambda _name: None)
     pdf_path = tmp_path / "doc.pdf"
     pdf_path.write_bytes(b"%PDF-1.4\n%%EOF")
 
     with pytest.raises(DocumentIngestError, match="marker_single"):
-        extract_text_from_file(pdf_path, ExtractionOptions(use_marker=True))
+        transcribe_file(pdf_path, TranscriptionOptions(use_marker=True))
 
 
 def test_use_marker_true_uses_marker_output_when_binary_present(
@@ -148,7 +148,7 @@ def test_use_marker_true_uses_marker_output_when_binary_present(
     import subprocess
     from pathlib import Path as _Path
 
-    from app.services.extraction_options import ExtractionOptions
+    from app.services.transcription_options import TranscriptionOptions
 
     monkeypatch.setattr(shutil, "which", lambda _name: "/usr/local/bin/marker_single")
 
@@ -161,25 +161,25 @@ def test_use_marker_true_uses_marker_output_when_binary_present(
     pdf_path = tmp_path / "doc.pdf"
     pdf_path.write_bytes(b"%PDF-1.4\n%%EOF")
 
-    text = extract_text_from_file(pdf_path, ExtractionOptions(use_marker=True))
+    text = transcribe_file(pdf_path, TranscriptionOptions(use_marker=True))
 
     assert "Extracted table content." in text
 
 
 def test_read_only_extraction_never_ocr_rewrites_scanned_pdf(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """LIGHT_EXTRACTION (transcript backfill) must raise on a scanned PDF, not mutate it."""
-    from app.services import text_extraction
-    from app.services.extraction_options import LIGHT_EXTRACTION
+    """LIGHT_TRANSCRIPTION (transcript backfill) must raise on a scanned PDF, not mutate it."""
+    from app.services import transcription
+    from app.services.transcription_options import LIGHT_TRANSCRIPTION
 
-    monkeypatch.setattr(text_extraction, "_read_pdf_text", lambda _path: "")
+    monkeypatch.setattr(transcription, "_read_pdf_text", lambda _path: "")
 
     def _must_not_be_called(_path: Path) -> None:
         raise AssertionError("ocr_pdf_in_place must not run in a read-only pass")
 
-    monkeypatch.setattr(text_extraction, "ocr_pdf_in_place", _must_not_be_called)
+    monkeypatch.setattr(transcription, "ocr_pdf_in_place", _must_not_be_called)
 
     pdf_path = tmp_path / "scan.pdf"
     pdf_path.write_bytes(b"%PDF-1.4\n%%EOF")
 
     with pytest.raises(DocumentIngestError, match="read-only"):
-        extract_text_from_file(pdf_path, LIGHT_EXTRACTION)
+        transcribe_file(pdf_path, LIGHT_TRANSCRIPTION)

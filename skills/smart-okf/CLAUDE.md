@@ -38,13 +38,13 @@ CI (`.github/workflows/python.yml`) runs the same ruff/mypy/pytest checks on pus
 ```
 Document folders (local storage)
         ↓ manual or cron-scheduled ingest (incremental via source_hashes)
-app/services/ingest.py  →  text_extraction (+ in-place OCRmyPDF)  →  llm_client  →  one OKF .md per folder
+app/services/ingest.py  →  transcription (+ in-place OCRmyPDF)  →  llm_client  →  one OKF .md per folder
         ↓
 Humans browse folders · agents query via the smart-okf skill + ripgrep
 ```
 
 - **OKF documents** (`app/models/okf.py`): `OKFFrontmatter` (Pydantic, `extra: allow`, required `type`, provenance via `source`) + `OKFDocument` (frontmatter + markdown body). `to_markdown`/`from_markdown` round-trip the `---` YAML frontmatter block; `add_link` appends to a `## Related` section in the body.
-- **Ingest pipeline** (`app/services/ingest.py`): walks a folder tree; per directory (non-recursive) extracts text from each supported file (`text_extraction.py` — pdfplumber plus in-place OCRmyPDF for scanned PDFs; `.docx`/`.eml`/`.csv`/`.xlsx` native; standalone images skipped), runs one LLM extraction per changed file (`llm_client.py`, any OpenAI-compatible server via `SMART_OKF_LLM_HOST`/`SMART_OKF_LLM_MODEL`), and merges results into one `FolderSummary` aggregate per folder. Incremental: `source_hashes` frontmatter (SHA-256 per source) lets unchanged files reuse their existing aggregate section without an LLM call; in-place OCR rewrites the PDF, so hashes are recomputed after extraction.
+- **Ingest pipeline** (`app/services/ingest.py`): walks a folder tree; per directory (non-recursive) transcribes each supported file to raw text (`transcription.py` — pdfplumber plus in-place OCRmyPDF for scanned PDFs; `.docx`/`.eml`/`.csv`/`.xlsx` native; standalone images skipped), runs one LLM extraction per changed file (`llm_client.py`, any OpenAI-compatible server via `SMART_OKF_LLM_HOST`/`SMART_OKF_LLM_MODEL`), and merges results into one `FolderSummary` aggregate per folder. Incremental: `source_hashes` frontmatter (SHA-256 per source) lets unchanged files reuse their existing aggregate section without an LLM call; in-place OCR rewrites the PDF, so hashes are recomputed after extraction.
 - **Prompts** live in `prompts/*.md`; `dream_synthesis.md` powers the shipped dream pass (`app/services/dream.py` + `scripts/dream.py` → root `synthesis.md`, `type: Synthesis`, hash-incremental). `reasoning_derive.md`/`reasoning_dream.md` remain as seeds for deeper R2 matter passes.
 - **`app/services/ports.py`** defines Protocols (e.g. `ReviewQueuePort`) for pieces not yet implemented — code against the protocol, not a concrete class, when building against planned Phase 1+ components.
 - **Immutability convention**: ingest defaults are applied via `apply_ingest_defaults()` + `model_copy` rather than mutating frontmatter in place.

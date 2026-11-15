@@ -1,4 +1,4 @@
-"""Text extraction helpers for ingest pipeline.
+"""Transcription helpers for the ingest pipeline: source file in, raw text (the transcript) out.
 
 Scanned PDFs (no text layer) are OCRed **in place** with OCRmyPDF before extraction:
 the text layer is embedded into the original PDF (searchable/editable ever after) and
@@ -10,7 +10,7 @@ PDF extraction defaults to an external `marker` CLI backend (layout-aware: table
 — **not** a pip dependency of this project; onboarding installs `marker-pdf` externally
 (`marker_single` on PATH), same pattern as `tesseract`/`ghostscript`. GPL-3.0 code +
 modified OpenRAIL-M weights stay outside this MIT graph. Opt out via
-`ExtractionOptions(use_marker=False)` / CLI `--no-marker` for pdfplumber + in-place
+`TranscriptionOptions(use_marker=False)` / CLI `--no-marker` for pdfplumber + in-place
 OCRmyPDF. See README.md.
 """
 
@@ -28,7 +28,7 @@ from docx import Document as DocxDocument
 
 from app.constants import IMAGE_DOCUMENT_SUFFIXES, OCR_LANGUAGES, SUPPORTED_DOCUMENT_SUFFIXES, TEXT_FILE_ENCODING
 from app.exceptions import DocumentIngestError, EncryptedDocumentError
-from app.services.extraction_options import DEFAULT_EXTRACTION, ExtractionOptions
+from app.services.transcription_options import DEFAULT_TRANSCRIPTION, TranscriptionOptions
 
 _OLE_MAGIC = b"\xd0\xcf\x11\xe0"
 """OLE2 compound-file header. Encrypted OOXML (.docx/.xlsx) is wrapped in this container
@@ -64,37 +64,37 @@ def _raise_if_encrypted(file_path: Path) -> None:
                 return
 
 
-def extract_text_from_file(
+def transcribe_file(
     file_path: Path,
-    options: ExtractionOptions = DEFAULT_EXTRACTION,
+    options: TranscriptionOptions = DEFAULT_TRANSCRIPTION,
 ) -> str:
     """Extract text from a supported document.
 
     With `options.use_marker` (default True), `.pdf` extraction goes through the marker CLI
     backend for layout-aware extraction (tables, forms). Onboarding installs `marker_single`
     as a prerequisite; explicit-fail rather than silent fallback if missing. Pass
-    `ExtractionOptions(use_marker=False)` (CLI: `--no-marker`) for pdfplumber/OCRmyPDF only.
+    `TranscriptionOptions(use_marker=False)` (CLI: `--no-marker`) for pdfplumber/OCRmyPDF only.
     """
     suffix = file_path.suffix.lower()
     _raise_if_encrypted(file_path)
     if suffix in IMAGE_DOCUMENT_SUFFIXES:
-        return _extract_text_from_image(file_path)
+        return _transcribe_image(file_path)
     if suffix == ".pdf":
         if options.use_marker:
             if not marker_available():
                 raise DocumentIngestError("marker_single not found on PATH; install marker-pdf or pass --no-marker")
-            return _extract_text_from_pdf_via_marker(file_path)
-        return _extract_text_from_pdf(file_path, allow_ocr_rewrite=options.allow_ocr_rewrite)
+            return _transcribe_pdf_via_marker(file_path)
+        return _transcribe_pdf(file_path, allow_ocr_rewrite=options.allow_ocr_rewrite)
     if suffix == ".docx":
-        return _extract_text_from_docx(file_path)
+        return _transcribe_docx(file_path)
     if suffix == ".eml":
-        return _extract_text_from_eml(file_path)
+        return _transcribe_eml(file_path)
     if suffix == ".xlsx":
-        return _extract_text_from_xlsx(file_path)
+        return _transcribe_xlsx(file_path)
     return file_path.read_text(encoding=TEXT_FILE_ENCODING, errors="ignore")
 
 
-def _extract_text_from_pdf(file_path: Path, *, allow_ocr_rewrite: bool = True) -> str:
+def _transcribe_pdf(file_path: Path, *, allow_ocr_rewrite: bool = True) -> str:
     """Extract plain text from a PDF; OCR scanned PDFs in place first (when permitted).
 
     With `allow_ocr_rewrite=False` (read-only paths like transcript backfill), a scanned
@@ -171,12 +171,12 @@ def _marker_error_detail(error: BaseException) -> str:
     return str(error)
 
 
-def _extract_text_from_pdf_via_marker(file_path: Path) -> str:
+def _transcribe_pdf_via_marker(file_path: Path) -> str:
     """Shell out to a user-installed `marker_single` CLI for layout-aware PDF extraction.
 
     Marker is never a pip dependency of smart-okf — onboarding installs `marker-pdf`
     externally (pipx/sibling venv). This path does not run OCRmyPDF in-place; marker
-    handles layout + any OCR it needs itself. Use `ExtractionOptions(use_marker=False)`
+    handles layout + any OCR it needs itself. Use `TranscriptionOptions(use_marker=False)`
     for the pdfplumber + in-place OCRmyPDF pipeline (searchable PDF rewrite).
     """
     with tempfile.TemporaryDirectory() as out_dir:
@@ -197,7 +197,7 @@ def _extract_text_from_pdf_via_marker(file_path: Path) -> str:
         return produced.read_text(encoding="utf-8")
 
 
-def _extract_text_from_image(file_path: Path) -> str:
+def _transcribe_image(file_path: Path) -> str:
     """OCR a standalone image via tesseract (read-only; the image is not modified)."""
     try:
         completed = subprocess.run(
@@ -215,7 +215,7 @@ def _extract_text_from_image(file_path: Path) -> str:
     return completed.stdout
 
 
-def _extract_text_from_docx(file_path: Path) -> str:
+def _transcribe_docx(file_path: Path) -> str:
     """Extract paragraph and table text from a .docx file."""
     document = DocxDocument(str(file_path))
     parts = [paragraph.text for paragraph in document.paragraphs if paragraph.text]
@@ -227,7 +227,7 @@ def _extract_text_from_docx(file_path: Path) -> str:
     return "\n".join(parts)
 
 
-def _extract_text_from_eml(file_path: Path) -> str:
+def _transcribe_eml(file_path: Path) -> str:
     """Extract headers + plain-text body from a .eml email file."""
     raw = file_path.read_bytes()
     message = message_from_bytes(raw)
@@ -251,7 +251,7 @@ def _extract_eml_body(message: Message) -> str:
     return str(message.get_payload())
 
 
-def _extract_text_from_xlsx(file_path: Path) -> str:
+def _transcribe_xlsx(file_path: Path) -> str:
     """Extract cell text from all sheets in an .xlsx workbook."""
     workbook = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
     lines: list[str] = []

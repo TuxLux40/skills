@@ -1,4 +1,4 @@
-"""Shared extraction policy for ingest + text extraction.
+"""Shared transcription policy for ingest (how source files become raw text).
 
 Keeps backend flags (marker, future backends) in one place instead of threading
 booleans through every ingest signature.
@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
-class ExtractionOptions:
+class TranscriptionOptions:
     """How to turn source files into raw text before LLM structuring.
 
     `use_marker` — shell out to external `marker_single` for PDFs (default on).
@@ -27,5 +27,5 @@ class ExtractionOptions:
 
 # Light path for transcript backfill / cheap re-reads — never cold-starts marker,
 # never mutates source files (no in-place OCR).
-LIGHT_EXTRACTION = ExtractionOptions(use_marker=False, allow_ocr_rewrite=False)
-DEFAULT_EXTRACTION = ExtractionOptions()
+LIGHT_TRANSCRIPTION = TranscriptionOptions(use_marker=False, allow_ocr_rewrite=False)
+DEFAULT_TRANSCRIPTION = TranscriptionOptions()

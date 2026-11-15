@@ -398,7 +398,7 @@ def test_image_falls_back_to_tesseract_when_no_vision_model(tmp_path: Path, monk
         assert file_path.suffix == ".jpg"
         return "tesseract OCR output"
 
-    monkeypatch.setattr(ingest_module, "extract_text_from_file", _fake_extract_text_from_file)
+    monkeypatch.setattr(ingest_module, "transcribe_file", _fake_extract_text_from_file)
     (tmp_path / "meter.jpg").write_bytes(b"\xff\xd8\xff fake jpeg bytes")
 
     result = ingest_folder(str(tmp_path), client=_NoVisionClient())  # type: ignore[arg-type]

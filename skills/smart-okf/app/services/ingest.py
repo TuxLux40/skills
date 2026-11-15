@@ -29,11 +29,11 @@ from app.constants import (
 from app.exceptions import DocumentIngestError, LLMClientError
 from app.models.okf import OKFDocument, OKFFrontmatter
 from app.services.chunking import chunk_text
-from app.services.extraction_options import DEFAULT_EXTRACTION, LIGHT_EXTRACTION, ExtractionOptions
 from app.services.fact_verification import FactVerificationResult, verify_extraction
 from app.services.gating import GatingRules, is_blocked_for_remote, is_excluded
 from app.services.llm_client import LLMClient
-from app.services.text_extraction import extract_text_from_file, is_supported_document
+from app.services.transcription import is_supported_document, transcribe_file
+from app.services.transcription_options import DEFAULT_TRANSCRIPTION, LIGHT_TRANSCRIPTION, TranscriptionOptions
 from app.types import FrontmatterPatch
 
 _SOURCE_MARKER_PATTERN = re.compile(r"^_Source: (?P<name>.+)_$", re.MULTILINE)
@@ -126,7 +126,7 @@ def extract_document(
     root: Path,
     client: LLMClient,
     *,
-    options: ExtractionOptions = DEFAULT_EXTRACTION,
+    options: TranscriptionOptions = DEFAULT_TRANSCRIPTION,
     verify_client: LLMClient | None = None,
 ) -> tuple[OKFDocument, FactVerificationResult]:
     """Extract and structure one document into an OKF document (no aggregate write).
@@ -145,7 +145,7 @@ def extract_document(
     if file_path.suffix.lower() in IMAGE_DOCUMENT_SUFFIXES and client.vision_model is not None:
         raw_text = client.describe_image(file_path, context=context)
     else:
-        raw_text = extract_text_from_file(file_path, options)
+        raw_text = transcribe_file(file_path, options)
     if not raw_text.strip():
         raise DocumentIngestError(f"No extractable text in {file_path}")
     write_transcript(file_path, root, raw_text)
@@ -292,7 +292,7 @@ def ingest_folder(
     folder: str,
     client: LLMClient | None = None,
     *,
-    options: ExtractionOptions = DEFAULT_EXTRACTION,
+    options: TranscriptionOptions = DEFAULT_TRANSCRIPTION,
     verbose: bool = False,
     verify_client: LLMClient | None = None,
     rules: GatingRules | None = None,
@@ -363,7 +363,7 @@ def ingest_folder(
 def _backfill_transcript(file_path: Path, root: Path, client: LLMClient) -> None:
     """Write a missing transcript for an already-ingested file, best-effort and read-only.
 
-    Uses LIGHT_EXTRACTION: never shells into marker, never OCR-rewrites a scanned PDF —
+    Uses LIGHT_TRANSCRIPTION: never shells into marker, never OCR-rewrites a scanned PDF —
     a pass over an unchanged folder must not mutate its files or cold-start heavy tools.
     Images are skipped when a vision model is configured: a tesseract-only transcript
     would contradict the vision-derived aggregate section, and the vision call is not
@@ -374,7 +374,7 @@ def _backfill_transcript(file_path: Path, root: Path, client: LLMClient) -> None
     if transcript_path(file_path, root).exists():
         return
     with contextlib.suppress(DocumentIngestError):
-        write_transcript(file_path, root, extract_text_from_file(file_path, LIGHT_EXTRACTION))
+        write_transcript(file_path, root, transcribe_file(file_path, LIGHT_TRANSCRIPTION))
 
 
 def _remove_orphan_aggregate(directory: Path, result: IngestFolderResult, *, verbose: bool) -> None:
@@ -402,7 +402,7 @@ def _ingest_directory(
     client: LLMClient,
     result: IngestFolderResult,
     *,
-    options: ExtractionOptions,
+    options: TranscriptionOptions,
     verbose: bool,
     verify_client: LLMClient | None = None,
     rules: GatingRules | None = None,

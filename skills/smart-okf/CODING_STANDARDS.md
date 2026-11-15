@@ -33,7 +33,7 @@ Architecture: [`docs/DESIGN.md`](docs/DESIGN.md)
 | Long functions (>50 lines) | Extract helpers in same module or `services/` |
 | Deep nesting | Early returns / guard clauses |
 | Magic numbers/strings | `app/constants.py` |
-| Duplicate ingest/OCR logic | `app/services/ingest.py`, `text_extraction.py` |
+| Duplicate ingest/OCR logic | `app/services/ingest.py`, `transcription.py` |
 | Mutating Pydantic models in place | `model_copy(update=...)` |
 
 ---

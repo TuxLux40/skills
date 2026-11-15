@@ -39,7 +39,7 @@ uv run pytest -q
 
 | Kind | Style | Examples |
 |------|-------|----------|
-| Modules | `snake_case` | `kb_manager.py`, `text_extraction.py` |
+| Modules | `snake_case` | `kb_manager.py`, `transcription.py` |
 | Classes | `PascalCase` | `OKFDocument`, `LLMClient` |
 | Functions | `snake_case` | `ingest_document_file`, `load_prompt` |
 | Constants | `SCREAMING_SNAKE` | `DEFAULT_LLM_MODEL`, `SUPPORTED_DOCUMENT_SUFFIXES` |
@@ -76,7 +76,7 @@ app/
   constants.py       # shared defaults
   exceptions.py      # SmartOkfError hierarchy
   models/            # Pydantic / OKF models
-  services/          # business logic (ingest, llm, prompts, text_extraction, …)
+  services/          # business logic (ingest, llm, prompts, transcription, …)
   ui/                # Streamlit
 scripts/             # CLI entrypoints
 tests/               # pytest
