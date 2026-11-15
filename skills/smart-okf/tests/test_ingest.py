@@ -338,7 +338,7 @@ def test_oversized_document_is_chunked_and_merged_into_one_section(tmp_path: Pat
     result = ingest_folder(str(tmp_path), client=client)  # type: ignore[arg-type]
 
     assert len(client.calls) > 1
-    assert all("part" in call for call in client.calls)
+    assert all(call == "" for call in client.calls)
     aggregate = (tmp_path / f"{tmp_path.name}.md").read_text(encoding="utf-8")
     assert len(re.findall(r"^## ", aggregate, flags=re.MULTILINE)) == 1  # exactly one real h2 section
     assert aggregate.count("### Facts") > 1  # each chunk's own heading demoted, not dropped
@@ -840,4 +840,3 @@ def test_extraction_never_sees_the_file_name(tmp_path: Path) -> None:
 
     assert seen
     assert not any("2019-07-05" in context or "SCHMITZ" in context or "2020-01-01" in context for context in seen)
-    assert any("part 1" in context for context in seen)  # chunked documents still tell the model which part it sees

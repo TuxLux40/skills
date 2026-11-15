@@ -152,10 +152,11 @@ def extract_document(
 
     chunks = chunk_text(raw_text)
     documents: list[OKFDocument] = []
-    for i, chunk in enumerate(chunks):
-        # The file name stays out of the extraction prompt: a model that sees "2019-07-05--Beleg.pdf" tends to
-        # treat the date in it as a fact of the document. The `source` field is filled from the path in code.
-        chunk_context = "" if len(chunks) == 1 else f"part {i + 1}/{len(chunks)} of one document"
+    for chunk in chunks:
+        # Neither the file name nor a "part i/n" label goes into the extraction prompt: the model echoes both
+        # into the page ("Dateiname", "Teil 2/3"), and fact verification then flags them as not in the source.
+        # The `source` field is filled from the path in code.
+        chunk_context = ""
         extracted_markdown = client.extract_structured(chunk, context=chunk_context)
         try:
             documents.append(OKFDocument.from_markdown(extracted_markdown))

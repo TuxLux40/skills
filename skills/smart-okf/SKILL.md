@@ -167,7 +167,7 @@ do not re-read every original PDF for facts that were already distilled.
    instead: the file is reported as skipped, retried on the next run, and an earlier section of the same
    file is kept. Use it when a fabricated fact in the knowledge base is worse than a missing one. The
    extraction prompt does not receive the file name at all (a date in it is not a fact of the document),
-   only which part of a long document it sees.
+   nor a part label for chunked documents.
 
    For folders that are too sensitive for a hosted model, add `local_only_patterns`: those files are
    skipped (and logged) while the extractor is remote and ingested normally once it is local, and
