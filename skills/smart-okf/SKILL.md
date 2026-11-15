@@ -1,6 +1,11 @@
 ---
 name: smart-okf
-description: Ingest and query a local-first OKF knowledge base of personal documents (health, insurance, government, providers/ISP, finances, contracts). Turns folders of PDFs, docx, eml, csv, xlsx, and txt files into one aggregate OKF markdown file per folder using a local OpenAI-compatible LLM, then answers questions from those aggregates. Use this skill whenever the user asks to ingest/OCR/index their documents, update or rebuild their document knowledge base, or asks a question answerable from their personal documents — "what does my ISP contract say", "when was my last doctor visit", "find my insurance policy number" — even if they don't mention OKF or smart-okf by name.
+description: Ingest and query a local-first OKF knowledge base of personal documents. Turns folders of PDFs, docx, eml, csv, xlsx and txt files into one aggregate Markdown file per folder with an OpenAI-compatible LLM, then answers questions from those aggregates. Use when the user asks to ingest, OCR or index their documents, rebuild the knowledge base, or asks something their documents answer ("what does my ISP contract say", "find my insurance policy number"), even without naming OKF or smart-okf.
+author: TuxLux40
+license: MIT
+repository: https://github.com/TuxLux40/skills
+version: 2.0.0
+keywords: [documents, knowledge-base, okf, ocr, rag, markdown, local-first]
 ---
 # smart-okf — personal document knowledge base
 
