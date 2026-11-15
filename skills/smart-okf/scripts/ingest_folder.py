@@ -128,6 +128,7 @@ def main() -> None:
     )
     derive_per_file = config.derive_per_file if config is not None else False
     generate_readme = config.generate_readme if config is not None else True
+    on_flagged = config.on_flagged if config is not None else "keep"
 
     combined = IngestFolderResult(root=Path(folders[0]))
     for folder in folders:
@@ -183,6 +184,7 @@ def main() -> None:
             derive_per_file=derive_per_file,
             generate_readme=generate_readme,
             force=args.force,
+            on_flagged=on_flagged,
         )
         combined.written_paths.extend(result.written_paths)
         combined.unchanged_dirs.extend(result.unchanged_dirs)

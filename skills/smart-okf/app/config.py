@@ -11,7 +11,7 @@ import contextvars
 import ipaddress
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import urlparse
 
 import yaml
@@ -170,6 +170,12 @@ class SmartOkfConfig(BaseSettings):
     """Glob patterns (root-relative path or bare filename) for sensitive files that only a local
     model may read. While the extractor is remote (`uses_remote_llm()`) they are skipped like excluded
     files; with a local model they are ingested normally. Existing aggregates are left untouched."""
+
+    on_flagged: Literal["keep", "skip"] = "keep"
+    """What to do with an extraction that fact verification flags as not traceable to its source.
+    `keep` (default): write it into the aggregate with a visible `_Verification: FLAGGED` line.
+    `skip`: hold it back, so a possibly fabricated section never reaches the aggregate; the file is
+    reported as skipped and retried on the next run, and any earlier section of that file is kept."""
 
     use_marker: bool = True
     """Route PDF extraction through the marker CLI backend (layout-aware: tables, forms).

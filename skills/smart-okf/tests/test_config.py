@@ -230,3 +230,10 @@ def test_config_file_with_legacy_dream_keys_is_not_dropped(tmp_path: Path, monke
     config = load_config(tmp_path)
     assert config is not None
     assert config.synthesize_model == "old-name"
+
+
+def test_on_flagged_defaults_to_keep_and_rejects_unknown_values() -> None:
+    assert _config().on_flagged == "keep"
+    assert _config(on_flagged="skip").on_flagged == "skip"
+    with pytest.raises(ValidationError):
+        _config(on_flagged="drop")

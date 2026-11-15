@@ -162,6 +162,12 @@ do not re-read every original PDF for facts that were already distilled.
    their own exceptions; `priority_patterns` forces something back into deep analysis.
    Password-protected files are always skipped and logged automatically.
 
+   Fact verification checks every extraction against its source text. By default a flagged extraction is
+   still written, with a visible `_Verification: FLAGGED` line. Set `on_flagged: skip` to hold it back
+   instead: the file is reported as skipped, retried on the next run, and an earlier section of the same
+   file is kept. Use it when a fabricated fact in the knowledge base is worse than a missing one. The
+   extraction prompt also forbids taking dates, names or numbers from the file name.
+
    For folders that are too sensitive for a hosted model, add `local_only_patterns`: those files are
    skipped (and logged) while the extractor is remote and ingested normally once it is local, and
    an aggregate made earlier with a local model is left alone. A local proxy that forwards to a cloud

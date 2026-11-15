@@ -299,6 +299,7 @@ def ingest_folder(
     derive_per_file: bool = False,
     generate_readme: bool = True,
     force: bool = False,
+    on_flagged: str = "keep",
 ) -> IngestFolderResult:
     """Ingest supported documents from a folder, writing one aggregate `.md` per subfolder.
 
@@ -340,6 +341,7 @@ def ingest_folder(
             rules=gating_rules,
             derive_per_file=derive_per_file,
             force=force,
+            on_flagged=on_flagged,
         )
 
     write_rollups(root, result, verbose=verbose)
@@ -408,6 +410,7 @@ def _ingest_directory(
     rules: GatingRules | None = None,
     derive_per_file: bool = False,
     force: bool = False,
+    on_flagged: str = "keep",
 ) -> None:
     """Ingest the files directly inside one directory (non-recursive) into its aggregate.
 
@@ -485,6 +488,10 @@ def _ingest_directory(
             document, verification = extract_document(
                 file_path, root, client, options=options, verify_client=verify_client
             )
+            if not verification.passed and on_flagged == "skip":
+                raise DocumentIngestError(
+                    f"held back (on_flagged=skip): fact verification flagged this extraction: {verification.issue}"
+                )
         except Exception as error:  # noqa: BLE001 — one corrupt file must never abort the whole run
             result.skipped.append((file_path, str(error)))
             if file_path.name in old_sections and file_path.name in old_hashes:

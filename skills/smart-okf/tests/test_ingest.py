@@ -779,3 +779,45 @@ def test_local_only_block_keeps_an_existing_aggregate(tmp_path: Path) -> None:
     ingest_folder(str(tmp_path), client=_StubLLMClient(), rules=rules)  # type: ignore[arg-type]
 
     assert (health / "health.md").read_text(encoding="utf-8") == aggregate_before
+
+
+def test_on_flagged_skip_holds_back_a_flagged_extraction(tmp_path: Path) -> None:
+    providers = tmp_path / "providers"
+    providers.mkdir()
+    (providers / "isp.txt").write_text("ISP contract details", encoding="utf-8")
+
+    result = ingest_folder(
+        str(tmp_path),
+        client=_StubLLMClient(),  # type: ignore[arg-type]
+        verify_client=_FlaggingVerifyClient(),  # type: ignore[arg-type]
+        on_flagged="skip",
+    )
+
+    assert not (providers / "providers.md").exists()
+    assert result.flagged == []
+    assert any("isp.txt" in str(path) and "held back" in reason for path, reason in result.skipped)
+    assert result.exit_code == 2
+
+
+def test_on_flagged_skip_keeps_the_previous_section_of_a_changed_file(tmp_path: Path) -> None:
+    providers = tmp_path / "providers"
+    providers.mkdir()
+    (providers / "isp.txt").write_text("ISP contract details", encoding="utf-8")
+    ingest_folder(str(tmp_path), client=_StubLLMClient())  # type: ignore[arg-type]
+    before = (providers / "providers.md").read_text(encoding="utf-8")
+
+    (providers / "isp.txt").write_text("ISP contract details, changed", encoding="utf-8")
+    ingest_folder(
+        str(tmp_path),
+        client=_StubLLMClient(),  # type: ignore[arg-type]
+        verify_client=_FlaggingVerifyClient(),  # type: ignore[arg-type]
+        on_flagged="skip",
+    )
+
+    assert (providers / "providers.md").read_text(encoding="utf-8") == before
+
+
+def test_extraction_prompt_forbids_facts_from_the_file_name() -> None:
+    from app.services.prompts import load_extraction_prompt
+
+    assert "never take a date, name, amount or number from the file name" in load_extraction_prompt().lower()

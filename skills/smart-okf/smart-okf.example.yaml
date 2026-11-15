@@ -49,6 +49,11 @@ llm_model: gemma-4-e4b-it-qat
 # cloud service (a loopback proxy in front of a hosted API). Without it, local_only_patterns cannot tell.
 # llm_hosts_are_remote: true
 
+# What to do with an extraction that fact verification flags as not traceable to its source.
+# keep (default): write it with a visible "_Verification: FLAGGED" line. skip: hold it back so a
+# possibly fabricated section never reaches the aggregate (reported as skipped, retried next run).
+# on_flagged: skip
+
 # Also write one derived-facts file per document under .okf-facts/ (facts are always in the
 # folder aggregate regardless; this is the opt-in per-file artifact). Default false.
 # derive_per_file: false
