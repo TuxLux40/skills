@@ -66,3 +66,25 @@ def test_from_markdown_with_malformed_yaml_degrades_to_unknown_type() -> None:
 
     assert document.frontmatter.type == UNKNOWN_OKF_TYPE
     assert "Body text" in document.body
+
+
+def test_from_markdown_drops_an_invalid_field_instead_of_discarding_the_frontmatter() -> None:
+    content = (
+        "---\ntype: DocumentSummary\ntitle: Kaufbeleg\ntimestamp: unbekannt\n"
+        "identifiers:\n  rechnungsnummer: ['006502']\n---\n## Fakten\n- Betrag: 1350,00 EUR"
+    )
+
+    document = OKFDocument.from_markdown(content)
+
+    assert document.frontmatter.type == "DocumentSummary"
+    assert document.frontmatter.title == "Kaufbeleg"
+    assert document.frontmatter.identifiers == {"rechnungsnummer": ["006502"]}
+    assert document.body == "## Fakten\n- Betrag: 1350,00 EUR"
+    assert "type:" not in document.body
+
+
+def test_from_markdown_without_a_valid_type_still_degrades_to_unknown() -> None:
+    document = OKFDocument.from_markdown("---\ntitle: no type here\n---\nbody")
+
+    assert document.frontmatter.type == UNKNOWN_OKF_TYPE
+    assert "title: no type here" in document.body

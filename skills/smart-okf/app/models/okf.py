@@ -6,9 +6,10 @@ Recommended: title, description, tags, timestamp, resource/source.
 """
 
 from datetime import datetime
+from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from app.constants import (
     DEFAULT_LINK_LABEL,
@@ -65,6 +66,27 @@ class OKFFrontmatter(BaseModel):
         return yaml.dump(data, sort_keys=False, allow_unicode=True)
 
 
+def _lenient_frontmatter(data: dict[str, Any]) -> OKFFrontmatter:
+    """Build frontmatter, dropping individual fields the model got wrong instead of the whole block.
+
+    A model that writes `timestamp: unbekannt` would otherwise make the whole frontmatter invalid, and the
+    document would fall back to Unknown-type with every field (identifiers included) pasted into the body.
+    A missing or invalid `type` still raises, so that fallback remains for blocks that are not OKF at all.
+    """
+    remaining = dict(data)
+    for _ in range(len(remaining) + 1):
+        try:
+            return OKFFrontmatter(**remaining)
+        except ValidationError as error:
+            bad = {str(item["loc"][0]) for item in error.errors() if item["loc"]}
+            droppable = (bad & remaining.keys()) - {"type"}
+            if not droppable:
+                raise
+            for key in droppable:
+                remaining.pop(key)
+    return OKFFrontmatter(**remaining)
+
+
 class OKFDocument(BaseModel):
     """Full OKF document: frontmatter plus markdown body."""
 
@@ -91,7 +113,7 @@ class OKFDocument(BaseModel):
                 body = parts[2].strip()
                 try:
                     frontmatter_data = yaml.safe_load(frontmatter_raw) or {}
-                    frontmatter = OKFFrontmatter(**frontmatter_data)
+                    frontmatter = _lenient_frontmatter(frontmatter_data)
                 except Exception:
                     return cls(
                         frontmatter=OKFFrontmatter.model_validate({"type": UNKNOWN_OKF_TYPE}),
