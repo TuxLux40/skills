@@ -820,4 +820,24 @@ def test_on_flagged_skip_keeps_the_previous_section_of_a_changed_file(tmp_path: 
 def test_extraction_prompt_forbids_facts_from_the_file_name() -> None:
     from app.services.prompts import load_extraction_prompt
 
-    assert "never take a date, name, amount or number from the file name" in load_extraction_prompt().lower()
+    assert "not told the file name" in load_extraction_prompt().lower()
+
+
+def test_extraction_never_sees_the_file_name(tmp_path: Path) -> None:
+    seen: list[str] = []
+
+    class _RecordingClient(_StubLLMClient):
+        def extract_structured(self, raw_text: str, context: str = "") -> str:
+            seen.append(context)
+            return super().extract_structured(raw_text, context)
+
+    folder = tmp_path / "2019-07-05--Kaufbeleg_SCHMITZ"
+    folder.mkdir()
+    (folder / "2019-07-05--Kaufbeleg_SCHMITZ.txt").write_text("plain document text", encoding="utf-8")
+    (folder / "big-2020-01-01.txt").write_text("This is a paragraph of text. " * 2000, encoding="utf-8")
+
+    ingest_folder(str(tmp_path), client=_RecordingClient())  # type: ignore[arg-type]
+
+    assert seen
+    assert not any("2019-07-05" in context or "SCHMITZ" in context or "2020-01-01" in context for context in seen)
+    assert any("part 1" in context for context in seen)  # chunked documents still tell the model which part it sees

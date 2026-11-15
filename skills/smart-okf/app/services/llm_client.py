@@ -222,7 +222,8 @@ class LLMClient:
     def extract_structured(self, raw_text: str, context: str = "") -> str:
         """Extract structured OKF markdown from raw OCR or document text."""
         system_prompt = self._localized(load_extraction_prompt())
-        user_prompt = f"Context: {context}\n\nRaw content/OCR:\n{raw_text}{DEFAULT_EXTRACTION_USER_SUFFIX}"
+        context_line = f"Context: {context}\n\n" if context else ""
+        user_prompt = f"{context_line}Raw content/OCR:\n{raw_text}{DEFAULT_EXTRACTION_USER_SUFFIX}"
         return self.chat(system_prompt, user_prompt)
 
     def summarize_sections(self, merged_sections: str) -> str:
