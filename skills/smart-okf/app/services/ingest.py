@@ -31,7 +31,7 @@ from app.models.okf import OKFDocument, OKFFrontmatter
 from app.services.chunking import chunk_text
 from app.services.extraction_options import DEFAULT_EXTRACTION, LIGHT_EXTRACTION, ExtractionOptions
 from app.services.fact_verification import FactVerificationResult, verify_extraction
-from app.services.gating import GatingRules, is_excluded
+from app.services.gating import GatingRules, is_blocked_for_remote, is_excluded
 from app.services.llm_client import LLMClient
 from app.services.text_extraction import extract_text_from_file, is_supported_document
 from app.types import FrontmatterPatch
@@ -419,15 +419,25 @@ def _ingest_directory(
     gating_rules = rules or GatingRules()
     supported = sorted(f for f in directory.iterdir() if f.is_file() and is_supported_document(f))
     files: list[Path] = []
+    blocked_local_only = False
     for candidate in supported:
-        if is_excluded(str(candidate.relative_to(root)), gating_rules):
+        relative = str(candidate.relative_to(root))
+        if is_excluded(relative, gating_rules):
             result.skipped.append((candidate, "excluded by gating pattern (not ingested)"))
             if verbose:
                 print(f"  Excluded {candidate} (gating pattern)")
             continue
+        if is_blocked_for_remote(relative, gating_rules):
+            result.skipped.append((candidate, "local-only pattern, extractor is remote (not ingested)"))
+            blocked_local_only = True
+            if verbose:
+                print(f"  Held back {candidate} (local-only pattern, extractor is remote)")
+            continue
         files.append(candidate)
     if not files:
-        _remove_orphan_aggregate(directory, result, verbose=verbose)
+        # An aggregate made earlier with a local model must survive a run with a remote one.
+        if not blocked_local_only:
+            _remove_orphan_aggregate(directory, result, verbose=verbose)
         return
 
     summary_path = folder_summary_path(directory)

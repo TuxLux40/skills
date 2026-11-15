@@ -162,6 +162,12 @@ do not re-read every original PDF for facts that were already distilled.
    their own exceptions; `priority_patterns` forces something back into deep analysis.
    Password-protected files are always skipped and logged automatically.
 
+   For folders that are too sensitive for a hosted model, add `local_only_patterns`: those files are
+   skipped (and logged) while the extractor is remote and ingested normally once it is local, and
+   an aggregate made earlier with a local model is left alone. A local proxy that forwards to a cloud
+   API has a loopback hostname, so declare it with `llm_hosts_are_remote: true`; otherwise the
+   hostname check cannot see it.
+
 9. **Write `<document_root>/.smart-okf/config.yaml`** from what you learned (see
    [smart-okf.example.yaml](smart-okf.example.yaml): `llm_host`, `llm_model`, optional
    `vision_model` / `dream_model` / `dream_host` / `verify_model` / `verify_host` /

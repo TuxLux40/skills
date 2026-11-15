@@ -43,3 +43,21 @@ def test_exclude_is_independent_of_deprioritize() -> None:
     rules = GatingRules()
     assert not is_excluded("providers/AGB.pdf", rules)
     assert is_deprioritized("providers/AGB.pdf", rules)
+
+
+def test_local_only_blocks_only_when_llm_is_remote() -> None:
+    from app.services.gating import is_blocked_for_remote
+
+    remote = GatingRules(local_only_patterns=["health/*"], remote_llm=True)
+    local = GatingRules(local_only_patterns=["health/*"], remote_llm=False)
+    assert is_blocked_for_remote("health/visits/report.pdf", remote)
+    assert not is_blocked_for_remote("health/visits/report.pdf", local)
+
+
+def test_local_only_matches_folder_glob_and_nothing_else() -> None:
+    from app.services.gating import is_blocked_for_remote
+
+    rules = GatingRules(local_only_patterns=["health/*"], remote_llm=True)
+    assert is_blocked_for_remote("health/report.pdf", rules)
+    assert not is_blocked_for_remote("finances/report.pdf", rules)
+    assert not is_blocked_for_remote("health/report.pdf", GatingRules(remote_llm=True))

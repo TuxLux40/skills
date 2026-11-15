@@ -188,3 +188,26 @@ def test_load_config_walks_up_to_an_ancestor_root(tmp_path: Path) -> None:
 
     assert config is not None
     assert config.llm_model == "model-root"
+
+
+def test_proxy_flag_marks_loopback_host_as_remote() -> None:
+    config = _config(llm_host="http://127.0.0.1:8645/v1", llm_hosts_are_remote=True)
+    assert config.uses_remote_llm() is True
+
+
+def test_plain_loopback_host_is_local() -> None:
+    assert _config(llm_host="http://127.0.0.1:11434").uses_remote_llm() is False
+
+
+def test_dream_host_remote_makes_the_whole_setup_remote() -> None:
+    config = _config(
+        llm_host="http://127.0.0.1:11434",
+        dream_host="https://api.example.com/v1",
+        allow_remote_llm=True,
+    )
+    assert config.uses_remote_llm() is True
+
+
+def test_local_only_patterns_load_from_yaml_and_default_empty(tmp_path: Path) -> None:
+    assert _config().local_only_patterns == []
+    assert _config(local_only_patterns=["health/*"]).local_only_patterns == ["health/*"]

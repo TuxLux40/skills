@@ -18,7 +18,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from app.config import load_config, resolve_document_root
+from app.config import DEFAULT_LLM_HOST_ALLOWLIST, llm_is_remote, load_config, resolve_document_root
 from app.constants import DEFAULT_LLM_HOST, DEFAULT_LLM_MODEL, LLM_LOG_FILENAME
 from app.exceptions import LLMClientError
 from app.services.extraction_options import ExtractionOptions
@@ -119,6 +119,12 @@ def main() -> None:
         exclude_patterns=list(config.exclude_patterns) if config is not None else [],
         low_priority_patterns=list(config.low_priority_patterns) if config is not None else [],
         priority_patterns=list(config.priority_patterns) if config is not None else [],
+        local_only_patterns=list(config.local_only_patterns) if config is not None else [],
+        remote_llm=llm_is_remote(
+            [host or DEFAULT_LLM_HOST, verify_host],
+            declared_remote=config.llm_hosts_are_remote if config is not None else False,
+            allowlist=config.llm_host_allowlist if config is not None else DEFAULT_LLM_HOST_ALLOWLIST,
+        ),
     )
     derive_per_file = config.derive_per_file if config is not None else False
     generate_readme = config.generate_readme if config is not None else True

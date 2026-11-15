@@ -110,6 +110,18 @@ def host_is_allowlisted(hostname: str, extra: list[str]) -> bool:
     return hostname in extra
 
 
+def llm_is_remote(hosts: list[str | None], *, declared_remote: bool, allowlist: list[str]) -> bool:
+    """True when the setup sends document text to a remote model.
+
+    A host counts as remote when its hostname is neither always-allowed, private (RFC 1918) nor in
+    `allowlist`, or when the config declares it (`declared_remote`): a loopback proxy that forwards
+    to a cloud API looks local by hostname alone.
+    """
+    if declared_remote:
+        return True
+    return any(not host_is_allowlisted(parse_llm_host(host), allowlist) for host in hosts if host)
+
+
 class YamlConfigSettingsSource(PydanticBaseSettingsSource):
     """Load a document root's `.smart-okf/config.yaml` via pyyaml.
 
@@ -149,6 +161,15 @@ class SmartOkfConfig(BaseSettings):
     allow_remote_llm: bool = False
     llm_host_allowlist: list[str] = Field(default_factory=lambda: list(DEFAULT_LLM_HOST_ALLOWLIST))
     llm_host: str = DEFAULT_LLM_HOST
+
+    llm_hosts_are_remote: bool = False
+    """Declare that the configured model hosts forward to a remote service even though their hostname
+    looks local, e.g. a loopback proxy in front of a cloud API. Makes `local_only_patterns` apply."""
+
+    local_only_patterns: list[str] = Field(default_factory=list)
+    """Glob patterns (root-relative path or bare filename) for sensitive files that only a local
+    model may read. While the extractor is remote (`uses_remote_llm()`) they are skipped like excluded
+    files; with a local model they are ingested normally. Existing aggregates are left untouched."""
 
     use_marker: bool = True
     """Route PDF extraction through the marker CLI backend (layout-aware: tables, forms).
@@ -226,6 +247,14 @@ class SmartOkfConfig(BaseSettings):
     `prompts/extraction_system.md`) and does NOT touch OKF schema field names or `type:` values
     (`FolderSummary`, `Synthesis`, ...) — those are code-matched constants, always English,
     per `docs/OKF_SPEC.md`."""
+
+    def uses_remote_llm(self) -> bool:
+        """Whether extraction, dreaming or verification would send text to a remote model."""
+        return llm_is_remote(
+            [self.llm_host, self.dream_host, self.verify_host],
+            declared_remote=self.llm_hosts_are_remote,
+            allowlist=self.llm_host_allowlist,
+        )
 
     @field_validator("ordering_principle")
     @classmethod

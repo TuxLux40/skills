@@ -129,6 +129,12 @@ class GatingRules:
     """Glob patterns that force priority — always deep-analyzed, overriding both the
     low-priority patterns and the built-in trivial-name heuristic."""
 
+    local_only_patterns: list[str] = field(default_factory=list)
+    """Glob patterns for sensitive files that only a local model may read."""
+
+    remote_llm: bool = False
+    """Whether the extractor sends text to a remote model; activates `local_only_patterns`."""
+
     trivial_keywords: frozenset[str] = DEFAULT_TRIVIAL_KEYWORDS
     """Built-in low-value keyword set for eager deprioritization; override to disable/extend."""
 
@@ -142,6 +148,11 @@ def _matches_any(relative_path: str, patterns: list[str]) -> bool:
 def is_excluded(relative_path: str, rules: GatingRules) -> bool:
     """Whether a file must not be ingested at all (matches an exclude pattern)."""
     return _matches_any(relative_path, rules.exclude_patterns)
+
+
+def is_blocked_for_remote(relative_path: str, rules: GatingRules) -> bool:
+    """Whether a file matches a local-only pattern while the extractor is remote."""
+    return rules.remote_llm and _matches_any(relative_path, rules.local_only_patterns)
 
 
 def is_deprioritized(relative_path: str, rules: GatingRules) -> bool:

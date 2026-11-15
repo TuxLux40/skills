@@ -42,6 +42,12 @@ llm_model: gemma-4-e4b-it-qat
 #   - "archive/*"
 # priority_patterns:     # forced into deep analysis (overrides low-priority + built-in trivial words)
 #   - "*aktenzeichen*"
+# local_only_patterns:   # sensitive files only a local model may read: skipped while the extractor
+#   - "health/*"         # is remote, ingested normally once it is local. Existing aggregates stay.
+
+# Set true when llm_host / dream_host / verify_host point at something that looks local but forwards to a
+# cloud service (a loopback proxy in front of a hosted API). Without it, local_only_patterns cannot tell.
+# llm_hosts_are_remote: true
 
 # Also write one derived-facts file per document under .okf-facts/ (facts are always in the
 # folder aggregate regardless; this is the opt-in per-file artifact). Default false.

@@ -269,7 +269,7 @@ def test_merge_chunk_documents_unions_identifiers_sorted_deduped() -> None:
     merged = merge_chunk_documents([first, second])
 
     assert merged.frontmatter.identifiers == {
-        "betriebsnummer": ["15027365", "11122233"],
+        "betriebsnummer": ["11122233", "15027365"],
         "personalnummer": ["87654321"],
         "versicherungsnummer": ["12345678X901"],
     }
@@ -309,8 +309,8 @@ def test_aggregate_frontmatter_unions_identifiers_from_documents(tmp_path: Path)
 
     aggregate = OKFDocument.from_markdown((folder / "social.md").read_text(encoding="utf-8"))
     assert aggregate.frontmatter.identifiers == {
-        "betriebsnummer": ["15027365", "11122233"],
-        "personalnummer": ["87654321", "11112222"],
+        "betriebsnummer": ["11122233", "15027365"],
+        "personalnummer": ["11112222", "87654321"],
     }
 
 
@@ -734,3 +734,48 @@ def test_preexisting_fabricated_aggregate_is_overwritten_with_a_flag_when_reextr
     aggregate_text = (providers / "providers.md").read_text(encoding="utf-8")
     assert "_Verification: FLAGGED" in aggregate_text
     assert "Material zu Providers" not in aggregate_text
+
+
+def test_local_only_file_is_skipped_with_reason_when_remote(tmp_path: Path) -> None:
+    from app.services.gating import GatingRules
+
+    health = tmp_path / "health"
+    health.mkdir()
+    (health / "report.txt").write_text("private report", encoding="utf-8")
+    client = _StubLLMClient()
+
+    rules = GatingRules(local_only_patterns=["health/*"], remote_llm=True)
+    result = ingest_folder(str(tmp_path), client=client, rules=rules)  # type: ignore[arg-type]
+
+    assert client.calls == 0
+    assert any("report.txt" in str(path) and "local-only" in reason for path, reason in result.skipped)
+    assert not (health / "health.md").exists()
+    assert not (tmp_path / ".okf-transcripts" / "health" / "report.txt.txt").exists()
+
+
+def test_local_only_file_is_ingested_when_extractor_is_local(tmp_path: Path) -> None:
+    from app.services.gating import GatingRules
+
+    health = tmp_path / "health"
+    health.mkdir()
+    (health / "report.txt").write_text("private report", encoding="utf-8")
+
+    rules = GatingRules(local_only_patterns=["health/*"], remote_llm=False)
+    ingest_folder(str(tmp_path), client=_StubLLMClient(), rules=rules)  # type: ignore[arg-type]
+
+    assert "report.txt" in (health / "health.md").read_text(encoding="utf-8")
+
+
+def test_local_only_block_keeps_an_existing_aggregate(tmp_path: Path) -> None:
+    from app.services.gating import GatingRules
+
+    health = tmp_path / "health"
+    health.mkdir()
+    (health / "report.txt").write_text("private report", encoding="utf-8")
+    ingest_folder(str(tmp_path), client=_StubLLMClient())  # type: ignore[arg-type]  # earlier run with a local model
+    aggregate_before = (health / "health.md").read_text(encoding="utf-8")
+
+    rules = GatingRules(local_only_patterns=["health/*"], remote_llm=True)
+    ingest_folder(str(tmp_path), client=_StubLLMClient(), rules=rules)  # type: ignore[arg-type]
+
+    assert (health / "health.md").read_text(encoding="utf-8") == aggregate_before
