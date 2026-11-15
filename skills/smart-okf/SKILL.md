@@ -407,6 +407,8 @@ uv run python scripts/ingest_folder.py /path/to/documents
   frontmatter (`source_hashes`). Re-runs skip unchanged files entirely — no LLM calls, no
   rewrites — so scheduled re-ingests of a mostly-static tree are cheap. Only changed, new, or
   removed files trigger work in their folder.
+- **`--only <relpath>`** limits a run to one folder and its subfolders. Nothing outside it is read, rewritten or
+  removed, which also keeps aggregates of other folders when only some sources are present on disk.
 - Roughly one LLM call per changed source file, so a large first run takes time. Ingest one
   subfolder at a time on first runs and check output quality before continuing. Documents too
   large for a single call (over ~8000 characters of extracted text) are chunked automatically

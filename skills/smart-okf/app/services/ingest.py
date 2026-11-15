@@ -303,6 +303,7 @@ def ingest_folder(
     generate_readme: bool = True,
     force: bool = False,
     on_flagged: str = "keep",
+    only: str | None = None,
 ) -> IngestFolderResult:
     """Ingest supported documents from a folder, writing one aggregate `.md` per subfolder.
 
@@ -316,6 +317,9 @@ def ingest_folder(
     writes one `.okf-facts/<file>.md` per document (the facts are always in the aggregate
     regardless). `generate_readme` refreshes the human navigation `README.md` at the root.
     `force` re-extracts every file regardless of `source_hashes` — see `_ingest_directory`.
+    `only` (a path relative to the root) limits the run to that folder and its subfolders: nothing outside
+    it is read, rewritten or removed as an orphan, so a root that is only partly present on disk (for
+    example a tree holding just some of the sources) never loses aggregates of the other folders.
     """
     root = Path(folder).expanduser().resolve()
     result = IngestFolderResult(root=root)
@@ -332,6 +336,13 @@ def ingest_folder(
     directories = [root] + sorted(
         p for p in root.rglob("*") if p.is_dir() and not any(part.startswith(".") for part in p.relative_to(root).parts)
     )
+    if only is not None:
+        scope = (root / only).resolve()
+        if root != scope and root not in scope.parents:
+            raise ValueError(f"`only` must point inside the root: {only}")
+        if not scope.is_dir():
+            raise ValueError(f"`only` folder not found: {only}")
+        directories = [d for d in directories if d == scope or scope in d.parents]
     for directory in directories:
         _ingest_directory(
             directory,

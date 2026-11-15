@@ -840,3 +840,44 @@ def test_extraction_never_sees_the_file_name(tmp_path: Path) -> None:
 
     assert seen
     assert not any("2019-07-05" in context or "SCHMITZ" in context or "2020-01-01" in context for context in seen)
+
+
+def test_only_limits_the_run_and_never_removes_aggregates_elsewhere(tmp_path: Path) -> None:
+    a, b = tmp_path / "a", tmp_path / "b"
+    a.mkdir()
+    b.mkdir()
+    (a / "x.txt").write_text("alpha", encoding="utf-8")
+    (b / "y.txt").write_text("beta", encoding="utf-8")
+    ingest_folder(str(tmp_path), client=_StubLLMClient())  # type: ignore[arg-type]
+    before_b = (b / "b.md").read_text(encoding="utf-8")
+
+    (b / "y.txt").unlink()  # without `only`, b's aggregate would now be removed as an orphan
+    (a / "x.txt").write_text("alpha changed", encoding="utf-8")
+    client = _StubLLMClient()
+    result = ingest_folder(str(tmp_path), client=client, only="a")  # type: ignore[arg-type]
+
+    assert (b / "b.md").read_text(encoding="utf-8") == before_b
+    assert result.removed_paths == []
+    assert "alpha changed" in (a / "a.md").read_text(encoding="utf-8")
+    assert client.calls == 1
+
+
+def test_only_covers_subfolders_of_the_chosen_folder(tmp_path: Path) -> None:
+    sub = tmp_path / "a" / "sub"
+    sub.mkdir(parents=True)
+    other = tmp_path / "b"
+    other.mkdir()
+    (sub / "x.txt").write_text("deep", encoding="utf-8")
+    (other / "y.txt").write_text("elsewhere", encoding="utf-8")
+
+    ingest_folder(str(tmp_path), client=_StubLLMClient(), only="a")  # type: ignore[arg-type]
+
+    assert (sub / "sub.md").is_file()
+    assert not (other / "b.md").exists()
+
+
+def test_only_rejects_a_missing_folder_and_paths_outside_the_root(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="not found"):
+        ingest_folder(str(tmp_path), client=_StubLLMClient(), only="nope")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="inside the root"):
+        ingest_folder(str(tmp_path), client=_StubLLMClient(), only="../elsewhere")  # type: ignore[arg-type]

@@ -64,6 +64,13 @@ def main() -> None:
         "from config/env, falling back to the extractor's --model). Verification always runs; "
         "this only controls which model checks the extractor's output.",
     )
+    parser.add_argument(
+        "--only",
+        default=None,
+        metavar="RELPATH",
+        help="Only ingest this folder (and its subfolders), given relative to the root. Aggregates elsewhere "
+        "are left untouched, even if their sources are absent.",
+    )
     parser.add_argument("--quiet", action="store_true", help="Suppress per-file progress output")
     parser.add_argument(
         "--force",
@@ -185,6 +192,7 @@ def main() -> None:
             generate_readme=generate_readme,
             force=args.force,
             on_flagged=on_flagged,
+            only=args.only,
         )
         combined.written_paths.extend(result.written_paths)
         combined.unchanged_dirs.extend(result.unchanged_dirs)
