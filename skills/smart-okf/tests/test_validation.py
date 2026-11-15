@@ -316,3 +316,16 @@ def test_bare_five_digit_number_without_label_does_not_flag(tmp_path: Path) -> N
     finding = _identifier_finding(report)
     assert finding.passed
     assert report.passed
+
+
+def test_isin_shaped_ocr_noise_is_not_treated_as_an_identifier() -> None:
+    from app.services.validation import extract_identifiers_from_transcript
+
+    assert extract_identifiers_from_transcript("m-16-Mistayschut2 Key Strado s") == []
+
+
+def test_a_real_isin_with_a_valid_check_digit_is_still_found() -> None:
+    from app.services.validation import extract_identifiers_from_transcript
+
+    assert ("ISIN", "US0378331005") in extract_identifiers_from_transcript("Wertpapier US0378331005 Apple Inc.")
+    assert ("ISIN", "DE000BAY0017") in extract_identifiers_from_transcript("Aktie DE000BAY0017")

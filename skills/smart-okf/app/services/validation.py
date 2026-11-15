@@ -155,6 +155,19 @@ _MAX_MISSING_EVIDENCE = 8
 """Cap listed missing identifiers in a finding so a catastrophic loss stays readable."""
 
 
+def _isin_check_digit_valid(isin: str) -> bool:
+    """Luhn check over the ISIN with letters expanded to numbers (A=10 ... Z=35)."""
+    digits = "".join(str(int(char, 36)) for char in isin.upper())
+    total = 0
+    for index, char in enumerate(reversed(digits)):
+        number = int(char)
+        if index % 2 == 1:
+            number *= 2
+            number -= 9 if number > 9 else 0
+        total += number
+    return total % 10 == 0
+
+
 def _normalize_identifier(value: str) -> str:
     """Strip spaces and dots so `12345678 X 901` matches `12345678X901`."""
     return re.sub(r"[\s.]", "", value)
@@ -189,7 +202,8 @@ def extract_identifiers_from_transcript(text: str) -> list[tuple[str, str]]:
     for match in _RVNR_PATTERN.finditer(text):
         _add("Rentenversicherungsnummer", match.group(0))
     for match in _ISIN_PATTERN.finditer(text):
-        _add("ISIN", match.group(0))
+        if _isin_check_digit_valid(match.group(0)):  # OCR noise often has the shape of an ISIN
+            _add("ISIN", match.group(0))
 
     return found
 

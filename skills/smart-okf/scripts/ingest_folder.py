@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 from app.config import DEFAULT_LLM_HOST_ALLOWLIST, llm_is_remote, load_config, resolve_document_root
-from app.constants import DEFAULT_LLM_HOST, DEFAULT_LLM_MODEL, LLM_LOG_FILENAME
+from app.constants import CHUNK_CHAR_THRESHOLD, DEFAULT_LLM_HOST, DEFAULT_LLM_MODEL, LLM_LOG_FILENAME
 from app.exceptions import LLMClientError
 from app.services.gating import GatingRules
 from app.services.ingest import IngestFolderResult, ingest_folder
@@ -136,6 +136,7 @@ def main() -> None:
     derive_per_file = config.derive_per_file if config is not None else False
     generate_readme = config.generate_readme if config is not None else True
     on_flagged = config.on_flagged if config is not None else "keep"
+    chunk_chars = config.chunk_chars if config is not None else CHUNK_CHAR_THRESHOLD
 
     combined = IngestFolderResult(root=Path(folders[0]))
     for folder in folders:
@@ -193,6 +194,7 @@ def main() -> None:
             force=args.force,
             on_flagged=on_flagged,
             only=args.only,
+            chunk_chars=chunk_chars,
         )
         combined.written_paths.extend(result.written_paths)
         combined.unchanged_dirs.extend(result.unchanged_dirs)

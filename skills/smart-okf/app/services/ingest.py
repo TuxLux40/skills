@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from app.constants import (
+    CHUNK_CHAR_THRESHOLD,
     FACTS_DIR_NAME,
     FOLDER_INDEX_OKF_TYPE,
     FOLDER_SUMMARY_OKF_TYPE,
@@ -128,6 +129,7 @@ def extract_document(
     *,
     options: TranscriptionOptions = DEFAULT_TRANSCRIPTION,
     verify_client: LLMClient | None = None,
+    chunk_chars: int = CHUNK_CHAR_THRESHOLD,
 ) -> tuple[OKFDocument, FactVerificationResult]:
     """Extract and structure one document into an OKF document (no aggregate write).
 
@@ -150,7 +152,7 @@ def extract_document(
         raise DocumentIngestError(f"No extractable text in {file_path}")
     write_transcript(file_path, root, raw_text)
 
-    chunks = chunk_text(raw_text)
+    chunks = chunk_text(raw_text, chunk_chars)
     documents: list[OKFDocument] = []
     for chunk in chunks:
         # Neither the file name nor a "part i/n" label goes into the extraction prompt: the model echoes both
@@ -304,6 +306,7 @@ def ingest_folder(
     force: bool = False,
     on_flagged: str = "keep",
     only: str | None = None,
+    chunk_chars: int = CHUNK_CHAR_THRESHOLD,
 ) -> IngestFolderResult:
     """Ingest supported documents from a folder, writing one aggregate `.md` per subfolder.
 
@@ -356,6 +359,7 @@ def ingest_folder(
             derive_per_file=derive_per_file,
             force=force,
             on_flagged=on_flagged,
+            chunk_chars=chunk_chars,
         )
 
     write_rollups(root, result, verbose=verbose)
@@ -425,6 +429,7 @@ def _ingest_directory(
     derive_per_file: bool = False,
     force: bool = False,
     on_flagged: str = "keep",
+    chunk_chars: int = CHUNK_CHAR_THRESHOLD,
 ) -> None:
     """Ingest the files directly inside one directory (non-recursive) into its aggregate.
 
@@ -500,7 +505,7 @@ def _ingest_directory(
             print(f"Processing: {file_path}")
         try:
             document, verification = extract_document(
-                file_path, root, client, options=options, verify_client=verify_client
+                file_path, root, client, options=options, verify_client=verify_client, chunk_chars=chunk_chars
             )
             if not verification.passed and on_flagged == "skip":
                 raise DocumentIngestError(

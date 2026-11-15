@@ -23,6 +23,8 @@ from pydantic_settings import (
 )
 
 from app.constants import (
+    CHUNK_CHAR_THRESHOLD,
+    CHUNK_OVERLAP_CHARS,
     DEFAULT_LLM_HOST,
     DEFAULT_LLM_MODEL,
     DEFAULT_LLM_TEMPERATURE,
@@ -170,6 +172,12 @@ class SmartOkfConfig(BaseSettings):
     """Glob patterns (root-relative path or bare filename) for sensitive files that only a local
     model may read. While the extractor is remote (`uses_remote_llm()`) they are skipped like excluded
     files; with a local model they are ingested normally. Existing aggregates are left untouched."""
+
+    chunk_chars: int = Field(default=CHUNK_CHAR_THRESHOLD, gt=CHUNK_OVERLAP_CHARS)
+    """Documents longer than this many characters are split into chunks, one model call each, and merged.
+    The built-in 8,000 suits small local models. A model with a large context can take much more, which
+    avoids the contradictions chunking causes (one part claims something is missing that another part has)
+    and saves calls. Must be larger than the chunk overlap."""
 
     on_flagged: Literal["keep", "skip"] = "keep"
     """What to do with an extraction that fact verification flags as not traceable to its source.

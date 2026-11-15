@@ -237,3 +237,12 @@ def test_on_flagged_defaults_to_keep_and_rejects_unknown_values() -> None:
     assert _config(on_flagged="skip").on_flagged == "skip"
     with pytest.raises(ValidationError):
         _config(on_flagged="drop")
+
+
+def test_chunk_chars_defaults_to_the_built_in_threshold_and_must_exceed_the_overlap() -> None:
+    from app.constants import CHUNK_CHAR_THRESHOLD, CHUNK_OVERLAP_CHARS
+
+    assert _config().chunk_chars == CHUNK_CHAR_THRESHOLD
+    assert _config(chunk_chars=30_000).chunk_chars == 30_000
+    with pytest.raises(ValidationError):
+        _config(chunk_chars=CHUNK_OVERLAP_CHARS)

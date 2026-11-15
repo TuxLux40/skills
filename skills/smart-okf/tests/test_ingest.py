@@ -881,3 +881,23 @@ def test_only_rejects_a_missing_folder_and_paths_outside_the_root(tmp_path: Path
         ingest_folder(str(tmp_path), client=_StubLLMClient(), only="nope")  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="inside the root"):
         ingest_folder(str(tmp_path), client=_StubLLMClient(), only="../elsewhere")  # type: ignore[arg-type]
+
+
+def test_chunk_chars_decides_whether_a_mid_sized_document_is_split(tmp_path: Path) -> None:
+    class _CountingClient(_StubLLMClient):
+        def extract_structured(self, raw_text: str, context: str = "") -> str:
+            self.calls += 1
+            return "---\ntype: Fact\ntitle: Letter\n---\n\n## Facts\n- one"
+
+    text = "This is a paragraph of text. " * 320  # about 9,300 characters
+    default_dir, wide_dir = tmp_path / "default", tmp_path / "wide"
+    for directory in (default_dir, wide_dir):
+        (directory / "docs").mkdir(parents=True)
+        (directory / "docs" / "letter.txt").write_text(text, encoding="utf-8")
+
+    default_client, wide_client = _CountingClient(), _CountingClient()
+    ingest_folder(str(default_dir), client=default_client)  # type: ignore[arg-type]
+    ingest_folder(str(wide_dir), client=wide_client, chunk_chars=20_000)  # type: ignore[arg-type]
+
+    assert default_client.calls > 1
+    assert wide_client.calls == 1

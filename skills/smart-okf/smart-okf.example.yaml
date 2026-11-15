@@ -49,6 +49,11 @@ llm_model: gemma-4-e4b-it-qat
 # cloud service (a loopback proxy in front of a hosted API). Without it, local_only_patterns cannot tell.
 # llm_hosts_are_remote: true
 
+# Documents longer than this many characters are split into chunks (one model call each) and merged.
+# The default (8000) suits small local models; a model with a large context can take much more, which
+# avoids one chunk claiming something is missing that another chunk has, and saves calls.
+# chunk_chars: 30000
+
 # What to do with an extraction that fact verification flags as not traceable to its source.
 # keep (default): write it with a visible "_Verification: FLAGGED" line. skip: hold it back so a
 # possibly fabricated section never reaches the aggregate (reported as skipped, retried next run).

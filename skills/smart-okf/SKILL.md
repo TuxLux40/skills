@@ -167,6 +167,10 @@ do not re-read every original PDF for facts that were already distilled.
    their own exceptions; `priority_patterns` forces something back into deep analysis.
    Password-protected files are always skipped and logged automatically.
 
+   Documents over `chunk_chars` characters (default 8000, sized for small local models) are split into chunks and
+   merged. With a large-context model raise it: chunking can make one part claim that something is missing
+   which another part has, and fact verification then rightly flags the merged result.
+
    Fact verification checks every extraction against its source text. By default a flagged extraction is
    still written, with a visible `_Verification: FLAGGED` line. Set `on_flagged: skip` to hold it back
    instead: the file is reported as skipped, retried on the next run, and an earlier section of the same
