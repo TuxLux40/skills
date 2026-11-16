@@ -186,6 +186,13 @@ python3 scripts/okf_docindex.py <root> --notes <dir> --write
   tree as well.
 - **Corrections go into the tree**, not into the block. The next export
   brings them back.
+- **Diagram.** Each person note gets a Mermaid chart of the immediate
+  family as the tree has it: parents, siblings, partners, children
+  (`--no-chart` leaves it out). It is drawn dashed throughout, since the
+  generator knows only what the tree asserts. Mermaid edges are not links,
+  so the Obsidian graph stays governed by §3. A picture makes a planted
+  error visible, such as a mother born sixty years before her son, but it
+  checks nothing: that is `gedcom_plausi.py`.
 - **Document index.** `okf_docindex.py` lists, in each note, the files whose
   names carry the note's ID as a token (`1964-06-09_SCH-IRI_GBUR.pdf`),
   between `<!-- BEGIN dokumente -->` and `<!-- END dokumente -->`. It shows

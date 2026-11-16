@@ -16,7 +16,7 @@ data is copied by rule, never retyped. Python standard library only.
 Usage:
     python3 gedcom_to_okf.py tree.ged --root NOTES_ROOT [--write] [--update]
         [--persons-dir DIR] [--families-dir DIR] [--id-map FILE]
-        [--lang de|en] [--by ACTOR]
+        [--lang de|en] [--by ACTOR] [--no-chart]
     python3 gedcom_to_okf.py tree.ged --list-ids      # xref;name;born;died
 """
 from __future__ import annotations
@@ -66,6 +66,9 @@ T = {
         "notes": "## Notizen laut Baum", "couple": "## Paar laut Baum", "partner": "Partner",
         "children": "## Kinder laut Baum", "child_cols": "| Kind | Geburt | Zuordnung |",
         "tree_only": "nur anderer Baum", "none": "keine",
+        "chart": "## Kernfamilie laut Baum",
+        "chart_legend": "Gestrichelt: Beziehung laut Baum, nicht ausgewertet. Das Diagramm erzeugt keine Links im Graphen.",
+        "more": "+{n} weitere",
         "tail_person": "## Belege\n\n## Dokumente\n\n{db}\n{de}\n\n## Offene Fragen\n\n## Nicht identisch mit\n",
         "tail_family": "## Belege\n\n## Dokumente\n\n{db}\n{de}\n\n## Offene Fragen\n",
         "before": "vor ", "after": "nach ",
@@ -91,6 +94,9 @@ T = {
         "notes": "## Notes as in the tree", "couple": "## Couple as in the tree", "partner": "Partner",
         "children": "## Children as in the tree", "child_cols": "| Child | Birth | Assignment |",
         "tree_only": "another tree only", "none": "none",
+        "chart": "## Immediate family as in the tree",
+        "chart_legend": "Dashed: relationship as in the tree, not evaluated. The diagram adds no links to the graph.",
+        "more": "+{n} more",
         "tail_person": "## Evidence\n\n## Documents\n\n{db}\n{de}\n\n## Open questions\n\n## Not identical with\n",
         "tail_family": "## Evidence\n\n## Documents\n\n{db}\n{de}\n\n## Open questions\n",
         "before": "before ", "after": "after ",
@@ -255,6 +261,89 @@ def event_rows(rec, tags, sources, t):
     return rows
 
 
+MAX_KIN = 12
+
+
+def mm_label(text: str) -> str:
+    return text.replace('"', "#quot;").replace("\n", " ")
+
+
+def family_chart(x, people, fam_info, t):
+    """Mermaid flowchart: parents, siblings, partners and children of one person.
+
+    Every edge is dashed: the generator only knows what the tree asserts.
+    Mermaid edges are not links, so the Obsidian graph stays governed by the
+    link rules; the diagram is a picture of the tree, not a claim."""
+    rec = people[x]["rec"]
+    nodes, edges, seen = [], [], set()
+
+    def nid(xref):
+        return "n" + re.sub(r"[^0-9A-Za-z]", "", xref)
+
+    def person(xref, cls=""):
+        if xref in seen:
+            return
+        seen.add(xref)
+        p = people[xref]
+        nodes.append(f'  {nid(xref)}["{mm_label(p["title"])}"]' + (f":::{cls}" if cls else ""))
+
+    def union(fx):
+        info = fam_info[fx]
+        marr = info["rec"].first("MARR")
+        year = year_of(marr.val("DATE")) if marr else ""
+        uid = "u" + re.sub(r"[^0-9A-Za-z]", "", fx)
+        if uid not in seen:
+            seen.add(uid)
+            nodes.append(f'  {uid}(("∞{" " + year if year else ""}"))')
+        return uid
+
+    def kids(fx, skip, cap):
+        out = [c.value.strip() for c in fam_info[fx]["rec"].all("CHIL")
+               if c.value.strip() in people and c.value.strip() != skip]
+        return out[:cap], max(0, len(out) - cap)
+
+    person(x, "self")
+    for famc in rec.all("FAMC"):
+        fx = famc.value.strip()
+        if fx not in fam_info:
+            continue
+        u = union(fx)
+        for parent in fam_info[fx]["partners"]:
+            person(parent)
+            edges.append(f"  {nid(parent)} -.- {u}")
+        edges.append(f"  {u} -.-> {nid(x)}")
+        sibs, rest = kids(fx, x, MAX_KIN)
+        for s in sibs:
+            person(s)
+            edges.append(f"  {u} -.-> {nid(s)}")
+        if rest:
+            more = f"m{nid(fx)}"
+            nodes.append(f'  {more}["{t["more"].format(n=rest)}"]')
+            edges.append(f"  {u} -.-> {more}")
+    for fams in rec.all("FAMS"):
+        fx = fams.value.strip()
+        if fx not in fam_info:
+            continue
+        u = union(fx)
+        edges.append(f"  {nid(x)} -.- {u}")
+        for partner in fam_info[fx]["partners"]:
+            if partner != x:
+                person(partner)
+                edges.append(f"  {nid(partner)} -.- {u}")
+        children, rest = kids(fx, None, MAX_KIN)
+        for c in children:
+            person(c)
+            edges.append(f"  {u} -.-> {nid(c)}")
+        if rest:
+            more = f"m{nid(fx)}"
+            nodes.append(f'  {more}["{t["more"].format(n=rest)}"]')
+            edges.append(f"  {u} -.-> {more}")
+    if not edges:
+        return []
+    return (["```mermaid", "flowchart TB", "  classDef self stroke-width:3px"]
+            + nodes + edges + ["```", "", t["chart_legend"]])
+
+
 def load_id_map(path):
     mapping = {}
     if not path:
@@ -300,6 +389,8 @@ def main() -> int:
     ap.add_argument("--list-ids", action="store_true")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--update", action="store_true")
+    ap.add_argument("--no-chart", action="store_true",
+                    help="no Mermaid diagram of the immediate family in person notes")
     ap.add_argument("--lang", choices=("de", "en"), default="de")
     ap.add_argument("--by", default="process:gedcom-to-okf")
     args = ap.parse_args()
@@ -422,6 +513,9 @@ def main() -> int:
                 fx = fams_.value.strip()
                 rel_lines.append(f"- {t['union']}: {link(x, fx, fam_info[fx]['id'] + ' ' + fam_info[fx]['title'])} – {UNREVIEWED}")
         block += ["", t["family"], ""] + (rel_lines or [f"- {t['none']}"])
+        chart = [] if args.no_chart else family_chart(x, people, fam_info, t)
+        if chart:
+            block += ["", t["chart"], ""] + chart
         notes = note_lines(r)
         if notes:
             block += ["", t["notes"], ""] + notes
