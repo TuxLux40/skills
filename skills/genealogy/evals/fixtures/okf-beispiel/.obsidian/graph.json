@@ -8,14 +8,21 @@
   "collapse-color-groups": false,
   "colorGroups": [
     {
-      "query": "[type:Person]",
+      "query": "[conclusion:ungeprüft]",
+      "color": {
+        "a": 1,
+        "rgb": 13882323
+      }
+    },
+    {
+      "query": "[type:Person] -[conclusion:ungeprüft]",
       "color": {
         "a": 1,
         "rgb": 5142951
       }
     },
     {
-      "query": "[type:Family]",
+      "query": "[type:Family] -[conclusion:ungeprüft]",
       "color": {
         "a": 1,
         "rgb": 5873999

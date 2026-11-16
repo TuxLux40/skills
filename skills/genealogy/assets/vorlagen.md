@@ -647,7 +647,11 @@ generated: { by: <agent>/<version>, at: <…> }
 ---
 ```
 
-Person, Familie, Ort:
+Person, Familie, Ort — written by hand for single cases. For an existing
+tree, generate person and family notes from the GEDCOM export
+(`scripts/gedcom_to_okf.py`); the generated notes use the same frontmatter,
+keep the tree data in a marked block, and start as `conclusion: ungeprüft`.
+`id` is whatever ID the archive already uses.
 
 ```markdown
 ---

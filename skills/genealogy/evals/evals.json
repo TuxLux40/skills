@@ -496,6 +496,56 @@
           "evidence": ""
         }
       ]
+    },
+    {
+      "id": 14,
+      "prompt": "Mein Familienarchiv liegt auf dem NAS, nach Dokumenttyp sortiert. Dateien heißen DATUM_PID_DOKTYP, z. B. 1964-06-09_SCH-IRI_GBUR.pdf; die PIDs stehen in _System/persons.md. Ich möchte für jede Person und jede Familie aus meinem MyHeritage-Baum eine Markdown-Datei mit Stammdaten, Beziehungen und einem Index der zugehörigen Dokumente. Der GEDCOM-Export liegt unter tree-exports/2026-11-14.ged. Leg los.",
+      "expected_output": "German reply that works with the archive as it is: keeps the existing PIDs and file naming and does not introduce its own ID scheme or rename files. Generates the notes from the GEDCOM with scripts/gedcom_to_okf.py instead of typing the data: first the ID list or an ID map that ties GEDCOM records to the PIDs from the register, then a dry run, and writing only after the user has seen what would be created. Says that everything taken over is marked ungeprüft. Fills the document index with scripts/okf_docindex.py from the PID in the file names and says that this shows how files were filed, not evidence. Flags that name-based PIDs can collide for namesakes. Ends with exactly one next step.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "keeps_existing_scheme",
+          "text": "Response adopts the existing PIDs and DATUM_PID_DOKTYP naming and does not propose renaming files or a second ID scheme",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "generated_not_retyped",
+          "text": "Person and family notes are produced with scripts/gedcom_to_okf.py from the GEDCOM export, not typed out by the model",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "id_map_before_write",
+          "text": "Response ties GEDCOM records to the PIDs (ID list or ID map from the register) before anything is written",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "dry_run_first",
+          "text": "Response runs or proposes the dry run first and writes only with the user's go-ahead",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "marked_unreviewed",
+          "text": "Response states that the data taken over from the tree is marked 'ungeprüft' (not evaluated)",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "doc_index_by_id",
+          "text": "The document index is built from the PID in the file names (scripts/okf_docindex.py) and described as filing information, not evidence",
+          "passed": false,
+          "evidence": ""
+        },
+        {
+          "name": "one_next_step",
+          "text": "Response ends with exactly one concrete next step",
+          "passed": false,
+          "evidence": ""
+        }
+      ]
     }
   ]
 }

@@ -7,8 +7,11 @@ relative Markdown links) and reports what makes the bundle non-conformant,
 the link graph misleading, or a conclusion rest on an unchecked reading:
 
   * notes without frontmatter or without `type`
-  * duplicate or misplaced IDs, unknown `conclusion` / `status` values
+  * duplicate IDs, IDs missing from the file name, unknown `conclusion` /
+    `status` values
   * persons or families in the tree with a conclusion below "wahrscheinlich"
+    ("ungeprüft" - taken over from the tree, not evaluated - is counted,
+    not flagged)
   * wikilinks, absolute links, links to files that do not exist
   * direct person-to-person links (kinship belongs in a Family note)
   * a line that says "belegt" but cites a reading no human has checked
@@ -33,13 +36,14 @@ TYPES = {
     "Person", "Family", "Place", "Source", "Hypothesis", "Proof",
     "ResearchLog", "Session", "Register",
 }
-ID_PREFIX = {"Person": "P", "Family": "F", "Hypothesis": "H", "Proof": "B"}
+NEEDS_ID = {"Person", "Family"}
 CONCLUSION_EN = {
     "proven": "belegt", "probable": "wahrscheinlich", "possible": "möglich",
     "unresolved": "ungeklärt", "disproven": "widerlegt",
 }
+CONCLUSION_EN["unreviewed"] = "ungeprüft"
 CONCLUSIONS = set(CONCLUSION_EN.values())
-TREE_OK = {"belegt", "wahrscheinlich"}
+TREE_OK = {"belegt", "wahrscheinlich", "ungeprüft"}
 NEEDS_CONCLUSION = {"Person", "Family", "Hypothesis", "Proof"}
 LIFECYCLE = {"draft", "stable", "deprecated"}
 RESERVED = {"index.md", "log.md"}
@@ -61,8 +65,7 @@ T = {
         "unknown_type": "Unbekannter `type` {v!r} (zulässig, aber außerhalb des Skill-Vokabulars)",
         "reserved_frontmatter": "{name} ist ein reservierter Name und trägt kein Frontmatter (Ausnahme: `okf_version` in der index.md der Wurzel)",
         "dup_id": "ID {v} mehrfach vergeben: {others}",
-        "bad_id": "ID {v!r} passt nicht zum Typ {t} (erwartet {p} + Ziffern)",
-        "id_not_in_name": "Dateiname beginnt nicht mit der ID {v}",
+        "id_not_in_name": "Dateiname enthält die ID {v} nicht",
         "no_id": "{t} ohne `id`",
         "bad_conclusion": "`conclusion` {v!r} gehört nicht zum Status-Vokabular",
         "no_conclusion": "{t} ohne `conclusion`",
@@ -79,6 +82,7 @@ T = {
         "unverified_source": "Lesung nicht von einem Menschen am Bild geprüft",
         "summary": "{n} Notizen · {types}",
         "trust": "Quellen: {h} von Menschen geprüft, {u} ungeprüft",
+        "tree": "Baum (Personen und Familien): {v}",
         "counts": "{e} Fehler, {w} Warnungen, {i} Hinweise",
         "clean": "Hinweis: Ein sauberer Bericht bedeutet widerspruchsfrei, nicht richtig.",
     },
@@ -89,8 +93,7 @@ T = {
         "unknown_type": "Unknown `type` {v!r} (allowed, but outside the skill's vocabulary)",
         "reserved_frontmatter": "{name} is a reserved name and carries no frontmatter (exception: `okf_version` in the root index.md)",
         "dup_id": "ID {v} used more than once: {others}",
-        "bad_id": "ID {v!r} does not fit type {t} (expected {p} + digits)",
-        "id_not_in_name": "File name does not start with the ID {v}",
+        "id_not_in_name": "File name does not contain the ID {v}",
         "no_id": "{t} without `id`",
         "bad_conclusion": "`conclusion` {v!r} is not in the status vocabulary",
         "no_conclusion": "{t} without `conclusion`",
@@ -107,6 +110,7 @@ T = {
         "unverified_source": "Reading not checked against the image by a human",
         "summary": "{n} notes · {types}",
         "trust": "Sources: {h} human-reviewed, {u} unchecked",
+        "tree": "Tree (persons and families): {v}",
         "counts": "{e} errors, {w} warnings, {i} notes",
         "clean": "Note: a clean report means consistent, not correct.",
     },
@@ -231,16 +235,12 @@ def scan(root: str):
         t = n["type"]
         if t not in TYPES:
             add("INFO", "unknown_type", rel, v=t)
-        prefix = ID_PREFIX.get(t)
-        if prefix:
-            if not n["id"]:
-                add("WARN", "no_id", rel, t=t)
-            else:
-                if not re.fullmatch(prefix + r"\d{3,}", n["id"]):
-                    add("WARN", "bad_id", rel, v=n["id"], t=t, p=prefix)
-                stem = os.path.basename(rel)[:-3]
-                if not (stem == n["id"] or stem.startswith(n["id"] + "_")):
-                    add("WARN", "id_not_in_name", rel, v=n["id"])
+        if t in NEEDS_ID and not n["id"]:
+            add("WARN", "no_id", rel, t=t)
+        if n["id"] and t in NEEDS_ID | {"Hypothesis", "Proof"}:
+            token = r"(?<![0-9A-Za-zÀ-ÿ-])" + re.escape(n["id"]) + r"(?![0-9A-Za-zÀ-ÿ-])"
+            if not re.search(token, os.path.basename(rel)[:-3]):
+                add("WARN", "id_not_in_name", rel, v=n["id"])
         if n["id"] and len(by_id[n["id"]]) > 1:
             others = ", ".join(p for p in by_id[n["id"]] if p != rel)
             add("ERROR", "dup_id", rel, v=n["id"], others=others)
@@ -286,9 +286,15 @@ def scan(root: str):
             add("INFO", "unverified_source", rel)
 
     sources = [n for n in notes.values() if n["type"] == "Source"]
+    tree = Counter()
+    for n in notes.values():
+        if n["type"] in ("Person", "Family"):
+            c = (n["conclusion"] or "").lower()
+            tree[CONCLUSION_EN.get(c, c) or "–"] += 1
     summary = {
         "notes": len(notes),
         "types": dict(sorted(Counter(n["type"] for n in notes.values()).items())),
+        "tree": dict(tree.most_common()),
         "sources_human_reviewed": sum(1 for n in sources if n["human"]),
         "sources_unchecked": sum(1 for n in sources if not n["human"]),
     }
@@ -319,6 +325,8 @@ def main() -> int:
         types = ", ".join(f"{k} {v}" for k, v in summary["types"].items())
         print(t["summary"].format(n=summary["notes"], types=types))
         print(t["trust"].format(h=summary["sources_human_reviewed"], u=summary["sources_unchecked"]))
+        if summary["tree"]:
+            print(t["tree"].format(v=" · ".join(f"{v} {k}" for k, v in summary["tree"].items())))
         print()
         for f in findings:
             print(f"[{t[f['severity']]}] {f['file']}: {f['message']}")
