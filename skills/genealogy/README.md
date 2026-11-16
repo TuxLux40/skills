@@ -36,11 +36,15 @@ mkdir -p ~/.claude/skills && curl -fsSL https://github.com/TuxLux40/skills/archi
 | `assets/vorlagen.md` | Templates in German and English |
 | `scripts/gedcom_plausi.py` | Read-only GEDCOM plausibility check (stdlib) |
 | `scripts/okf_check.py` | Read-only check of the notes: OKF conformance, link rules, unchecked readings (stdlib) |
+| `scripts/gedcom_to_okf.py` | One note per person and family from a GEDCOM export; dry run by default, updates only its own block (stdlib) |
+| `scripts/okf_docindex.py` | Per-note index of the files that carry the note's ID in their name; dry run by default (stdlib) |
 | `evals/` | Scenario prompts, a test GEDCOM, and an example note bundle that opens as an Obsidian vault (`fixtures/okf-beispiel/`) |
 
 ```bash
 python3 scripts/gedcom_plausi.py tree.ged --lang de        # or --lang en, --json
 python3 scripts/okf_check.py path/to/notes --lang de       # or --lang en, --json
+python3 scripts/gedcom_to_okf.py tree.ged --root path/to/archive   # dry run; --write to create notes
+python3 scripts/okf_docindex.py path/to/archive                    # dry run; --write to fill the index
 ```
 
 ## Works with

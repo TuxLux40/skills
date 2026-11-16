@@ -26,7 +26,7 @@ Tool names differ per client; map these classes to what the session offers.
 | Tool / MCP (examples) | What it can reach | Used for |
 |-----------------------|-------------------|----------|
 | Web search and fetch (`WebSearch`, `WebFetch`, Firecrawl, Tavily) | Open web: GenWiki, GOV, Matricula, archive sites and finding aids, newspapers | Own searching in open sources (`references/schnittstellen-katalog.md`) |
-| File tools and shell (`Read`, `Write`, `Bash`) | Local files, mounted storage (NAS) | GEDCOM export, scans, notes; `scripts/gedcom_plausi.py` and `scripts/okf_check.py` read and write nothing |
+| File tools and shell (`Read`, `Write`, `Bash`) | Local files, mounted storage (NAS) | GEDCOM export, scans, notes; `scripts/gedcom_plausi.py` and `scripts/okf_check.py` only read; `scripts/gedcom_to_okf.py` and `scripts/okf_docindex.py` write notes, and only with `--write` |
 | Sub-agent tool (`Agent`, `Task`) | Isolated model calls without shared context | Fächer-Modus branches |
 | Interactive choice (`AskUserQuestion`) | The user | Grill-Modus, single clarifying questions |
 | MyHeritage, Ancestry, Archion | **No tool access** — login sites | The user looks up and exports; you say exactly where |
@@ -70,6 +70,10 @@ Only **belegt** and (flagged) **wahrscheinlich** belong in the tree. Because
 tree sites have no status field, put the status as a fixed prefix at the start
 of the fact's source citation or note — `[belegt]`, `[wahrscheinlich]`,
 `[möglich]` — so it travels with the GEDCOM export and can be searched.
+
+`ungeprüft` is not a conclusion. It marks what was taken over from the tree
+or an import and has not been evaluated yet — the honest label for most of an
+existing tree.
 
 ## Ausgabeform / Output shape
 
@@ -254,6 +258,14 @@ folder opens as an Obsidian vault and its graph. Read
   *wahrscheinlich*. Everything weaker lives in a Hypothesis note. Never
   link person to person; "nicht identisch mit" is text. A name in a record
   is linked to a person only once the identity stands.
+- **Use the IDs, names and type codes the archive already has** (a person
+  register, IDs in file names). Never introduce a second scheme beside them.
+- **One note per person and per family** mirrors the tree: vital data,
+  relationships, citations. Generate it from the GEDCOM export with
+  `scripts/gedcom_to_okf.py` — tree data is copied by script, never retyped
+  by you. Everything it takes over is `ungeprüft` until evaluated.
+  `scripts/okf_docindex.py` adds to each note the files that carry its ID
+  in their name. Both run dry unless `--write` is given.
 - After a batch of notes run `scripts/okf_check.py <root>` (read-only).
 
 ## GEDCOM-Plausibilitätsprüfung

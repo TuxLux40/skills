@@ -141,6 +141,11 @@ table is a generated listing rather than a second place to maintain.
 - **Ortsregister** — one row per place: preferred name and GOV-ID ·
   historical names and spellings · parish(es), Standesamt and territory
   with the dates each applied · same-named places to rule out.
+- **IDs the archive already uses stay.** A register of person IDs, IDs in
+  existing file names, type codes: adopt them as they are. An ID made from
+  name parts (`MUS-JOH`) collides with the first namesake; the register
+  settles that before a file is named — a suffix is enough (`MUS-JOH-2`) —
+  and records which person each one is.
 - The same form everywhere: file names (compact, `MUSTER-Johann-Heinrich`),
   tags, person notes, replies. Source spellings stay in the transcriptions
   and in the variant column — the register is where "Schmitz", "Schmits"
@@ -200,6 +205,10 @@ a record is hidden from everyone it names.
   person, when, and how sure they were (`interview-oral-history.md`), and
   give it a status like any other claim. Resemblance, a caption in another
   tree and automatic face grouping are hints, not identification.
+- **Enhanced, colourised or animated versions are illustrations.** Such
+  tools invent detail — skin, eyes, colours, movement. Keep the untouched
+  scan as the master, mark the derivative in its name, and never identify a
+  person or date a photo from the derivative.
 - Keep the file name meaningful all the same: platforms strip metadata.
 - **Terms at capture time.** With every file from an archive or portal,
   note the terms it came under — private research only, publication with

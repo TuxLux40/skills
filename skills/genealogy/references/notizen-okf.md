@@ -50,8 +50,8 @@ verified: { by: human:<id>, at: 2026-11-15T09:00:00Z }   # only after a human ch
 
 | Type | Fields besides `type`, `title`, `description`, `tags`, `status`, `generated` |
 |------|------------------------------------------------------------------------------|
-| Person | `id`, `aliases`, `conclusion`, `kekule`, `myheritage_id`, `familysearch_id` |
-| Family | `id`, `conclusion` |
+| Person | `id`, `aliases`, `conclusion`, `sex`, `kekule`, `gedcom_xref`, `myheritage_id`, `familysearch_id` |
+| Family | `id`, `conclusion`, `gedcom_xref` |
 | Place | `aliases` (historical names), `gov_id` |
 | Source | `record_type`, `record_date`, `repository`, `call_number`, `locator`, `source_class` (Original, Derivat, Kompilation, Index), `seen_as` (Original, Digitalisat, Kopie, Index), `seen_at`, `resource` (permalink), `file` (the master), `sha256`, `original_filename`, `script`, `language`, `terms_of_use`, `verified` |
 | Hypothesis, Proof | `id`, `conclusion` |
@@ -60,7 +60,7 @@ Three fields that answer three different questions:
 
 | Field | Question | Values |
 |-------|----------|--------|
-| `conclusion` | How well is this established? | belegt · wahrscheinlich · möglich · ungeklärt · widerlegt |
+| `conclusion` | How well is this established? | belegt · wahrscheinlich · möglich · ungeklärt · widerlegt — and `ungeprüft` for what was taken over from the tree and not evaluated yet |
 | `status` | Is the note itself finished? | draft · stable · deprecated |
 | `verified` | Has a human checked the content against its source? | one or more `{ by, at }` |
 
@@ -94,7 +94,7 @@ link means the same to OKF, Obsidian, GitHub and a file browser.
 
 | From → to | Says | Allowed when |
 |-----------|------|--------------|
-| Person ↔ Family | kinship | *belegt* or *wahrscheinlich*, the status written beside the link |
+| Person ↔ Family | kinship | *belegt* or *wahrscheinlich*, the status written beside the link — or *ungeprüft* where the note mirrors what the master tree already asserts (§6) |
 | Person, Family → Source | this fact rests on this record | always; the status stands in the same row |
 | Source → Person | "the one named here is this person" — an identity claim | identity *belegt* or *wahrscheinlich*, **and** the reading checked where the record is handwritten; otherwise the name stays text |
 | any → Place | where | always |
@@ -107,7 +107,8 @@ Why this strict: an edge in a graph has no label and no status. Two person
 nodes joined by a line read as "related", whatever the note says. The
 Family note in between makes kinship visible as kinship; the Hypothesis note
 in between makes a guess visible as a guess. Filter the hypothesis notes
-out, and what remains is the tree as far as it is proven.
+out, and what remains is the tree; colour the notes by `conclusion`, and it
+shows how far that tree is proven.
 
 People who are only named in a record — godparents, witnesses — get a note
 of their own when they are in scope or turn up a second time. Until then
@@ -116,10 +117,17 @@ the claim that it is one person.
 
 ## 4. IDs und Dateinamen / IDs and file names
 
-- `P`, `F`, `H`, `B` plus four digits; assigned once, never reused.
-- The ID leads the file name: a broken link can be repaired from the ID, and
-  the rest keeps the name readable — Obsidian labels graph nodes with the
-  file name, not with `title`.
+- **Use the IDs the project already has** — a person register, the IDs in
+  existing file names (`SCH-IRI`, `FAM-SCH-ERN`), the IDs of the tree
+  software. An ID is an opaque token: unique, assigned once, never reused.
+  Only where none exist: `P`, `F`, `H`, `B` plus four digits.
+- An ID built from name parts collides as soon as a namesake appears, and
+  namesakes are the rule in this field. The register decides the second ID
+  before the first file is named; a suffix is enough (`MUS-JOH-2`).
+- The ID stands in the file name as its own token: a broken link can be
+  repaired from it, files can be gathered by it (§6), and the rest keeps the
+  name readable — Obsidian labels graph nodes with the file name, not with
+  `title`.
 - Person: `<ID>_<NACHNAME>-<Vorname>_<Geburtsjahr>`; estimated year as
   estimated, unknown `0000`.
 - Rename (a corrected birth year) inside Obsidian with link updating on, or
@@ -146,7 +154,48 @@ the claim that it is one person.
   register table is then a generated listing, not a second place to keep
   up to date.
 
-## 6. Obsidian
+## 6. Baum-Spiegel und Dokumenten-Index / Tree mirror and document index
+
+One note per person and per family, holding what the tree holds — vital
+data, relationships, citations, notes — plus what a tree cannot hold: proof
+status, links to source notes, open questions, the files that belong to the
+person. **The tree data is copied by script, never retyped by you**: a model
+that retypes two hundred dates gets some of them wrong, and nobody sees
+which.
+
+```bash
+python3 scripts/gedcom_to_okf.py tree.ged --list-ids            # xref;name;born;died
+python3 scripts/gedcom_to_okf.py tree.ged --root <root> \
+    --persons-dir <dir> --families-dir <dir> --id-map ids.csv     # dry run
+python3 scripts/gedcom_to_okf.py tree.ged --root <root> … --write
+python3 scripts/gedcom_to_okf.py neuer-export.ged --root <root> … --update --write
+python3 scripts/okf_docindex.py <root> --notes <dir> --write
+```
+
+- **IDs.** `--id-map` is a list `xref;id` that ties the tree's records to
+  the project's own IDs. Without it the GEDCOM cross-reference is the ID.
+  Settle the IDs before the first `--write`.
+- **What is generated** lies between `<!-- BEGIN gedcom -->` and `<!-- END
+  gedcom -->`. `--update` replaces that block and nothing else: frontmatter
+  — including a `conclusion` set after review — and every section below the
+  block stay untouched. A note without the markers is never touched.
+- **Status.** A fact carries the status found as a prefix in its citation or
+  note in the tree (`[belegt]` …). Without one it is `ungeprüft`: taken
+  over, not evaluated. New notes start with `conclusion: ungeprüft`; you
+  raise it only after the evidence has been worked through, and then in the
+  tree as well.
+- **Corrections go into the tree**, not into the block. The next export
+  brings them back.
+- **Document index.** `okf_docindex.py` lists, in each note, the files whose
+  names carry the note's ID as a token (`1964-06-09_SCH-IRI_GBUR.pdf`),
+  between `<!-- BEGIN dokumente -->` and `<!-- END dokumente -->`. It shows
+  how files were filed. That a file bears a person's ID is an assignment
+  made when filing, not evidence; what a document proves is said in a Source
+  note.
+- Both scripts run dry unless `--write` is given, and report every file
+  they would touch.
+
+## 7. Obsidian
 
 Open the bundle root as a vault. Three settings keep the files portable
 (Settings → Files and links): **Use [[Wikilinks]]** off · **New link
@@ -158,8 +207,9 @@ Graph view, colour groups — each group is a search query:
 
 | Group | Query |
 |-------|-------|
-| Persons | `[type:Person]` |
-| Families | `[type:Family]` |
+| Not yet evaluated | `[conclusion:ungeprüft]` |
+| Persons | `[type:Person] -[conclusion:ungeprüft]` |
+| Families | `[type:Family] -[conclusion:ungeprüft]` |
 | Sources | `[type:Source]` |
 | Places | `[type:Place]` |
 | Hypotheses | `[type:Hypothesis]` |
@@ -174,6 +224,7 @@ Views, typed into the graph's filter:
 | The tree with its evidence | `[type:Person] OR [type:Family] OR [type:Source]` |
 | Readings still to check at the image | `[type:Source] -[verified]` |
 | Open questions | `[type:Hypothesis] OR [conclusion:möglich] OR [conclusion:ungeklärt]` |
+| The tree as far as it is evaluated | `([type:Person] OR [type:Family]) -[conclusion:ungeprüft]` |
 
 - Local graph of a person at depth 2: the family group with its records.
   Depth 3 adds everyone named in the same records — the cluster.
@@ -187,7 +238,7 @@ Views, typed into the graph's filter:
 The graph shows what is linked, not what is true. It is a view of the notes;
 the master tree stays where the working setup says it is.
 
-## 7. Prüfen / Checking
+## 8. Prüfen / Checking
 
 ```bash
 python3 scripts/okf_check.py <bundle-root> [--lang de|en] [--json]
@@ -198,9 +249,11 @@ values, a proof status written into `status`, wikilinks and absolute links,
 missing link targets, person-to-person links, persons or families below
 *wahrscheinlich*, person links out of an unchecked reading of handwriting,
 and lines that say "belegt" while citing a reading nobody has checked. Run
-it after each batch of new notes. Clean means consistent, not correct.
+it after each batch of new notes. Clean means consistent, not correct. The
+summary counts persons and families by `conclusion` — how much of the tree
+is evaluated, and how much is still `ungeprüft`.
 
-## 8. Beispiel / Example
+## 9. Beispiel / Example
 
 `evals/fixtures/okf-beispiel/` — twelve notes with invented data: a proven
 baptism, a namesake known only from an index, and a marriage entry whose
