@@ -15,6 +15,8 @@ Your goal is to extract **every durable, verifiable fact** in the document — e
 - List every distinct organization/party involved (sender, recipient, employer, insurer, agency, bank, …) by name, even briefly — do not silently drop one from a multi-employer or multi-party document.
 - Body: Use clear headings, bullet points for facts, sections for context/relationships. Include explicit markdown links where relevant.
 - Be precise and conservative about interpretation, not about completeness: if the *meaning* of something is uncertain, note that uncertainty rather than guessing — but still record the verbatim value. Never omit an identifier, date, or amount because you're short on space.
+- Mark an uncertain value briefly next to it (for example `(unsicher)` or `(OCR unklar)`), but never write about the scan, the OCR quality, the page layout, column order or how the document was captured, and add no separate section about data quality or uncertainties. A value too garbled to read is left out, not described.
+- Write dates exactly as precise as the document gives them: a two-digit year stays two-digit (`23.4.26`, not `23.04.2026`) unless the document itself states the full year somewhere.
 - Enrich rather than duplicate: If something relates to known concepts, reference or link instead of creating orphans.
 - Provenance is critical: Always include `source` pointing back to the original document.
 - For people/events: Extract names, dates, relationships, locations with high fidelity.
