@@ -28,6 +28,7 @@ from app.services.prompts import (
     load_extraction_prompt,
     load_fact_verification_prompt,
     load_folder_summary_prompt,
+    load_pdf_page_transcription_prompt,
     load_synthesis_matter_prompt,
     load_synthesis_overview_prompt,
     load_vision_extraction_prompt,
@@ -134,6 +135,33 @@ class LLMClient:
             },
         ]
         return self._complete(messages, self.vision_model, user_text, payload_bytes=len(image_bytes))
+
+    def transcribe_page_image(self, image_bytes: bytes, *, context: str = "", mime_type: str = "image/jpeg") -> str:
+        """Transcribe one rendered PDF page verbatim via the vision model (replaces local OCR).
+
+        Unlike `describe_image` there is no scene description: the output stands in for an OCR
+        text layer. `context` (file and page) only goes into the call log, never into the prompt,
+        so the model cannot echo it into the transcript.
+        """
+        if self.vision_model is None:
+            raise LLMClientError("transcribe_page_image called without a configured vision_model")
+        data_url = f"data:{mime_type};base64,{base64.b64encode(image_bytes).decode('ascii')}"
+        messages: list[dict[str, Any]] = [
+            {"role": "system", "content": load_pdf_page_transcription_prompt()},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Transcribe this page."},
+                    {"type": "image_url", "image_url": {"url": data_url}},
+                ],
+            },
+        ]
+        return self._complete(
+            messages,
+            self.vision_model,
+            f"PDF page: {context}" if context else "PDF page",
+            payload_bytes=len(image_bytes),
+        )
 
     def _complete(
         self,

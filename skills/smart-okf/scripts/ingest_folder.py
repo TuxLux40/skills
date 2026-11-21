@@ -52,6 +52,16 @@ def main() -> None:
         "its marker_single binary as a prerequisite.",
     )
     parser.add_argument(
+        "--pdf-vision",
+        dest="pdf_vision",
+        action="store_true",
+        default=None,
+        help="Transcribe PDFs with --vision-model instead of marker/OCRmyPDF/tesseract: good text "
+        "layers as is, scanned pages rendered and read by the model. Default: pdf_vision from "
+        "config/env (SMART_OKF_PDF_VISION).",
+    )
+    parser.add_argument("--no-pdf-vision", dest="pdf_vision", action="store_false", help="Turn --pdf-vision off.")
+    parser.add_argument(
         "--verify-host",
         default=None,
         help="OpenAI-compatible server URL for mandatory fact verification (default: "
@@ -114,14 +124,24 @@ def main() -> None:
     # this only picks which model does the checking.
     verify_host: str | None = args.verify_host or (config.verify_host if config is not None else None) or host
     verify_model: str | None = args.verify_model or (config.verify_model if config is not None else None) or model
-    use_marker = not args.no_marker and (config.use_marker if config is not None else True)
+    pdf_vision_setting = (
+        args.pdf_vision if args.pdf_vision is not None else (config.pdf_vision if config is not None else False)
+    )
+    if pdf_vision_setting and vision_model is None:
+        parser.error("--pdf-vision / pdf_vision needs a vision model (--vision-model or SMART_OKF_VISION_MODEL)")
+        return
+    pdf_vision = bool(pdf_vision_setting)
+    # With PDF vision no PDF goes through marker, so marker need not be installed.
+    use_marker = not pdf_vision and not args.no_marker and (config.use_marker if config is not None else True)
     if use_marker and not marker_available():
         parser.error(
             "marker_single not found on PATH but marker extraction is enabled (default). "
             "Install it (pipx install marker-pdf) or pass --no-marker for pdfplumber/OCRmyPDF only."
         )
         return
-    options = TranscriptionOptions(use_marker=use_marker)
+    options = TranscriptionOptions(use_marker=use_marker, pdf_vision=pdf_vision)
+    if pdf_vision:
+        print(f"PDF transcription: vision model {vision_model} (no local OCR)", file=sys.stderr)
     rules = GatingRules(
         exclude_patterns=list(config.exclude_patterns) if config is not None else [],
         low_priority_patterns=list(config.low_priority_patterns) if config is not None else [],

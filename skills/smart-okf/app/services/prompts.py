@@ -4,12 +4,14 @@ from app.constants import (
     DEFAULT_EXTRACTION_PROMPT,
     DEFAULT_FACT_VERIFICATION_PROMPT,
     DEFAULT_FOLDER_SUMMARY_PROMPT,
+    DEFAULT_PDF_PAGE_TRANSCRIPTION_PROMPT,
     DEFAULT_SYNTHESIS_MATTER_PROMPT,
     DEFAULT_SYNTHESIS_OVERVIEW_PROMPT,
     DEFAULT_VISION_EXTRACTION_PROMPT,
     EXTRACTION_PROMPT_FILE,
     FACT_VERIFICATION_PROMPT_FILE,
     FOLDER_SUMMARY_PROMPT_FILE,
+    PDF_PAGE_TRANSCRIPTION_PROMPT_FILE,
     PROMPTS_DIR,
     SYNTHESIS_MATTER_PROMPT_FILE,
     SYNTHESIS_OVERVIEW_PROMPT_FILE,
@@ -38,6 +40,11 @@ def load_folder_summary_prompt() -> str:
 def load_vision_extraction_prompt() -> str:
     """Load the system prompt used to transcribe + describe images via a vision-capable model."""
     return load_prompt(VISION_EXTRACTION_PROMPT_FILE, fallback=DEFAULT_VISION_EXTRACTION_PROMPT)
+
+
+def load_pdf_page_transcription_prompt() -> str:
+    """Load the system prompt used to transcribe one rendered PDF page via a vision-capable model."""
+    return load_prompt(PDF_PAGE_TRANSCRIPTION_PROMPT_FILE, fallback=DEFAULT_PDF_PAGE_TRANSCRIPTION_PROMPT)
 
 
 def load_synthesis_overview_prompt() -> str:

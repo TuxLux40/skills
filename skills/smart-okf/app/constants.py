@@ -106,6 +106,13 @@ DEFAULT_VISION_EXTRACTION_PROMPT = (
     "Then briefly describe the scene (setting, objects, what kind of document/photo this is)."
 )
 
+PDF_PAGE_TRANSCRIPTION_PROMPT_FILE = "pdf_page_transcription.md"
+DEFAULT_PDF_PAGE_TRANSCRIPTION_PROMPT = (
+    "Transcribe every legible piece of text on this scanned document page verbatim, in reading "
+    "order, tables as Markdown tables. Copy numbers, dates and names exactly; mark illegible "
+    "parts with [unclear]. Output only the transcription, no remarks or descriptions."
+)
+
 FACT_VERIFICATION_PROMPT_FILE = "fact_verification.md"
 DEFAULT_FACT_VERIFICATION_PROMPT = (
     "You verify that an extraction accurately reflects its source. Given SOURCE TEXT and "

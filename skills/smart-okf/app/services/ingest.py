@@ -33,7 +33,8 @@ from app.services.chunking import chunk_text
 from app.services.fact_verification import FactVerificationResult, verify_extraction
 from app.services.gating import GatingRules, is_blocked_for_remote, is_excluded
 from app.services.llm_client import LLMClient
-from app.services.transcription import is_supported_document, transcribe_file
+from app.services.pdf_vision import transcribe_pdf_with_vision
+from app.services.transcription import _raise_if_encrypted, is_supported_document, transcribe_file
 from app.services.transcription_options import DEFAULT_TRANSCRIPTION, LIGHT_TRANSCRIPTION, TranscriptionOptions
 from app.types import FrontmatterPatch
 
@@ -144,8 +145,14 @@ def extract_document(
     verification runs even when no separate verifier is configured.
     """
     context = str(file_path.relative_to(root))
-    if file_path.suffix.lower() in IMAGE_DOCUMENT_SUFFIXES and client.vision_model is not None:
+    vision_model = getattr(client, "vision_model", None)
+    if file_path.suffix.lower() in IMAGE_DOCUMENT_SUFFIXES and vision_model is not None:
         raw_text = client.describe_image(file_path, context=context)
+    elif file_path.suffix.lower() == ".pdf" and options.pdf_vision and vision_model is not None:
+        _raise_if_encrypted(file_path)
+        raw_text = transcribe_pdf_with_vision(
+            file_path, lambda png, label: client.transcribe_page_image(png, context=label), context=context
+        )
     else:
         raw_text = transcribe_file(file_path, options)
     if not raw_text.strip():

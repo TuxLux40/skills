@@ -192,6 +192,12 @@ class SmartOkfConfig(BaseSettings):
     prerequisite alongside tesseract/ghostscript. Set false (CLI: `--no-marker`) to opt
     out and use plain pdfplumber/OCRmyPDF instead. See README.md."""
 
+    pdf_vision: bool = False
+    """Transcribe PDFs with `vision_model` instead of marker/OCRmyPDF/tesseract (env
+    `SMART_OKF_PDF_VISION`, CLI `--pdf-vision`/`--no-pdf-vision`). Good text layers are used as
+    is; scanned or broken pages are rendered with pdftoppm and read by the vision model. Needs
+    `vision_model`; turns marker off for PDFs. See app/services/pdf_vision.py."""
+
     vision_model: str | None = None
     """Vision-capable model name for standalone image ingest (handwriting transcription +
     scene description), served by the same `llm_host`. None (default) falls back to
